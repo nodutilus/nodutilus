@@ -1,0 +1,12 @@
+{
+  "name": "ndk-source-code",
+  "description": "[REPO ONLY]",
+  "repository": "github:nd-toolkit/source-code",
+  "license": "Unlicense",
+  "devDependencies": {
+    "ndk-source-builder": "github:nd-toolkit/source-builder"
+  },
+  "scripts": {
+    "build": "node node_modules/ndk-source-builder"
+  }
+}

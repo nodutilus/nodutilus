@@ -1,1 +1,1 @@
-# NDK Source Code [![CodeFactor](https://www.codefactor.io/repository/github/nd-toolkit/source-code/badge)](https://www.codefactor.io/repository/github/nd-toolkit/source-code)
+# NDK Source Code [![Build Status](https://travis-ci.com/nd-toolkit/source-code.svg?branch=master)](https://travis-ci.com/nd-toolkit/source-code) [![CodeFactor](https://www.codefactor.io/repository/github/nd-toolkit/source-code/badge)](https://www.codefactor.io/repository/github/nd-toolkit/source-code)

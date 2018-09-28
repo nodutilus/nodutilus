@@ -6,4 +6,4 @@
 [cf_badge]: https://www.codefactor.io/repository/github/nd-toolkit/source-code/badge
 [cf_home]: https://www.codefactor.io/repository/github/nd-toolkit/source-code
 
-# [![LOGO][logo22]][home_org] NDK Source Code  [![Build][ts_badge]][ts_home] [![CodeFactor][cf_badge]][cf_home]
+# [![LOGO][logo22]][home_org] NDK Source Code [![Build][ts_badge]][ts_home] [![CodeFactor][cf_badge]][cf_home]

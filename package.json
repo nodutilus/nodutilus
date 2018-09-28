@@ -4,10 +4,12 @@
   "description": "[REPO ONLY]",
   "repository": "github:nd-toolkit/source-code",
   "license": "Unlicense",
-  "dependencies": {
-    "ndk-source-builder": "github:nd-toolkit/source-builder"
-  },
+  "main": "node_modules/ndk-source-builder/builder.js",
+  "files": ["@ndk", "logo", "tests"],
   "scripts": {
     "build": "node node_modules/ndk-source-builder"
+  },
+  "dependencies": {
+    "ndk-source-builder": "github:nd-toolkit/source-builder"
   }
 }

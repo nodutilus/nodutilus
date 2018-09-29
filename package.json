@@ -5,7 +5,11 @@
   "repository": "github:nd-toolkit/source-code",
   "license": "Unlicense",
   "main": "node_modules/ndk-source-builder/builder.js",
-  "files": ["@ndk", "logo", "tests"],
+  "files": [
+    "@ndk",
+    "logo",
+    "tests"
+  ],
   "scripts": {
     "build": "node node_modules/ndk-source-builder"
   },

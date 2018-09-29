@@ -127,7 +127,7 @@ function __logCommandHelp(command) {
       commandArgsOpts.push(opt);
     }
   }
-  console.log('  ', command.name, ...commandArgsOpts);
+  console.log('  ', command.name || '<без имени>', ...commandArgsOpts);
   console.log('    ', command.description, '\n');
 }
 

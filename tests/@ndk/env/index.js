@@ -9,7 +9,7 @@ const { envKeys, appRoot, appPackage, appName, appHome } = require('@ndk/env');
 
 const thisAppRoot = resolve(__dirname, './../../..');
 const thisAppPackage = join(thisAppRoot, 'package.json');
-const thisAppName = 'ndk-master';
+const thisAppName = require(thisAppPackage).name;
 const thisAppHome = join(homedir(), '.' + thisAppName);
 const myAppRoot = resolve(thisAppRoot, './tests/resources/@ndk/env/my-app');
 const myAppPackage = join(myAppRoot, 'package.json');

@@ -1,5 +1,10 @@
 # Зависимости
-node_modules
+/node_modules
 
+# Папка сборки модулей
+/build
+
+# Зависимости в тестах
+/tests/node_modules
 # Отчеты о покрытии тестами
-.nyc_output
+/.nyc_output

@@ -16,5 +16,10 @@
   },
   "dependencies": {
     "ndk-source-builder": "github:nd-toolkit/source-builder"
+  },
+  "nyc": {
+    "exclude": [
+      "!**/tests/node_modules/"
+    ]
   }
 }

@@ -8,3 +8,4 @@
 /tests/node_modules
 # Отчеты о покрытии тестами
 /.nyc_output
+/coverage

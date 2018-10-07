@@ -12,3 +12,10 @@
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/1721e518be7244ecb10f1558ae973c93)](https://app.codacy.com/app/nd-toolkit/source-code)
 [![Codacy Badge](https://api.codacy.com/project/badge/Coverage/1721e518be7244ecb10f1558ae973c93)](https://app.codacy.com/app/nd-toolkit/source-code)
+
+[![Maintainability](https://api.codeclimate.com/v1/badges/a92ab736505cb4df1add/maintainability)](https://codeclimate.com/github/nd-toolkit/source-code)
+[![Code Climate](https://img.shields.io/codeclimate/maintainability-percentage/nd-toolkit/source-code.svg)](https://codeclimate.com/github/nd-toolkit/source-code)
+[![Code Climate](https://img.shields.io/codeclimate/maintainability/nd-toolkit/source-code.svg)](https://codeclimate.com/github/nd-toolkit/source-code)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/a92ab736505cb4df1add/test_coverage)](https://codeclimate.com/github/nd-toolkit/source-code)
+[![Code Climate](https://img.shields.io/codeclimate/coverage/nd-toolkit/source-code.svg)](https://codeclimate.com/github/nd-toolkit/source-code)
+[![Code Climate](https://img.shields.io/codeclimate/coverage-letter/nd-toolkit/source-code.svg)](https://codeclimate.com/github/nd-toolkit/source-code)

@@ -7,6 +7,6 @@
 # Зависимости в тестах
 /tests/node_modules
 # Отчеты о покрытии тестами
-/cc-test-reporter
+/.cc-test-reporter
 /.nyc_output
 /coverage

@@ -7,11 +7,11 @@ const { Test } = require('@ndk/test');
 const { equal, deepEqual } = require('assert').strict;
 const { envKeys, appRoot, appPackage, appName, appHome } = require('@ndk/env');
 
-const thisAppRoot = resolve(__dirname, './../../..');
+const thisAppRoot = resolve(__dirname, './../../../..');
 const thisAppPackage = join(thisAppRoot, 'package.json');
 const thisAppName = require(thisAppPackage).name;
 const thisAppHome = join(homedir(), '.' + thisAppName);
-const myAppRoot = resolve(thisAppRoot, './tests/resources/@ndk/env/my-app');
+const myAppRoot = resolve(thisAppRoot, './source/tests/resources/@ndk/env/my-app');
 const myAppPackage = join(myAppRoot, 'package.json');
 const myAppName = 'my-app';
 const myAppHome = join(homedir(), '.' + myAppName);

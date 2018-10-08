@@ -1,5 +1,5 @@
 [logo_source]: https://www.tinygraphs.com/labs/isogrids/hexa16/igor?theme=frogideas&numcolors=4&size=48&fmt=svg
-[logo22]:      ./logo/logo22.png
+[logo22]:      ./source/logo/logo22.png
 [home_org]:    https://github.com/nd-toolkit
 [ts_badge]:    https://travis-ci.com/nd-toolkit/source-code.svg?branch=master
 [ts_home]:     https://travis-ci.com/nd-toolkit/source-code

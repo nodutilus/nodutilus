@@ -19,7 +19,7 @@
   },
   "nyc": {
     "exclude": [
-      "!**/tests/node_modules/"
+      "!**/source/node_modules/"
     ]
   }
 }

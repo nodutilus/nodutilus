@@ -20,6 +20,11 @@
   "nyc": {
     "exclude": [
       "!**/source/node_modules/"
-    ]
+    ],
+    "reporter": [
+      "lcovonly"
+    ],
+    "temp-directory": "./build/nyc_output",
+    "report-dir": "./build/coverage"
   }
 }

@@ -1,0 +1,466 @@
+{
+  "ci_service": {
+    "branch": "master",
+    "build_identifier": "150582716",
+    "build_url": "",
+    "commit_sha": "ee837dfdd9d2b0240defdc9b4d86279bf30b4a6d",
+    "committed_at": 1539083308,
+    "name": "true"
+  },
+  "environment": {
+    "gem_version": "2.6.12",
+    "package_version": "",
+    "pwd": "/home/travis/build/nd-toolkit/source-code",
+    "prefix": "/home/travis/build/nd-toolkit/source-code",
+    "rails_root": "",
+    "reporter_version": "0.6.3",
+    "simplecov_root": ""
+  },
+  "git": {
+    "branch": "master",
+    "head": "ee837dfdd9d2b0240defdc9b4d86279bf30b4a6d",
+    "committed_at": 1539083308
+  },
+  "covered_percent": 46.95156695156695,
+  "covered_strength": 0,
+  "line_counts": {
+    "missed": 931,
+    "covered": 824,
+    "total": 1755
+  },
+  "source_files": [
+    {
+      "blob_id": "cd75f783bad6b00a863e1acb49ee403827c9b79a",
+      "coverage": "[null,null,1,1,null,1,1,1,null,1,null,null,1,null,null,1,null,null,null,1,1,1,null,1,0,null,null,null,null,1,0,null,null,null,1,1,null,0,0,null,0,0,null,0,0,null,0,0,null,0,null,null,null,2,2,null,null,0,0]",
+      "covered_percent": 56.666666666666664,
+      "covered_strength": 0.6333333333333333,
+      "line_counts": {
+        "missed": 13,
+        "covered": 17,
+        "total": 30
+      },
+      "name": "source/node_modules/@ndk/cfg/ndk.cfg.js"
+    },
+    {
+      "blob_id": "a53af5eb1ffa65ff48ce8e7f4f4a81d7f663d0df",
+      "coverage": "[null,null,1,1,1,1,null,1,1,1,1,1,1,1,1,1,null,null,null,null,null,null,null,null,null,null,null,0,0,0,null,null,null,0,0,0,0,0,null,0,0,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0,null,0,0,null,0,null,null,0,null,null,null,0,0,0,null,null,null,null,null,null,null,null,null,null,null,null,0,0,0,null,null,null,null,null,null,null,null,null,null,null,0,0,0,0,null,0,null,null,0,0,null,null,0,null,null,null,null,null,null,null,null,null,null,0,0,0,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0,0,null,0,0,0,0,0,null,0,0,null,null,null,null,null,null,null,null,null,null,null,null,null,0,null,null,null,null,null,null,null,null,null,null,0,0,0,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0,null,0,0,null,null,null,0,0,0,0,0,0,0,0,null,null,0,0,0,0,0,0,null,null,null,0,0,0,null,0,0,0,null,0,0,null,null,0]",
+      "covered_percent": 14.942528735632186,
+      "covered_strength": 0.14942528735632185,
+      "line_counts": {
+        "missed": 74,
+        "covered": 13,
+        "total": 87
+      },
+      "name": "source/node_modules/@ndk/fs/structure.js"
+    },
+    {
+      "blob_id": "5ee4d795384b7758635c33917b94f0d83c7a40b1",
+      "coverage": "[null,null,1,null,null,null,null,null,1]",
+      "covered_percent": 100,
+      "covered_strength": 1,
+      "line_counts": {
+        "missed": 0,
+        "covered": 2,
+        "total": 2
+      },
+      "name": "source/node_modules/@ndk/git/ndk.git.js"
+    },
+    {
+      "blob_id": "9efb4bdec17d3c1ed72d8fe3eef1b8965927cb53",
+      "coverage": "[null,null,1,1,1,1,1,1,1]",
+      "covered_percent": 100,
+      "covered_strength": 1,
+      "line_counts": {
+        "missed": 0,
+        "covered": 7,
+        "total": 7
+      },
+      "name": "source/node_modules/@ndk/ps/TaskMaster/consts.js"
+    },
+    {
+      "blob_id": "978e274ce4d761d769d5c853465e5b96d0166a9c",
+      "coverage": "[null,null,1,null,null,null,null,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0,0,0,null,0,null,null,null,null,null,null,null,null,null,null,null,null,null,0,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0]",
+      "covered_percent": 16.666666666666664,
+      "covered_strength": 0.16666666666666666,
+      "line_counts": {
+        "missed": 10,
+        "covered": 2,
+        "total": 12
+      },
+      "name": "source/node_modules/@ndk/fn/PromiseEventEmitter.js"
+    },
+    {
+      "blob_id": "a1824f7929a54eddee79a0c9b12c44b7afb10189",
+      "coverage": "[null,null,1,1,1,null,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,1]",
+      "covered_percent": 100,
+      "covered_strength": 1,
+      "line_counts": {
+        "missed": 0,
+        "covered": 11,
+        "total": 11
+      },
+      "name": "source/node_modules/@ndk/fs/promisify.js"
+    },
+    {
+      "blob_id": "642cf48d0adb48ed1ac132202024ee8e1ba1569d",
+      "coverage": "[null,1,null,1,null,null,null,null,null,1,1]",
+      "covered_percent": 100,
+      "covered_strength": 1,
+      "line_counts": {
+        "missed": 0,
+        "covered": 4,
+        "total": 4
+      },
+      "name": "source/tests/@ndk/fn/index.js"
+    },
+    {
+      "blob_id": "098cd9192e4690ee98641f947c434a91e77511dd",
+      "coverage": "[null,1,1,null,null,null,null,null,null,null,null,6,6,null,null,null,null,null,null,null,null,9,null,null,null,null,null,null,null,null,null,null,null,null,2,null,null,8,null,null,null,null,1,null,null,null,null,null,null,null,null,null,6,null,null,null,1,1,1,1,1,1,1,1,1,1,0,null,1,1,1,1,1,null,null,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,null,null,null,1,1,1,null,null,null,null,1,1,1,1,1,0,null,1,1,1,1,null,null,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,null,null,null,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,null,null,null,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,null,null,null,1,1,1,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,null,null,null,null,1,1]",
+      "covered_percent": 98.72611464968153,
+      "covered_strength": 1.1847133757961783,
+      "line_counts": {
+        "missed": 2,
+        "covered": 155,
+        "total": 157
+      },
+      "name": "source/tests/@ndk/test/index.js"
+    },
+    {
+      "blob_id": "886d760e747a55769cae8068cafef454454abeab",
+      "coverage": "[null,null,null,1,null,null,null,null,null,null,null,null,null,102,102,102,null,null,null,null,null,null,84,null,null,null,null,null,null,null,57,57,57,1,null,56,null,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,57,11,null,46,null,null,null,null,null,null,null,null,null,null,null,null,null,null,2,2,null,null,null,null,null,null,null,2,null,null,null,null,null,null,null,1,null,null,null,null,null,null,1,1,1,null,1,null,null,null,null,null,null,null,null,null,null,null,4,4,4,4,4,null,null,null,null,null,null,null,null,5,5,5,5,5,null,null,null,null,null,null,null,null,43,43,43,43,43,43,null,null,1,1,1,1,1]",
+      "covered_percent": 100,
+      "covered_strength": 24.488372093023255,
+      "line_counts": {
+        "missed": 0,
+        "covered": 43,
+        "total": 43
+      },
+      "name": "source/node_modules/@ndk/fn/datetime.js"
+    },
+    {
+      "blob_id": "d6aac25b03b9a2b05cc908e6832a6f1b5343be59",
+      "coverage": "[null,null,1,1,1,null,null,null,null,null,14,null,null,null,1,1,1,1,1,1,null,1,1,1,1,1,1,null,null,null,1,1,1,null,1,1,1,null,null,null,1,1,1,1,1,1,1,null,1,1,null,null,null,1,1,1,1,1,1,1,1,1,1,1,1,null,1,1,1,1,1,1,1,1,1,1,1,1,null,null,null,1,1,null,1,1,null,null,null,1,1,1,null,1,1,1,null,null,null,1,1,1,1,1,1,1,1,1,1,1,1,1,1,null,null,null,1,1,1,null,null,null,1,null,null,null,null,null,1,1,1,1,null,1,1,1,null,null,null,1,1,1,1,null,null,null,null,1,null,null,1,null,null,null,1,null,null,1,null,null,1,null,null,1,null,null,null,null,null,null,null,1,1]",
+      "covered_percent": 100,
+      "covered_strength": 1.1274509803921569,
+      "line_counts": {
+        "missed": 0,
+        "covered": 102,
+        "total": 102
+      },
+      "name": "source/tests/@ndk/type/index.js"
+    },
+    {
+      "blob_id": "89867cbbe325940c88395d358169459f2c4e9cf1",
+      "coverage": "[null,null,null,1,1,null,null,null,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,0,null,1,1,1,1,1,1,1,1,1,1,1,1,null,null,1,null,null,null,null,null,null,null,null,null,0,0,0,null,0,0,0,null,0,0,0,null,0,0,null,null,null,null,null,null,null,0,0,0,0,0,null,0,null,null,null,0,0,0,0,0,0,0,null,null,0,0,0,0,0,null,null,0,0,null,0,null,0,null,null,0,0,null,null,null,null,0,0,0,null,null,0,0,0,0,0,null,0,0,0,null,0,null,null,0,0,null,null,null,null,null,0,0,0,0,0,0,0,null,0,0,0,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0,0,0,0,0,0,0,null,0,0,null,0,null,null,0,0,null,null,null,null,null,null,null,null,null,0,0,0,0,0,null,0,null,0,0,null,null,null,null,null,null,null,null,null,null,null,0,0,0,null,null,0,0,null,null,null,null,null,1,1,1]",
+      "covered_percent": 19.626168224299064,
+      "covered_strength": 0.19626168224299065,
+      "line_counts": {
+        "missed": 86,
+        "covered": 21,
+        "total": 107
+      },
+      "name": "source/node_modules/@ndk/cli/ndk.cli.js"
+    },
+    {
+      "blob_id": "4abe76a22641e34261f95efa928b9671374fa215",
+      "coverage": "[null,null,1,1,null,1,1,1,1,1,1,null,1,4,null,0,null,0,0,null,null,0,0,0,0,0,0,0,null,null,4,4,null,null,1,1,null,193,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,0,null,38,0,null,0,null,null,null,null,0,null,null,0,0,0,0,0,0,0,0,null,0,null,null,1,225,225,null,null,225,38,null,null,null,0,0,0,null,0,0,0,0,0,0,0,null,0,0,null,0,null,null,0,null,null,0,null,null,0,null,null,0,0,null,null,null,null,null,0,0,0,null,0,0,0,null,null,null,0,0,0,null,0,null,0,null,null,null,1,0,0,null,0,0,0,0,0,0,0,null,0,null,null,0,null,null,0,0,null,0,null,null,null,0,0,0,0,0,0,0,null,0,0,0,0,0,0,null,0,0,null,0,0,0,null,0,0,0,null,0,null,null,1,0,0,null,0,0,0,0,0,null,0,null,null,0,null,null,0,0,null,0,null,null,null,0,0,0,0,null,0,0,null,0,0,null,0,0,null,0,0,null,0,null,0,0,0,null,null,null,0,0,0,0]",
+      "covered_percent": 17.24137931034483,
+      "covered_strength": 6.703448275862069,
+      "line_counts": {
+        "missed": 120,
+        "covered": 25,
+        "total": 145
+      },
+      "name": "source/node_modules/@ndk/console/ndk.console.js"
+    },
+    {
+      "blob_id": "3d5d76ded91142d91229791ae7219051ffd66bfb",
+      "coverage": "[null,null,2]",
+      "covered_percent": 100,
+      "covered_strength": 2,
+      "line_counts": {
+        "missed": 0,
+        "covered": 1,
+        "total": 1
+      },
+      "name": "source/tests/resources/@ndk/env/my-app/env.js"
+    },
+    {
+      "blob_id": "c1dbe4314f988bd1a8eb0bbd6dc3d8f2293c8f79",
+      "coverage": "[null,1,1,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,null,null,1,1]",
+      "covered_percent": 100,
+      "covered_strength": 1,
+      "line_counts": {
+        "missed": 0,
+        "covered": 6,
+        "total": 6
+      },
+      "name": "source/tests/index.js"
+    },
+    {
+      "blob_id": "bdb62f1d3827f1f4bb2229589e468a5bef46ec53",
+      "coverage": "[null,null,1,1,1,1,1,1,1,1,1]",
+      "covered_percent": 100,
+      "covered_strength": 1,
+      "line_counts": {
+        "missed": 0,
+        "covered": 9,
+        "total": 9
+      },
+      "name": "source/node_modules/@ndk/cli/strings.js"
+    },
+    {
+      "blob_id": "c7ab3e951b2d40b122a556c1b8b874376bc1c649",
+      "coverage": "[null,null,1,1,1,1,1,1,1,null,1,1,1,1,1,1,null,1,1,null,1,1,null,1,1,1,null,1,1,1,1,1,null,null,0,0,0,null,0,0,0,null,0,0,0,null,null,null,null,0,0,0,0,null,null,null,null,0,0,0,0,null,null,null,null,0,0,0,0,null,null,null,null,0,0,0,0,0,0,0,null,0,0,0,null,0,0,0,0,null,0,0,null,null,null,1,1,null,null,0,0,0,0,0,null,null,null,0,0,0,0,null,null,null,null,0,0,0,0,null,null,null,0,0,null,0,0,0,0,null,0,0,0,0,0,0,null,0,0,0,null,null,null,0,0,null,0,0,0,0,null,0,0,0,0,0,null,null,1,1,null,null,0,0,0,0,0,null,null,null,0,0,0,0,null,null,null,null,0,0,0,null,0,null,0,null,null,null,1,null,null,0,0,0,0,0,0,0,null,0,0,0,0,null,0,0,null,0,0,null,0,0,0,0,null,null,1,null,null,0,0,0,0,0,0,0,0,0,null,null,null,0,0,0,0,null,null,null,null,0,0,0,null,0]",
+      "covered_percent": 19.745222929936308,
+      "covered_strength": 0.19745222929936307,
+      "line_counts": {
+        "missed": 126,
+        "covered": 31,
+        "total": 157
+      },
+      "name": "source/node_modules/@ndk/log/ndk.log.js"
+    },
+    {
+      "blob_id": "7203f8934799d71b9cf5f42129d087a9ccebe240",
+      "coverage": "[null,null,1,1,1,1,1,1,1,1,null,1,null,null,null,null,null,null,null,null,null,null,0,0,null,0,null,null,null,null,null,null,null,0,0,0,0,0,0,0,0,null,0,null,0,0,0,0,null,0,null,0,0,null,0,0,0,0,null,null,0,0,0,0,0,0,0,null,null,null,null,null,null,null,null,null,null,null,0,0,null,0,0,0,0,0,0,0,0,0,null,null,null,null,0,0,0,0,0,null,null,null,0,null,null,null,null,null,null,0,0,null,null,0,0,0,0,0,null,null,0,null,0,0,null,null,0,0,null,null,null,null,null,null,0,0,0,null,null,0,null,null,null,null,null,null,0,0,0,0,null,0,null,null,null,null,null,null,null,0,0,null,0,0,0,null,0,0,0,null,null,null,null,0,0,0,0,0,0,0,null,0,0,null,null,null,null,null,null,0,0,0,null,0,0,0,0,null,null,null,null,null,0,0,null,null,null,0,0,null,null,null,0,null,null,null,0,0,0,0,0,0,null,0,null,null,null,null,0,0,0,0,0,0,null,0,null,null,0,null,null,null,null,1,1]",
+      "covered_percent": 8.94308943089431,
+      "covered_strength": 0.08943089430894309,
+      "line_counts": {
+        "missed": 112,
+        "covered": 11,
+        "total": 123
+      },
+      "name": "source/node_modules/@ndk/ps/TaskMaster/index.js"
+    },
+    {
+      "blob_id": "19fa04c43b5923ee6ba32ff777235d27f36c20fe",
+      "coverage": "[null,null,null,1,1,null,1,1,1,null,null,null,null,null,20,20,12,null,null,null,null,113,503,null,null,null,92,92,92,92,18,18,18,null,92,null,null,null,58,219,219,219,31,null,188,null,null,219,null,null,null,null,9,25,25,25,7,7,24,null,null,18,null,null,25,null,null,null,null,7,1,1,0,null,null,null,null,null,null,null,14,14,14,8,65,17,null,14,14,null,0,0,null,14,7,null,14,null,null,null,60,60,60,52,null,8,8,8,8,null,60,60,60,null,null,null,20,20,20,20,74,74,null,74,14,null,60,null,74,8,null,74,null,null,20,20,20,20,null,null,null,null,null,null,2,3,3,null,null,null,null,null,null,1,1,1,1,1,1,0,30,7,null,null,null,2,null,null,null,0,null,null,null,37,null,null,null,67,null,null,null,9,null,null,null,1,null,null,null,0,null,null,null,1,1,1,null,null,null,null,null,null,null,null,null,null,0,0,null,null,null,30,null,null,null,null,null,null,null,null,null,null,7,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,1,1]",
+      "covered_percent": 92.5233644859813,
+      "covered_strength": 37.149532710280376,
+      "line_counts": {
+        "missed": 8,
+        "covered": 99,
+        "total": 107
+      },
+      "name": "source/node_modules/@ndk/test/ndk.test.js"
+    },
+    {
+      "blob_id": "345a5a221aa804aabaa9e5a7840feff066ed196e",
+      "coverage": "[null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,55,55,null,31,27,null,4,null,12,10,6,null,8,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,35,35,null,18,1,null,13,null,4,null,null,null,null,1,1]",
+      "covered_percent": 100,
+      "covered_strength": 17.61111111111111,
+      "line_counts": {
+        "missed": 0,
+        "covered": 18,
+        "total": 18
+      },
+      "name": "source/node_modules/@ndk/type/ndk.type.js"
+    },
+    {
+      "blob_id": "aed36fea6ac1521ef200a523ce9e0d24921219f1",
+      "coverage": "[null,null,1,4]",
+      "covered_percent": 100,
+      "covered_strength": 2.5,
+      "line_counts": {
+        "missed": 0,
+        "covered": 2,
+        "total": 2
+      },
+      "name": "source/node_modules/@ndk/type/strings.js"
+    },
+    {
+      "blob_id": "4c18f2cc3f551d83b86031218bacf480cba96ee5",
+      "coverage": "[null,null,null,null,null,null,0,0,null,null,null,null,0,0,0,null,0,null,null,null,null,null,null,null,0,0,null,null,null,null,0,0,0,0,0,0,0,null,null,0,null,null,null,null,null,null,null,0,null,0,0,0,null,0,0,null,0,0,0,null,0,null,0,0,0,0,0,null,null,null,null,0,0,null,0,null,0,null,null,null,0,0,0,null,0,null,null,null,0,0,0,null,0,null,null,null,0,null,null,null,0,null,null,null,0,null,null,null,0,0,null,null,null,null,null,null,0,null,null,null,0,0,null,null,null,null,1,null,null,0,0,null,0,0,0,0,0,0,null,0,null,0,null,null,null,null,null,0,null,null,null,null,1,0,null,null,1,0,null,null,1,null,0,null,0,null,null,null,1,1,1,1]",
+      "covered_percent": 10.81081081081081,
+      "covered_strength": 0.10810810810810811,
+      "line_counts": {
+        "missed": 66,
+        "covered": 8,
+        "total": 74
+      },
+      "name": "source/node_modules/@ndk/dom/ndk.dom.js"
+    },
+    {
+      "blob_id": "b623a0aef0e0879beb8bcee5c1bc0ed4c7ab47f7",
+      "coverage": "[null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1]",
+      "covered_percent": 100,
+      "covered_strength": 1,
+      "line_counts": {
+        "missed": 0,
+        "covered": 4,
+        "total": 4
+      },
+      "name": "source/node_modules/@ndk/fn/ndk.fn.js"
+    },
+    {
+      "blob_id": "0203d4b37fb6467f860bc7d1eb39b5f3a32d1dab",
+      "coverage": "[null,null,1,1,1,1,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,null,null,null,null,0,0,0,0,null,0,0,0,0,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,null,0,0,0]",
+      "covered_percent": 27.77777777777778,
+      "covered_strength": 0.2777777777777778,
+      "line_counts": {
+        "missed": 13,
+        "covered": 5,
+        "total": 18
+      },
+      "name": "source/node_modules/@ndk/git/cli.js"
+    },
+    {
+      "blob_id": "44eb9e63fa9319dc7626ebcd984343d90714f33d",
+      "coverage": "[null,null,1,1,null,1,null,null,null,null,null,null,null,0,0,0,0,0,0,0,null,null,null,null,0,0,null,0,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,0,0,0,0,0,0,0,0,null,0,0,0,0,0,0,0,null,0,0,0,0,0,0,0,0,null,0,0,0,0,null,0,0,0,null,0,0,0,null,0,null,0,0,0,null,null,null,0,0,0,0,0,0,null,0,null,0,0,null,0,0,null,0,null,0,0,0,null,0,0,0,0,0,0,0,0,null,0,0,0,0,null,null,0,null,0,0,0,null,0,0,null,0,0,0,null,0,0,null,0,0,null,0,0,0,null,null,null,0,0,0,0,0,0,0,null,null,0,0,0,0,0,0,0,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,0,0,0,0,0,null,0,0,0,null,0,0,null,null,null,null,0,0,null,0,null,null,null,null,0,0,null,0,null,null,null,null,0,0,null,0,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,0,0,0,0,0,null,null,null,0,0,0,null,0,null,null,null,null,0,0,null,0,null,null,null,null,null,1,null,null,0,0,0,0,0,0,null,null,0,null,null,null,0,null,null,0,0,0,null,0,null,0,0,0,null,0,0,null,0,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,0,0,0,0,0,0,0,null,0,0,null,0,0,0,0,0,0,0,0,0,0,null,0,null,null,null,0,0,null,0,0,null,0,0,null,null,null,null,0,0,null,0,null,null,null,null,0,0,null,0,null,null,null,null,0,0,null,0,null,null,null,null,0,0,null,0]",
+      "covered_percent": 4.0201005025125625,
+      "covered_strength": 0.04020100502512563,
+      "line_counts": {
+        "missed": 191,
+        "covered": 8,
+        "total": 199
+      },
+      "name": "source/node_modules/@ndk/pg/Schema.js"
+    },
+    {
+      "blob_id": "05682e882f23b5e20cbadb8d3787bf5ab453a0e9",
+      "coverage": "[null,null,1,null,null,null,null,null,1,null,null,null,null,null,1]",
+      "covered_percent": 100,
+      "covered_strength": 1,
+      "line_counts": {
+        "missed": 0,
+        "covered": 3,
+        "total": 3
+      },
+      "name": "source/node_modules/@ndk/ps/ndk.ps.js"
+    },
+    {
+      "blob_id": "a2865effea6e7b5fb75ad1c1a0cb6dd68c944946",
+      "coverage": "[null,null,6]",
+      "covered_percent": 100,
+      "covered_strength": 6,
+      "line_counts": {
+        "missed": 0,
+        "covered": 1,
+        "total": 1
+      },
+      "name": "source/tests/resources/@ndk/env/my-app/index.js"
+    },
+    {
+      "blob_id": "f2edbdcd658ce5b8766a99745d920af95c808b22",
+      "coverage": "[null,null,1,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0,null,0,0,0,0,null,0,0,null,0,0,0,0,0,0,null,0,0,0,0,null,0,0,null,null,0,null,0,0,0,0,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0,0,0,null,0,null,0,null,null,null,null,null,null,null,null,null,null,null,null,0,0,0,0,null,0,null,null,null,null,null,null,null,null,null,null,0,null,null,null,null,null,null,null,null,null,null,0,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0,null,0,0,0,null,0,0,null,null,null,null,null,null,null,null,null,0,0,0,0,null,0,null,null,0,null,null,0,0,null,null,0,0,null,null,null,null,null,null,null,null,null,null,null,null,null,0,null,null,null,null,null,null,null,null,null,null,0,null,null,null,null,null,null,null,null,null,0,null,null,null,null,null,null,null,null,null,null,null,0]",
+      "covered_percent": 4.838709677419355,
+      "covered_strength": 0.04838709677419355,
+      "line_counts": {
+        "missed": 59,
+        "covered": 3,
+        "total": 62
+      },
+      "name": "source/node_modules/@ndk/fn/TaskMaster.js"
+    },
+    {
+      "blob_id": "b72e43f3dd18f023ab5933b64c2c282a64f95cdf",
+      "coverage": "[null,null,null,1,null,1,1,1,1,null,null,null,null,null,null,null,null,null,null,null,null,0,0,0,null,0,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0,0,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0,0,null,0,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0]",
+      "covered_percent": 29.411764705882355,
+      "covered_strength": 0.29411764705882354,
+      "line_counts": {
+        "missed": 12,
+        "covered": 5,
+        "total": 17
+      },
+      "name": "source/node_modules/@ndk/fs/readwrite.js"
+    },
+    {
+      "blob_id": "5e3dbdaaba2efb4ced479a1ecbba902b10c9d7f7",
+      "coverage": "[null,null,1,null,null,null,null,null,1]",
+      "covered_percent": 100,
+      "covered_strength": 1,
+      "line_counts": {
+        "missed": 0,
+        "covered": 2,
+        "total": 2
+      },
+      "name": "source/node_modules/@ndk/pg/ndk.pg.js"
+    },
+    {
+      "blob_id": "e06aed6d5a1e372f57ab7249da9163f5512f2531",
+      "coverage": "[null,null,null,null,null,null,null,1,1,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,0,0,0,0,0,0,0,null,null,0,0,0,0,0,null,null,0,0,0,0,0,null,0,0,0,0,0,null,0,null,null,null,0,0,0,null,0,null,null,null,null,0,null,null,null,0,null,null,null,null,null,null,null,null,null,null,null,0,null,null,null,null,null,null,null,null,null,null,null,null,null,null,0,null,null,null,1,null,null,null,null,null,null,null,null,null,null,null,0,0,0,null,0,null,null,null,null,null,null,null,null,null,null,null,null,0,null,null,null,null,null,null,null,null,null,null,null,0,null,null,1,1,1]",
+      "covered_percent": 13.636363636363635,
+      "covered_strength": 0.13636363636363635,
+      "line_counts": {
+        "missed": 38,
+        "covered": 6,
+        "total": 44
+      },
+      "name": "source/node_modules/@ndk/ps/child.js"
+    },
+    {
+      "blob_id": "10b423d3732ecba4dd6e4fe0d0d508c6a5d52bc1",
+      "coverage": "[null,null,1,1,1,null,null,null,null,null,2,null,null,null,1,13,13,null,null,null,null,null,null,1,1]",
+      "covered_percent": 100,
+      "covered_strength": 3.7777777777777777,
+      "line_counts": {
+        "missed": 0,
+        "covered": 9,
+        "total": 9
+      },
+      "name": "source/tests/@ndk/all/index.js"
+    },
+    {
+      "blob_id": "7304cd464935c7d69c5fa2ac50bd6bb5347ef2b3",
+      "coverage": "[null,null,1,13,null,null,1,null,1,null,null,1,null,null,1,null,null,1,null,null,1,null,null,1,null,null,1,null,null,1,null,null,1,null,null,1,null,null,1,null,null,1,null,null,1]",
+      "covered_percent": 100,
+      "covered_strength": 1.75,
+      "line_counts": {
+        "missed": 0,
+        "covered": 16,
+        "total": 16
+      },
+      "name": "source/node_modules/@ndk/all/ndk.all.js"
+    },
+    {
+      "blob_id": "dfaa65618446972257a4e0de6fa47cb10da004c2",
+      "coverage": "[null,null,null,7,7,7,null,null,null,null,null,null,null,null,null,null,7,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,7,null,null,null,null,null,null,null,null,null,null,null,null,7,null,null,null,7,2,2,2,0,null,5,5,5,5,null,5,7,7,5,null,2,2,null,5,5,5,null,null,null,null,null,7,2,5,5,null,null,null,null,7,7,null,null,null,null,null,7,7,7,7,7,7,20,20,16,16,null,16,4,4,12,8,8,null,4,null,null,null,4,null,null,null,null,null,7,7,7,7,7,7,7]",
+      "covered_percent": 98.18181818181819,
+      "covered_strength": 6.8,
+      "line_counts": {
+        "missed": 1,
+        "covered": 54,
+        "total": 55
+      },
+      "name": "source/node_modules/@ndk/env/ndk.env.js"
+    },
+    {
+      "blob_id": "c4c4ad12ca976123df602c316e0c3e3e8d7cf521",
+      "coverage": "[null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1,null,null,null,null,null,1]",
+      "covered_percent": 100,
+      "covered_strength": 1,
+      "line_counts": {
+        "missed": 0,
+        "covered": 4,
+        "total": 4
+      },
+      "name": "source/node_modules/@ndk/fs/ndk.fs.js"
+    },
+    {
+      "blob_id": "034fda74c42c72a4d6f71180082bf735d8f50879",
+      "coverage": "[null,null,1,1,1,1,1,1,null,1,1,1,1,1,1,1,1,null,null,null,null,null,4,null,null,null,1,1,1,1,1,1,1,1,1,1,1,null,null,null,1,1,1,1,null,null,null,null,null,null,null,null,null,null,null,null,1,null,null,null,1,1,1,1,1,1,null,null,null,null,null,1,1]",
+      "covered_percent": 100,
+      "covered_strength": 1.0769230769230769,
+      "line_counts": {
+        "missed": 0,
+        "covered": 39,
+        "total": 39
+      },
+      "name": "source/tests/@ndk/env/index.js"
+    },
+    {
+      "blob_id": "c8df884f9b32ada8d5b089726153c12cccfbc3eb",
+      "coverage": "[null,1,1,1,null,null,null,null,9,null,null,null,1,1,1,1,1,1,1,1,1,1,null,null,null,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,null,null,null,1,1,1,null,null,null,1,1,1,1,null,null,null,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,null,null,null,1,1,1,null,null,null,1,1,1,1,null,null,null,1,1,1,1,null,null,null,null,1,1]",
+      "covered_percent": 100,
+      "covered_strength": 1.1025641025641026,
+      "line_counts": {
+        "missed": 0,
+        "covered": 78,
+        "total": 78
+      },
+      "name": "source/tests/@ndk/fn/datetime.js"
+    }
+  ],
+  "repo_token": "d02e53733c21a29a69c682ab677ee19af5434ec0afd89f1a81f6069ab91555d2"
+}

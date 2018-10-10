@@ -66,6 +66,14 @@ class NDKEnv extends Test {
     equal(output.appName, 'appName');
   }
 
+  ['test: EnvKeys (package.json)']() {
+    const env = Object.assign(Object.assign({}, process.env), {
+      [envKeys.appRoot]: myAppRoot
+    });
+    const output = JSON.parse(execSync(`node ${myAppRoot}`, { env }).toString());
+    equal(output.appPackage, myAppPackage);
+  }
+
 }
 
 

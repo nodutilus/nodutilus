@@ -6,9 +6,7 @@
   "license": "Unlicense",
   "main": "node_modules/ndk-source-builder/builder.js",
   "files": [
-    "@ndk",
-    "logo",
-    "tests"
+    "source"
   ],
   "scripts": {
     "build": "node node_modules/ndk-source-builder",

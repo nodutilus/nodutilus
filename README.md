@@ -19,3 +19,5 @@
 [![Test Coverage](https://api.codeclimate.com/v1/badges/a92ab736505cb4df1add/test_coverage)](https://codeclimate.com/github/nd-toolkit/source-code)
 [![Code Climate](https://img.shields.io/codeclimate/coverage/nd-toolkit/source-code.svg)](https://codeclimate.com/github/nd-toolkit/source-code)
 [![Code Climate](https://img.shields.io/codeclimate/coverage-letter/nd-toolkit/source-code.svg)](https://codeclimate.com/github/nd-toolkit/source-code)
+
+[![Coverage Status](https://coveralls.io/repos/github/nd-toolkit/source-code/badge.svg?branch=master)](https://coveralls.io/github/nd-toolkit/source-code?branch=master)

@@ -1,6 +1,11 @@
 'use strict';
-const { Test, createTest } = require('@ndk/test');
+
 const { strict: assert } = require('assert');
+const { resolve } = require('path');
+const { spawnSync } = require('child_process');
+
+const { Test, createTest } = require('@ndk/test');
+
 
 class SimpleClass extends Test {
 
@@ -16,6 +21,7 @@ class SimpleClass extends Test {
 
 }
 
+
 class AggregateClass extends Test {
 
   get testAggregateClass() {
@@ -24,11 +30,13 @@ class AggregateClass extends Test {
 
 }
 
+
 class InheritClass extends SimpleClass {
 
   testThrow() {}
 
 }
+
 
 class InheritAndAggregateClass extends SimpleClass {
 
@@ -40,12 +48,14 @@ class InheritAndAggregateClass extends SimpleClass {
 
 }
 
+
 const CustomTestClass = createTest('CustomTestClass', {
   testSimpleClass: SimpleClass,
   testAggregateClass: AggregateClass,
   testInheritClass: InheritClass,
   testInheritAndAggregateClass: InheritAndAggregateClass
 });
+
 
 class NDKTest extends Test {
 
@@ -245,7 +255,14 @@ class NDKTest extends Test {
     assert.equal(typeof result.items.testInheritAndAggregateClass, 'object');
   }
 
+  ['test: runIsMainModule']() {
+    const app = resolve('source/tests/resources/@ndk/test/my-test-app');
+    const status = spawnSync('node', [app], { 'stdio': 'ignore' }).status;
+    assert.equal(status, 1);
+  }
+
 }
+
 
 module.exports = NDKTest;
 NDKTest.runIsMainModule();

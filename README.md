@@ -23,3 +23,5 @@
 [![Coverage Status](https://coveralls.io/repos/github/nd-toolkit/source-code/badge.svg?branch=master)](https://coveralls.io/github/nd-toolkit/source-code?branch=master)
 
 [![codebeat badge](https://codebeat.co/badges/7e6ffc13-f7a8-4921-ada7-7277d78151cc)](https://codebeat.co/projects/github-com-nd-toolkit-source-code-master)
+
+[![BCH compliance](https://bettercodehub.com/edge/badge/nd-toolkit/source-code?branch=master)](https://bettercodehub.com/results/nd-toolkit/source-code)

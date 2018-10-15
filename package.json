@@ -22,7 +22,7 @@
     "reporter": [
       "lcovonly"
     ],
-    "temp-directory": "./build/nyc_output",
+    "temp-dir": "./build/nyc_output",
     "report-dir": "./build/coverage"
   }
 }

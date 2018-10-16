@@ -119,7 +119,7 @@ function __logCommandHelp(command) {
           opt += '=VALUE';
         }
       }
-      if (commandOpt.require == true) {
+      if (commandOpt.require === true) {
         opt = `<${opt}>`;
       } else {
         opt = `[${opt}]`;

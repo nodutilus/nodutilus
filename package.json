@@ -10,7 +10,8 @@
   ],
   "scripts": {
     "build": "node node_modules/ndk-source-builder",
-    "test": "node node_modules/ndk-source-builder test"
+    "test": "node node_modules/ndk-source-builder test",
+    "coverage": "node node_modules/ndk-source-builder coverage"
   },
   "dependencies": {
     "ndk-source-builder": "github:nd-toolkit/source-builder"

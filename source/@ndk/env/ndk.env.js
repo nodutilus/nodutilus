@@ -8,22 +8,22 @@ const clArgNameRE = /^(\w+)=(.*)$/;
 class CLArguments {
 
   static parse(string = '') {
-    const args = typeof string === 'string' ? string.split(' ') : string.slice();
+    const args = typeof string === 'string' ? string.split(' ') : string;
     const namedArgs = {};
     const ordinalArgs = [];
-    while (args.length > 0) {
-      const arg = args.shift();
+    for (let index = 0; index < args.length; index++) {
+      const arg = args[index];
       if (clArgDashRE.test(arg)) {
         const argName = arg.replace(clArgDashRE, '');
         if (clArgNameRE.test(argName)) {
           const [, exName, exValue] = clArgNameRE.exec(argName);
           namedArgs[exName] = exValue;
         } else {
-          const nextArg = args[0];
+          const nextArg = args[index + 1];
           if (clArgDashRE.test(nextArg)) {
             namedArgs[argName] = true;
           } else {
-            args.shift();
+            index++;
             namedArgs[argName] = nextArg;
           }
         }

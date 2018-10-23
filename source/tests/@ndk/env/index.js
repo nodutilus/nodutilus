@@ -92,10 +92,17 @@ class NDKEnv extends Test {
     }), '-a --b=c --d==e f');
   }
 
-  ['_test: CLArguments.constructor']() {
-    deepEqual(new CLArguments().namedArgs, {});
-    deepEqual(new CLArguments().ordinalArgs, []);
-    equal(new CLArguments('a b c').stringify(), 'a b c');
+  ['test: class CLArguments']() {
+    const clArgs = new CLArguments({ prefixPattern: /^##?/, setterPattern: /:=/ });
+    deepEqual(clArgs.parseOptions, { prefixPattern: /^##?/, setterPattern: /:=/ });
+    clArgs.parse('#a ##b:=c xyz');
+    // parse
+    deepEqual(clArgs.flags, { a: true });
+    deepEqual(clArgs.options, { b: 'c' });
+    deepEqual(clArgs.args, ['xyz']);
+    // stringify
+    // TODO: Опции для stringify
+    equal(clArgs.stringify(), '-a --b=c xyz');
   }
 }
 

@@ -120,21 +120,34 @@ class CLArguments {
     return args.join(' ');
   }
 
-  constructor(string = '') {
-    this.parse(string);
+  /**
+   * @class CLArguments
+   * @param {CLArguments~parseOptions} parseOptions
+   * @prop {CLArguments~parseOptions} parseOptions
+   * @prop {Object<boolean>} flags
+   * @prop {Object<string>} options
+   * @prop {Array<string>} args
+   */
+  constructor(parseOptions) {
+    this.parseOptions = parseOptions;
   }
 
-  parse(string) {
-    const { namedArgs, ordinalArgs } = CLArguments.parse(string);
-    this.namedArgs = namedArgs;
-    this.ordinalArgs = ordinalArgs;
+  /**
+   * @method CLArguments#parse
+   * @param {string|Array<string>} [input=[]]
+   * @returns {CLArguments}
+   */
+  parse(input) {
+    Object.assign(this, this.constructor.parse(input, this.parseOptions));
+    return this;
   }
 
+  /**
+   * @method CLArguments#stringify
+   * @returns {string}
+   */
   stringify() {
-    return CLArguments.stringify({
-      namedArgs: this.namedArgs,
-      ordinalArgs: this.ordinalArgs
-    });
+    return this.constructor.stringify(this);
   }
 
 }

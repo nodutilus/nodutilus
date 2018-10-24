@@ -5,7 +5,7 @@ const { createTest } = require('@ndk/test');
 
 const TestEnv = createTest('@ndk/env', {
 
-  ['test: @ndk/env/args']: require('./args')
+  ['test: @ndk/env/args']: require('./test_args')
 
 });
 

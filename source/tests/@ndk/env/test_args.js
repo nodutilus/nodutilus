@@ -238,6 +238,49 @@ class TestEnvArgs extends Test {
     equal(clArgsFull.stringify(), argsString);
   }
 
+  ['test: class CLArguments - claOptions Lite + RegExp Symbols']() {
+    const claOptions = {
+      flagPrefix: '*',
+      optionPrefix: '..',
+      setter: '[['
+    };
+    const argsString = '*a ..b[[c xyz';
+    const clArgsInst = new CLArguments(claOptions);
+    deepEqual(clArgsInst.claOptions, claOptions);
+    const clArgsFull = clArgsInst.parse(argsString);
+    // parse c облегченным набором опций
+    deepEqual(clArgsFull.flags, { a: true });
+    deepEqual(clArgsFull.options, { b: 'c' });
+    deepEqual(clArgsFull.args, ['xyz']);
+    // stringify c облегченным набором опций
+    equal(clArgsFull.stringify(), argsString);
+  }
+
+  ['test: class CLArguments - extends']() {
+    class X1CLArgs extends CLArguments {
+      static get prefixPattern() {
+        return /^\*\*?/;
+      }
+      static get flagPrefix() {
+        return '*';
+      }
+      static get optionPrefix() {
+        return '**';
+      }
+      static get setterPattern() {
+        return /:/;
+      }
+      static get setter() {
+        return ':';
+      }
+    }
+    const x1clArgs = new X1CLArgs();
+    let { flags, options, args } = x1clArgs.parse('*a **b c *d:e f');
+    deepEqual(flags, { a: true });
+    deepEqual(options, { b: 'c', d: 'e' });
+    deepEqual(args, ['f']);
+  }
+
 }
 
 

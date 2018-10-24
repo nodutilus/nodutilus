@@ -4,6 +4,10 @@
 
 class CLArguments {
 
+  static __escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
   /**
    * @name CLArguments.prefixPattern
    * @type {RegExp}
@@ -39,8 +43,8 @@ class CLArguments {
    */
   static resolvePrefixPattern(flagPrefix, optionPrefix) {
     if (flagPrefix || optionPrefix) {
-      flagPrefix = flagPrefix || this.flagPrefix;
-      optionPrefix = optionPrefix || this.optionPrefix;
+      flagPrefix = CLArguments.__escapeRegExp(flagPrefix || this.flagPrefix);
+      optionPrefix = CLArguments.__escapeRegExp(optionPrefix || this.optionPrefix);
       if (flagPrefix.length < optionPrefix.length) {
         return new RegExp(`^${optionPrefix}|^${flagPrefix}`);
       } else {
@@ -76,7 +80,7 @@ class CLArguments {
    */
   static resolveSetterPattern(setter) {
     if (setter) {
-      return new RegExp(setter);
+      return new RegExp(CLArguments.__escapeRegExp(setter));
     } else {
       return this.setterPattern;
     }

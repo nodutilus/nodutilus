@@ -115,12 +115,12 @@ class CLArguments {
   }
 
   /**
-   * @method CLArguments.resolveArgName
+   * @method CLArguments.resolveArgumentName
    * @param {string} name
    * @param {Object<string>|Object<Array<string>>} aliases
    * @returns {string}
    */
-  static resolveArgName(name, aliases) {
+  static resolveArgumentName(name, aliases) {
     if (aliases) {
       for (const [realName, alias] of Object.entries(aliases)) {
         if (name === alias || ~alias.indexOf(name)) {
@@ -135,8 +135,24 @@ class CLArguments {
    * @typedef CLArguments~solvedArgument
    * @prop {string} name
    * @prop {string} value
+   * @prop {string} type
    * @prop {boolean} offset
    */
+
+  static resolveArgumentType({ name, value }, types = {}) {
+    let type = types[name];
+    if (!type) {
+      if (name && value) {
+        type = 'Option';
+      } else if (name) {
+        type = 'Flag';
+      } else {
+        type = 'Argument';
+      }
+    }
+    return type;
+  }
+
   /**
    * @method CLArguments.resolveArgument
    * @param {string} testName
@@ -145,24 +161,26 @@ class CLArguments {
    * @returns {CLArguments~solvedArgument}
    */
   static resolveArgument(testName, testValue, claOptions) {
-    const { prefixPattern, setterPattern, aliases } = this.resolveCLAOptions(claOptions);
+    const { prefixPattern, setterPattern, aliases, types } = this.resolveCLAOptions(claOptions);
     const result = {};
     if (prefixPattern.test(testName)) {
       const name = testName.replace(prefixPattern, '');
       if (setterPattern.test(name)) {
         const setter = name.replace(setterPattern, ' ').split(' ');
-        result.name = this.resolveArgName(setter[0], aliases);
+        result.name = this.resolveArgumentName(setter[0], aliases);
         result.value = setter[1];
+        result.offset = false;
       } else if (typeof testValue === 'undefined' || prefixPattern.test(testValue)) {
-        result.name = this.resolveArgName(name, aliases);
+        result.name = this.resolveArgumentName(name, aliases);
       } else {
-        result.name = this.resolveArgName(name, aliases);
+        result.name = this.resolveArgumentName(name, aliases);
         result.value = testValue;
         result.offset = true;
       }
     } else {
       result.value = testName;
     }
+    result.type = this.resolveArgumentType(result, types);
     return result;
   }
 
@@ -182,15 +200,22 @@ class CLArguments {
     const inputArgs = typeof input === 'string' ? input.split(' ').filter(Boolean) : input;
     const parsed = { flags: {}, options: {}, args: [] };
     for (let index = 0; index < inputArgs.length; index++) {
-      const { name, value, offset } = this.resolveArgument(
+      const { name, value, type, offset } = this.resolveArgument(
         inputArgs[index], inputArgs[index + 1], claOptions
       );
-      if (name && value) {
-        parsed.options[name] = value;
-      } else if (name) {
-        parsed.flags[name] = true;
-      } else {
-        parsed.args.push(value);
+      switch (type) {
+        case 'Option':
+          parsed.options[name] = value;
+
+          break;
+        case 'Flag':
+          parsed.flags[name] = true;
+          if (value) {
+            parsed.args.push(value);
+          }
+          break;
+        case 'Argument':
+          parsed.args.push(value);
       }
       if (offset) {
         index++;

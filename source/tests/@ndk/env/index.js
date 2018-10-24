@@ -67,31 +67,38 @@ class NDKEnv extends Test {
     });
   }
 
-  ['test: CLArguments.resolveArgName']() {
-    equal(CLArguments.resolveArgName('name'), 'name');
-    equal(CLArguments.resolveArgName('name', {}), 'name');
-    equal(CLArguments.resolveArgName('n', { 'name': 'n' }), 'name');
-    equal(CLArguments.resolveArgName('n2', { 'name': 'n' }), 'n2');
-    equal(CLArguments.resolveArgName('nn', { 'name': ['n', 'nn'] }), 'name');
+  ['test: CLArguments.resolveArgumentName']() {
+    equal(CLArguments.resolveArgumentName('name'), 'name');
+    equal(CLArguments.resolveArgumentName('name', {}), 'name');
+    equal(CLArguments.resolveArgumentName('n', { 'name': 'n' }), 'name');
+    equal(CLArguments.resolveArgumentName('n2', { 'name': 'n' }), 'n2');
+    equal(CLArguments.resolveArgumentName('nn', { 'name': ['n', 'nn'] }), 'name');
+  }
+
+  ['test: CLArguments.resolveArgumentType']() {
+    equal(CLArguments.resolveArgumentType({ name: 'name' }), 'Flag');
+    equal(CLArguments.resolveArgumentType({ value: 'name' }), 'Argument');
+    equal(CLArguments.resolveArgumentType({ name: 'name', value: 'name' }), 'Option');
+    equal(CLArguments.resolveArgumentType({ name: 'name', value: 'name' }, { name: 'Flag' }), 'Flag');
   }
 
   ['test: CLArguments.resolveArgument']() {
     // Флаги
-    deepEqual(CLArguments.resolveArgument('--a'), { name: 'a' });
-    deepEqual(CLArguments.resolveArgument('-a'), { name: 'a' });
-    deepEqual(CLArguments.resolveArgument('--a', '-b'), { name: 'a' });
-    deepEqual(CLArguments.resolveArgument('--a', '-b=c'), { name: 'a' });
+    deepEqual(CLArguments.resolveArgument('--a'), { name: 'a', type: 'Flag' });
+    deepEqual(CLArguments.resolveArgument('-a'), { name: 'a', type: 'Flag' });
+    deepEqual(CLArguments.resolveArgument('--a', '-b'), { name: 'a', type: 'Flag' });
+    deepEqual(CLArguments.resolveArgument('--a', '-b=c'), { name: 'a', type: 'Flag' });
     // Опции
-    deepEqual(CLArguments.resolveArgument('--a', 'b'), { name: 'a', value: 'b', offset: true });
-    deepEqual(CLArguments.resolveArgument('-a', 'b'), { name: 'a', value: 'b', offset: true });
+    deepEqual(CLArguments.resolveArgument('--a', 'b'), { name: 'a', value: 'b', type: 'Option', offset: true });
+    deepEqual(CLArguments.resolveArgument('-a', 'b'), { name: 'a', value: 'b', type: 'Option', offset: true });
     // Присвоение значения опции
-    deepEqual(CLArguments.resolveArgument('-a=b'), { name: 'a', value: 'b' });
-    deepEqual(CLArguments.resolveArgument('--a=b'), { name: 'a', value: 'b' });
-    deepEqual(CLArguments.resolveArgument('--a=b', 'c'), { name: 'a', value: 'b' });
-    deepEqual(CLArguments.resolveArgument('--a=b', '-c'), { name: 'a', value: 'b' });
-    deepEqual(CLArguments.resolveArgument('--a=b', '-c=e'), { name: 'a', value: 'b' });
+    deepEqual(CLArguments.resolveArgument('-a=b'), { name: 'a', value: 'b', type: 'Option', offset: false });
+    deepEqual(CLArguments.resolveArgument('--a=b'), { name: 'a', value: 'b', type: 'Option', offset: false });
+    deepEqual(CLArguments.resolveArgument('--a=b', 'c'), { name: 'a', value: 'b', type: 'Option', offset: false });
+    deepEqual(CLArguments.resolveArgument('--a=b', '-c'), { name: 'a', value: 'b', type: 'Option', offset: false });
+    deepEqual(CLArguments.resolveArgument('--a=b', '-c=e'), { name: 'a', value: 'b', type: 'Option', offset: false });
     // Аргументы
-    deepEqual(CLArguments.resolveArgument('a', 'b'), { value: 'a' });
+    deepEqual(CLArguments.resolveArgument('a', 'b'), { value: 'a', type: 'Argument' });
   }
 
   ['test: CLArguments.parse']() {
@@ -141,6 +148,19 @@ class NDKEnv extends Test {
       flags: { zz: true },
       options: { aa: 'b', cc: 'd' },
       args: ['x', 'y']
+    });
+  }
+
+  ['test: CLArguments.parse - types']() {
+    // Типы, переопределение опции флагом, аргументом
+    // 1. Опции -> Флаги = выталкивают value в аргументы
+    // 2. Опции -> Аргументы = теряют name, выталкивая value в аргументы
+    deepEqual(CLArguments.parse('--a b --c=d --e=f -x y', {
+      types: { a: 'Flag', c: 'Flag', e: 'Argument', x: 'Argument' }
+    }), {
+      flags: { a: true, c: true },
+      options: {},
+      args: ['b', 'd', 'f', 'y']
     });
   }
 

@@ -31,7 +31,9 @@ class NDKEnv extends Test {
       flagPrefix: '-',
       optionPrefix: '--',
       setterPattern: /=/,
-      setter: '='
+      setter: '=',
+      types: {},
+      aliases: {}
     });
     // Изменение префикса флага
     deepEqual(CLArguments.resolveCLAOptions({ flagPrefix: '#' }), {
@@ -39,7 +41,9 @@ class NDKEnv extends Test {
       flagPrefix: '#',
       optionPrefix: '--',
       setterPattern: /=/,
-      setter: '='
+      setter: '=',
+      types: {},
+      aliases: {}
     });
     // Изменение префикса опции
     deepEqual(CLArguments.resolveCLAOptions({ optionPrefix: '##' }), {
@@ -47,7 +51,9 @@ class NDKEnv extends Test {
       flagPrefix: '-',
       optionPrefix: '##',
       setterPattern: /=/,
-      setter: '='
+      setter: '=',
+      types: {},
+      aliases: {}
     });
     // Изменение сеттера
     deepEqual(CLArguments.resolveCLAOptions({ setter: ':=' }), {
@@ -55,8 +61,18 @@ class NDKEnv extends Test {
       flagPrefix: '-',
       optionPrefix: '--',
       setterPattern: /:=/,
-      setter: ':='
+      setter: ':=',
+      types: {},
+      aliases: {}
     });
+  }
+
+  ['test: CLArguments.resolveArgName']() {
+    equal(CLArguments.resolveArgName('name'), 'name');
+    equal(CLArguments.resolveArgName('name', {}), 'name');
+    equal(CLArguments.resolveArgName('n', { 'name': 'n' }), 'name');
+    equal(CLArguments.resolveArgName('n2', { 'name': 'n' }), 'n2');
+    equal(CLArguments.resolveArgName('nn', { 'name': ['n', 'nn'] }), 'name');
   }
 
   ['test: CLArguments.resolveArgument']() {
@@ -83,39 +99,47 @@ class NDKEnv extends Test {
     deepEqual(CLArguments.parse(), { flags: {}, options: {}, args: [] });
     deepEqual(CLArguments.parse(' ', {}), { flags: {}, options: {}, args: [] });
     // Флаги
-    deepEqual(CLArguments.parse('-a --b', {}).flags, { a: true, b: true });
+    deepEqual(CLArguments.parse('-a --b').flags, { a: true, b: true });
     // Опции
-    deepEqual(CLArguments.parse('-a b --c=d', {}).options, { a: 'b', c: 'd' });
-    deepEqual(CLArguments.parse('--a==b', {}).options, { a: '=b' });
-    deepEqual(CLArguments.parse('--a=b=c', {}).options, { a: 'b=c' });
+    deepEqual(CLArguments.parse('-a b --c=d').options, { a: 'b', c: 'd' });
+    deepEqual(CLArguments.parse('--a==b').options, { a: '=b' });
+    deepEqual(CLArguments.parse('--a=b=c').options, { a: 'b=c' });
     // Аргументы
-    deepEqual(CLArguments.parse('a b c', {}).args, ['a', 'b', 'c']);
+    deepEqual(CLArguments.parse('a b c').args, ['a', 'b', 'c']);
     // Флаги + опции
-    deepEqual(CLArguments.parse('-a --b -c=d --e f', {}), {
+    deepEqual(CLArguments.parse('-a --b -c=d --e f'), {
       flags: { a: true, b: true },
       options: { c: 'd', e: 'f' },
       args: []
     });
-    deepEqual(CLArguments.parse('-a=--b -c --d', {}), {
+    deepEqual(CLArguments.parse('-a=--b -c --d'), {
       flags: { c: true, d: true },
       options: { a: '--b' },
       args: []
     });
-    deepEqual(CLArguments.parse('-a b --c=d -e', {}), {
+    deepEqual(CLArguments.parse('-a b --c=d -e'), {
       flags: { e: true },
       options: { a: 'b', c: 'd' },
       args: []
     });
     // Флаги + аргументы
-    deepEqual(CLArguments.parse('a --b', {}), {
+    deepEqual(CLArguments.parse('a --b'), {
       flags: { b: true },
       options: {},
       args: ['a']
     });
     // Флаги + опции + аргументы
-    deepEqual(CLArguments.parse('x -a b y -z --c=d', {}), {
+    deepEqual(CLArguments.parse('x -a b y -z --c=d'), {
       flags: { z: true },
       options: { a: 'b', c: 'd' },
+      args: ['x', 'y']
+    });
+    // Псевдонимы
+    deepEqual(CLArguments.parse('x -a b y -z --c=d', {
+      aliases: { zz: 'z', aa: 'a', cc: 'c' }
+    }), {
+      flags: { zz: true },
+      options: { aa: 'b', cc: 'd' },
       args: ['x', 'y']
     });
   }

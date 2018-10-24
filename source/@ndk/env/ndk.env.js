@@ -90,6 +90,8 @@ class CLArguments {
    * @prop {string} [optionPrefix=CLArguments.optionPrefix]
    * @prop {RegExp} [setterPattern=CLArguments.setterPattern]
    * @prop {string} [setter=CLArguments.setter]
+   * @prop {Object<string>} [types={}]
+   * @prop {Object<string>|Object<Array<string>>} [aliases={}]
    */
   /**
    * @method CLArguments.resolveCLAOptions
@@ -107,7 +109,26 @@ class CLArguments {
       claOptions.setter
     );
     claOptions.setter = claOptions.setter || this.setter;
+    claOptions.types = claOptions.types || {};
+    claOptions.aliases = claOptions.aliases || {};
     return claOptions;
+  }
+
+  /**
+   * @method CLArguments.resolveArgName
+   * @param {string} name
+   * @param {Object<string>|Object<Array<string>>} aliases
+   * @returns {string}
+   */
+  static resolveArgName(name, aliases) {
+    if (aliases) {
+      for (const [realName, alias] of Object.entries(aliases)) {
+        if (name === alias || ~alias.indexOf(name)) {
+          return realName;
+        }
+      }
+    }
+    return name;
   }
 
   /**
@@ -124,18 +145,18 @@ class CLArguments {
    * @returns {CLArguments~solvedArgument}
    */
   static resolveArgument(testName, testValue, claOptions) {
-    const { prefixPattern, setterPattern } = this.resolveCLAOptions(claOptions);
+    const { prefixPattern, setterPattern, aliases } = this.resolveCLAOptions(claOptions);
     const result = {};
     if (prefixPattern.test(testName)) {
       const name = testName.replace(prefixPattern, '');
       if (setterPattern.test(name)) {
         const setter = name.replace(setterPattern, ' ').split(' ');
-        result.name = setter[0];
+        result.name = this.resolveArgName(setter[0], aliases);
         result.value = setter[1];
       } else if (typeof testValue === 'undefined' || prefixPattern.test(testValue)) {
-        result.name = name;
+        result.name = this.resolveArgName(name, aliases);
       } else {
-        result.name = name;
+        result.name = this.resolveArgName(name, aliases);
         result.value = testValue;
         result.offset = true;
       }

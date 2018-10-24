@@ -14,6 +14,24 @@ class CLArguments {
   }
 
   /**
+   * @name CLArguments.flagPrefix
+   * @type {string}
+   * @default -
+   */
+  static get flagPrefix() {
+    return '-';
+  }
+
+  /**
+   * @name CLArguments.optionPrefix
+   * @type {string}
+   * @default --
+   */
+  static get optionPrefix() {
+    return '--';
+  }
+
+  /**
    * @name CLArguments.setterPattern
    * @type {RegExp}
    * @default /=/
@@ -23,9 +41,21 @@ class CLArguments {
   }
 
   /**
-   * @typedef CLArguments~parseOptions
+   * @name CLArguments.setter
+   * @type {string}
+   * @default =
+   */
+  static get setter() {
+    return '=';
+  }
+
+  /**
+   * @typedef CLArguments~claOptions
    * @prop {RegExp} [prefixPattern=CLArguments.prefixPattern]
+   * @prop {string} [flagPrefix=CLArguments.flagPrefix]
+   * @prop {string} [optionPrefix=CLArguments.optionPrefix]
    * @prop {RegExp} [setterPattern=CLArguments.setterPattern]
+   * @prop {string} [setter=CLArguments.setter]
    */
   /**
    * @typedef CLArguments~solvedArgument
@@ -37,7 +67,7 @@ class CLArguments {
    * @method CLArguments.resolveArgument
    * @param {string} testName
    * @param {string} [testValue]
-   * @param {CLArguments~parseOptions} options
+   * @param {CLArguments~claOptions} claOptions
    * @returns {CLArguments~solvedArgument}
    */
   static resolveArgument(testName, testValue, {
@@ -73,15 +103,15 @@ class CLArguments {
   /**
    * @method CLArguments.parse
    * @param {string|Array<string>} [input=[]]
-   * @param {CLArguments~parseOptions} options
+   * @param {CLArguments~claOptions} claOptions
    * @returns {CLArguments~parsedArguments}
    */
-  static parse(input = [], options) {
+  static parse(input = [], claOptions) {
     const inputArgs = typeof input === 'string' ? input.split(' ').filter(Boolean) : input;
     const parsed = { flags: {}, options: {}, args: [] };
     for (let index = 0; index < inputArgs.length; index++) {
       const { name, value, offset } = this.resolveArgument(
-        inputArgs[index], inputArgs[index + 1], options
+        inputArgs[index], inputArgs[index + 1], claOptions
       );
       if (name && value) {
         parsed.options[name] = value;
@@ -100,18 +130,23 @@ class CLArguments {
   /**
    * @method CLArguments.stringify
    * @param {CLArguments~parsedArguments} parsedArguments
+   * @param {CLArguments~claOptions} claOptions
    * @returns {string}
    */
-  static stringify(parsedArguments) {
+  static stringify(parsedArguments, {
+    flagPrefix = this.flagPrefix,
+    optionPrefix = this.optionPrefix,
+    setter = this.setter
+  } = {}) {
     const args = [];
     if ('flags' in parsedArguments) {
       for (const [name] of Object.entries(parsedArguments.flags)) {
-        args.push('-' + name);
+        args.push(flagPrefix + name);
       }
     }
     if ('options' in parsedArguments) {
       for (const [name, value] of Object.entries(parsedArguments.options)) {
-        args.push(`--${name}=${value}`);
+        args.push(optionPrefix + name + setter + value);
       }
     }
     if ('args' in parsedArguments) {
@@ -122,14 +157,14 @@ class CLArguments {
 
   /**
    * @class CLArguments
-   * @param {CLArguments~parseOptions} parseOptions
-   * @prop {CLArguments~parseOptions} parseOptions
+   * @param {CLArguments~claOptions} claOptions
+   * @prop {CLArguments~claOptions} claOptions
    * @prop {Object<boolean>} flags
    * @prop {Object<string>} options
    * @prop {Array<string>} args
    */
-  constructor(parseOptions) {
-    this.parseOptions = parseOptions;
+  constructor(claOptions) {
+    this.claOptions = claOptions;
   }
 
   /**
@@ -138,8 +173,7 @@ class CLArguments {
    * @returns {CLArguments}
    */
   parse(input) {
-    Object.assign(this, this.constructor.parse(input, this.parseOptions));
-    return this;
+    return Object.assign(this, this.constructor.parse(input, this.claOptions));
   }
 
   /**
@@ -147,7 +181,7 @@ class CLArguments {
    * @returns {string}
    */
   stringify() {
-    return this.constructor.stringify(this);
+    return this.constructor.stringify(this, this.claOptions);
   }
 
 }

@@ -32,6 +32,27 @@ class CLArguments {
   }
 
   /**
+   * @method CLArguments.resolvePrefixPattern
+   * @param {string} [flagPrefix=CLArguments.flagPrefix]
+   * @param {string} [optionPrefix=CLArguments.optionPrefix]
+   * @returns {RegExp}
+   */
+  static resolvePrefixPattern(flagPrefix, optionPrefix) {
+    if (flagPrefix || optionPrefix) {
+      flagPrefix = flagPrefix || this.flagPrefix;
+      optionPrefix = optionPrefix || this.optionPrefix;
+      if (flagPrefix.length < optionPrefix.length) {
+        return new RegExp(`^${optionPrefix}|^${flagPrefix}`);
+      } else {
+        return new RegExp(`^${flagPrefix}|^${optionPrefix}`);
+      }
+
+    } else {
+      return this.prefixPattern;
+    }
+  }
+
+  /**
    * @name CLArguments.setterPattern
    * @type {RegExp}
    * @default /=/
@@ -47,6 +68,38 @@ class CLArguments {
    */
   static get setter() {
     return '=';
+  }
+
+  /**
+   * @method CLArguments.resolveSetterPattern
+   * @param {string} [setter=CLArguments.setter]
+   * @returns {RegExp}
+   */
+  static resolveSetterPattern(setter) {
+    if (setter) {
+      return new RegExp(setter);
+    } else {
+      return this.setterPattern;
+    }
+  }
+
+  /**
+   * @method CLArguments.resolveCLAOptions
+   * @param {CLArguments~claOptions} claOptions
+   * @returns {CLArguments~claOptions}
+   */
+  static resolveCLAOptions(claOptions = {}) {
+    claOptions.prefixPattern = claOptions.prefixPattern || this.resolvePrefixPattern(
+      claOptions.flagPrefix,
+      claOptions.optionPrefix
+    );
+    claOptions.flagPrefix = claOptions.flagPrefix || this.flagPrefix;
+    claOptions.optionPrefix = claOptions.optionPrefix || this.optionPrefix;
+    claOptions.setterPattern = claOptions.setterPattern || this.resolveSetterPattern(
+      claOptions.setter
+    );
+    claOptions.setter = claOptions.setter || this.setter;
+    return claOptions;
   }
 
   /**
@@ -70,10 +123,8 @@ class CLArguments {
    * @param {CLArguments~claOptions} claOptions
    * @returns {CLArguments~solvedArgument}
    */
-  static resolveArgument(testName, testValue, {
-    prefixPattern = this.prefixPattern,
-    setterPattern = this.setterPattern
-  } = {}) {
+  static resolveArgument(testName, testValue, claOptions) {
+    const { prefixPattern, setterPattern } = this.resolveCLAOptions(claOptions);
     const result = {};
     if (prefixPattern.test(testName)) {
       const name = testName.replace(prefixPattern, '');
@@ -133,11 +184,8 @@ class CLArguments {
    * @param {CLArguments~claOptions} claOptions
    * @returns {string}
    */
-  static stringify(parsedArguments, {
-    flagPrefix = this.flagPrefix,
-    optionPrefix = this.optionPrefix,
-    setter = this.setter
-  } = {}) {
+  static stringify(parsedArguments, claOptions) {
+    const { flagPrefix, optionPrefix, setter } = this.resolveCLAOptions(claOptions);
     const args = [];
     if ('flags' in parsedArguments) {
       for (const [name] of Object.entries(parsedArguments.flags)) {
@@ -164,7 +212,7 @@ class CLArguments {
    * @prop {Array<string>} args
    */
   constructor(claOptions) {
-    this.claOptions = claOptions;
+    this.claOptions = this.constructor.resolveCLAOptions(claOptions);
   }
 
   /**

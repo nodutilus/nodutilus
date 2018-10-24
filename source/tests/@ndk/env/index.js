@@ -12,6 +12,53 @@ class NDKEnv extends Test {
     return '@ndk/env';
   }
 
+  ['test: CLArguments.resolvePrefixPattern']() {
+    deepEqual(CLArguments.resolvePrefixPattern(), /^--?/);
+    deepEqual(CLArguments.resolvePrefixPattern('#'), /^--|^#/);
+    deepEqual(CLArguments.resolvePrefixPattern('###'), /^###|^--/);
+    deepEqual(CLArguments.resolvePrefixPattern(undefined, '#'), /^-|^#/);
+  }
+
+  ['test: CLArguments.resolveSetterPattern']() {
+    deepEqual(CLArguments.resolveSetterPattern(), /=/);
+    deepEqual(CLArguments.resolveSetterPattern(':='), /:=/);
+  }
+
+  ['test: CLArguments.resolveCLAOptions']() {
+    // Опции по умолчанию
+    deepEqual(CLArguments.resolveCLAOptions(), {
+      prefixPattern: /^--?/,
+      flagPrefix: '-',
+      optionPrefix: '--',
+      setterPattern: /=/,
+      setter: '='
+    });
+    // Изменение префикса флага
+    deepEqual(CLArguments.resolveCLAOptions({ flagPrefix: '#' }), {
+      prefixPattern: /^--|^#/,
+      flagPrefix: '#',
+      optionPrefix: '--',
+      setterPattern: /=/,
+      setter: '='
+    });
+    // Изменение префикса опции
+    deepEqual(CLArguments.resolveCLAOptions({ optionPrefix: '##' }), {
+      prefixPattern: /^##|^-/,
+      flagPrefix: '-',
+      optionPrefix: '##',
+      setterPattern: /=/,
+      setter: '='
+    });
+    // Изменение сеттера
+    deepEqual(CLArguments.resolveCLAOptions({ setter: ':=' }), {
+      prefixPattern: /^--?/,
+      flagPrefix: '-',
+      optionPrefix: '--',
+      setterPattern: /:=/,
+      setter: ':='
+    });
+  }
+
   ['test: CLArguments.resolveArgument']() {
     // Флаги
     deepEqual(CLArguments.resolveArgument('--a'), { name: 'a' });
@@ -92,7 +139,7 @@ class NDKEnv extends Test {
     }), '-a --b=c --d==e f');
   }
 
-  ['test: class CLArguments - claOptions']() {
+  ['test: class CLArguments - claOptions Full']() {
     const claOptions = {
       prefixPattern: /^##?/,
       flagPrefix: '#',
@@ -104,13 +151,32 @@ class NDKEnv extends Test {
     const clArgsInst = new CLArguments(claOptions);
     deepEqual(clArgsInst.claOptions, claOptions);
     const clArgs = clArgsInst.parse(argsString);
-    // parse
+    // parse c полным набором опций
     deepEqual(clArgs.flags, { a: true });
     deepEqual(clArgs.options, { b: 'c' });
     deepEqual(clArgs.args, ['xyz']);
-    // stringify
+    // stringify c полным набором опций
     equal(clArgs.stringify(), argsString);
   }
+
+  ['test: class CLArguments - claOptions Lite']() {
+    const claOptions = {
+      flagPrefix: '#',
+      optionPrefix: '##',
+      setter: ':='
+    };
+    const argsString = '#a ##b:=c xyz';
+    const clArgsInst = new CLArguments(claOptions);
+    deepEqual(clArgsInst.claOptions, claOptions);
+    const clArgsFull = clArgsInst.parse(argsString);
+    // parse c облегченным набором опций
+    deepEqual(clArgsFull.flags, { a: true });
+    deepEqual(clArgsFull.options, { b: 'c' });
+    deepEqual(clArgsFull.args, ['xyz']);
+    // stringify c облегченным набором опций
+    equal(clArgsFull.stringify(), argsString);
+  }
+
 }
 
 

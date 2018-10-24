@@ -103,7 +103,7 @@ class NDKEnv extends Test {
     deepEqual(CLArguments.resolveArgument('a', 'b'), { value: 'a', type: 'Argument' });
   }
 
-  ['test: CLArguments.parse']() {
+  ['test: CLArguments.parse - base']() {
     // Пустые значения
     deepEqual(CLArguments.parse(), { flags: {}, options: {}, args: [] });
     deepEqual(CLArguments.parse(' ', {}), { flags: {}, options: {}, args: [] });
@@ -143,6 +143,9 @@ class NDKEnv extends Test {
       options: { a: 'b', c: 'd' },
       args: ['x', 'y']
     });
+  }
+
+  ['test: CLArguments.parse - aliases']() {
     // Псевдонимы
     deepEqual(CLArguments.parse('x -a b y -z --c=d', {
       aliases: { zz: 'z', aa: 'a', cc: 'c' }
@@ -163,6 +166,18 @@ class NDKEnv extends Test {
       flags: { a: true, c: true },
       options: {},
       args: ['b', 'd', 'f', 'y']
+    });
+  }
+
+  ['test: CLArguments.parse - type: Array']() {
+    // Массив опций
+    // Задается дублированием опции
+    deepEqual(CLArguments.parse('--a b --c=d --c e -c f g', {
+      types: { c: 'Array' }
+    }), {
+      flags: {},
+      options: { a: 'b', c: ['d', 'e', 'f'] },
+      args: ['g']
     });
   }
 

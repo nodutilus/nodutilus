@@ -46,7 +46,6 @@ class CLArguments {
       } else {
         return new RegExp(`^${flagPrefix}|^${optionPrefix}`);
       }
-
     } else {
       return this.prefixPattern;
     }
@@ -123,7 +122,7 @@ class CLArguments {
   static resolveArgumentName(name, aliases) {
     if (aliases) {
       for (const [realName, alias] of Object.entries(aliases)) {
-        if (name === alias || ~alias.indexOf(name)) {
+        if (name === alias || alias instanceof Array && ~alias.indexOf(name)) {
           return realName;
         }
       }
@@ -138,7 +137,12 @@ class CLArguments {
    * @prop {string} type
    * @prop {boolean} offset
    */
-
+  /**
+   * @method CLArguments.resolveArgumentType
+   * @param {CLArguments~solvedArgument} solvedArgument
+   * @param {Object<string>} types
+   * @returns {string}
+   */
   static resolveArgumentType({ name, value }, types = {}) {
     let type = types[name];
     if (!type) {
@@ -206,7 +210,9 @@ class CLArguments {
       switch (type) {
         case 'Option':
           parsed.options[name] = value;
-
+          break;
+        case 'Array':
+          (parsed.options[name] = parsed.options[name] || []).push(value);
           break;
         case 'Flag':
           parsed.flags[name] = true;

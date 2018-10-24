@@ -84,6 +84,14 @@ class CLArguments {
   }
 
   /**
+   * @typedef CLArguments~claOptions
+   * @prop {RegExp} [prefixPattern=CLArguments.prefixPattern]
+   * @prop {string} [flagPrefix=CLArguments.flagPrefix]
+   * @prop {string} [optionPrefix=CLArguments.optionPrefix]
+   * @prop {RegExp} [setterPattern=CLArguments.setterPattern]
+   * @prop {string} [setter=CLArguments.setter]
+   */
+  /**
    * @method CLArguments.resolveCLAOptions
    * @param {CLArguments~claOptions} claOptions
    * @returns {CLArguments~claOptions}
@@ -102,14 +110,6 @@ class CLArguments {
     return claOptions;
   }
 
-  /**
-   * @typedef CLArguments~claOptions
-   * @prop {RegExp} [prefixPattern=CLArguments.prefixPattern]
-   * @prop {string} [flagPrefix=CLArguments.flagPrefix]
-   * @prop {string} [optionPrefix=CLArguments.optionPrefix]
-   * @prop {RegExp} [setterPattern=CLArguments.setterPattern]
-   * @prop {string} [setter=CLArguments.setter]
-   */
   /**
    * @typedef CLArguments~solvedArgument
    * @prop {string} name

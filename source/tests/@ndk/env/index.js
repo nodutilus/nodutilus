@@ -71,8 +71,10 @@ class NDKEnv extends Test {
     equal(CLArguments.resolveArgumentName('name'), 'name');
     equal(CLArguments.resolveArgumentName('name', {}), 'name');
     equal(CLArguments.resolveArgumentName('n', { 'name': 'n' }), 'name');
+    equal(CLArguments.resolveArgumentName('n', { 'name': 'nn' }), 'n');
     equal(CLArguments.resolveArgumentName('n2', { 'name': 'n' }), 'n2');
     equal(CLArguments.resolveArgumentName('nn', { 'name': ['n', 'nn'] }), 'name');
+    equal(CLArguments.resolveArgumentName('nn', { 'name': ['n', 'nna'] }), 'nn');
   }
 
   ['test: CLArguments.resolveArgumentType']() {

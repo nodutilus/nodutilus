@@ -9,6 +9,10 @@ const { Test, createTest } = require('@ndk/test');
 
 class SimpleClass extends Test {
 
+  get testData() {
+    return 'it is test data';
+  }
+
   testMyFn() {}
 
   ['test: Мой тест']() {}
@@ -64,6 +68,7 @@ class NDKTest extends Test {
   }
 
   async ['test: SimpleClass']() {
+    assert.equal(new SimpleClass().testData, 'it is test data');
     let ownNamas = SimpleClass.getOwnTestNames();
     let namas = SimpleClass.getTestNames();
     let expectedNames = ['testMyFn', 'test: Мой тест', 'testThrow'];

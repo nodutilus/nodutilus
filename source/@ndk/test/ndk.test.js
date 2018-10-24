@@ -171,9 +171,7 @@ class TestPrinter {
   }
 
   timeStyle(text) {
-    text = String(text).split('.');
-    text[0] = text[0].padStart(3);
-    return this.console.style.yellow(text.join('.'));
+    return this.console.style.yellow(String(text).padStart(10));
   }
 
   testNameStyle(text) {

@@ -193,6 +193,45 @@ class CLArguments {
   }
 
   /**
+   * @method CLArguments.setterTypeOption
+   * @param {CLArguments~parsedArguments} parsedArguments
+   * @param {CLArguments~solvedArgument} solvedArgument
+   */
+  static setterTypeOption({ options }, { name, value }) {
+    options[name] = value;
+  }
+
+  /**
+   * @method CLArguments.setterTypeArray
+   * @param {CLArguments~parsedArguments} parsedArguments
+   * @param {CLArguments~solvedArgument} solvedArgument
+   */
+  static setterTypeArray({ options }, { name, value }) {
+    (options[name] = options[name] || []).push(value);
+  }
+
+  /**
+   * @method CLArguments.setterTypeFlag
+   * @param {CLArguments~parsedArguments} parsedArguments
+   * @param {CLArguments~solvedArgument} solvedArgument
+   */
+  static setterTypeFlag({ flags, args }, { name, value }) {
+    flags[name] = true;
+    if (value) {
+      this.setterTypeArgument({ args }, { value });
+    }
+  }
+
+  /**
+   * @method CLArguments.setterTypeArgument
+   * @param {CLArguments~parsedArguments} parsedArguments
+   * @param {CLArguments~solvedArgument} solvedArgument
+   */
+  static setterTypeArgument({ args }, { value }) {
+    args.push(value);
+  }
+
+  /**
    * @typedef CLArguments~parsedArguments
    * @prop {Object<boolean>} flags
    * @prop {Object<string>} options
@@ -208,26 +247,11 @@ class CLArguments {
     const inputArgs = typeof input === 'string' ? input.split(' ').filter(Boolean) : input;
     const parsed = { flags: {}, options: {}, args: [] };
     for (let index = 0; index < inputArgs.length; index++) {
-      const { name, value, type, offset } = this.resolveArgument(
+      const solvedArgument = this.resolveArgument(
         inputArgs[index], inputArgs[index + 1], claOptions
       );
-      switch (type) {
-        case 'Option':
-          parsed.options[name] = value;
-          break;
-        case 'Array':
-          (parsed.options[name] = parsed.options[name] || []).push(value);
-          break;
-        case 'Flag':
-          parsed.flags[name] = true;
-          if (value) {
-            parsed.args.push(value);
-          }
-          break;
-        case 'Argument':
-          parsed.args.push(value);
-      }
-      if (offset) {
+      this['setterType' + solvedArgument.type](parsed, solvedArgument);
+      if (solvedArgument.offset) {
         index++;
       }
     }

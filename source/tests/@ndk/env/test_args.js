@@ -257,7 +257,7 @@ class TestEnvArgs extends Test {
   }
 
   ['test: class CLArguments - extends']() {
-    class X1CLArgs extends CLArguments {
+    class XCLArgs extends CLArguments {
       static get prefixPattern() {
         return /^\*\*?/;
       }
@@ -274,11 +274,27 @@ class TestEnvArgs extends Test {
         return ':';
       }
     }
-    const x1clArgs = new X1CLArgs();
-    let { flags, options, args } = x1clArgs.parse('*a **b c *d:e f');
+    const xclArgs = new XCLArgs();
+    const { flags, options, args } = xclArgs.parse('*a **b c *d:e f');
     deepEqual(flags, { a: true });
     deepEqual(options, { b: 'c', d: 'e' });
     deepEqual(args, ['f']);
+  }
+
+  ['test: class CLArguments - extends - user type']() {
+    class XCLArgs extends CLArguments {
+      static setterTypeOptionNumber({ options }, { name, value }) {
+        value = Number(value);
+        if (!isNaN(value)) {
+          options[name] = value;
+        }
+      }
+    }
+    const xclArgs = new XCLArgs({
+      types: { a: 'OptionNumber' }
+    });
+    deepEqual(xclArgs.parse('--a 123').options, { a: 123 });
+    deepEqual(xclArgs.parse('--a a').options, {});
   }
 
 }

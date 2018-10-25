@@ -207,7 +207,11 @@ class CLArguments {
    * @param {CLArguments~solvedArgument} solvedArgument
    */
   static setterTypeArray({ options }, { name, value }) {
-    (options[name] = options[name] || []).push(value);
+    if (name in options) {
+      options[name].push(value);
+    } else {
+      options[name] = [value];
+    }
   }
 
   /**

@@ -17,6 +17,7 @@
   "dependencies": {
     "ndk-source-builder": "github:nd-toolkit/source-builder"
   },
+  "eslintIgnore": ["source/node_modules"],
   "nyc": {
     "exclude": [
       "!**/source/node_modules/"

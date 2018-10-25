@@ -147,7 +147,9 @@ async function __setcolumnoptions(column, client) {
       }
     }
   }
-  if (sql) { await client.query(sql); }
+  if (sql) {
+    await client.query(sql);
+  }
 }
 
 async function __getcolumnoptions(schema_name, table_name, column_name, client) {
@@ -169,13 +171,13 @@ async function __getcolumnoptions(schema_name, table_name, column_name, client) 
 }
 
 const __constraint_types_sqlgenerators = {
-  'UNIQUE' (options) {
+  'UNIQUE'(options) {
     return `UNIQUE (${options.column || options.columns.join(', ')})`;
   },
-  'PRIMARY KEY' (options) {
+  'PRIMARY KEY'(options) {
     return `PRIMARY KEY (${options.column || options.columns.join(', ')})`;
   },
-  'FOREIGN KEY' (options) {
+  'FOREIGN KEY'(options) {
     return `FOREIGN KEY (${options.column}) REFERENCES ${options.refschema}.${options.reftable}` +
       ('refcolumn' in options ? ` (${options.refcolumn})` : '') +
       ('on_delete' in options ? ` ON DELETE ${options.on_delete}` : '') +

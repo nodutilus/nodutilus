@@ -147,9 +147,7 @@ async function __setcolumnoptions(column, client) {
       }
     }
   }
-  if (sql) {
-    await client.query(sql);
-  }
+  if (sql) { await client.query(sql); }
 }
 
 async function __getcolumnoptions(schema_name, table_name, column_name, client) {

@@ -1,6 +1,6 @@
 {
   "name": "ndk-source-code",
-  "version": "0.0.67",
+  "version": "0.0.68",
   "description": "[REPO ONLY]",
   "repository": "github:nd-toolkit/source-code",
   "license": "Unlicense",
@@ -17,7 +17,9 @@
   "dependencies": {
     "ndk-source-builder": "github:nd-toolkit/source-builder"
   },
-  "eslintIgnore": ["source/node_modules"],
+  "eslintIgnore": [
+    "source/node_modules"
+  ],
   "nyc": {
     "exclude": [
       "!**/source/node_modules/"

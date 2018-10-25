@@ -2,11 +2,12 @@
 'use strict';
 
 
-class CLArguments {
+function __escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
-  static __escapeRegExp(string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
+
+class CLArguments {
 
   /**
    * @name CLArguments.prefixPattern
@@ -43,8 +44,8 @@ class CLArguments {
    */
   static resolvePrefixPattern(flagPrefix, optionPrefix) {
     if (flagPrefix || optionPrefix) {
-      flagPrefix = CLArguments.__escapeRegExp(flagPrefix || this.flagPrefix);
-      optionPrefix = CLArguments.__escapeRegExp(optionPrefix || this.optionPrefix);
+      flagPrefix = __escapeRegExp(flagPrefix || this.flagPrefix);
+      optionPrefix = __escapeRegExp(optionPrefix || this.optionPrefix);
       if (flagPrefix.length < optionPrefix.length) {
         return new RegExp(`^${optionPrefix}|^${flagPrefix}`);
       } else {
@@ -80,7 +81,7 @@ class CLArguments {
    */
   static resolveSetterPattern(setter) {
     if (setter) {
-      return new RegExp(CLArguments.__escapeRegExp(setter));
+      return new RegExp(__escapeRegExp(setter));
     } else {
       return this.setterPattern;
     }

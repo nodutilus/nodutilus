@@ -1,0 +1,6 @@
+version: "2"         # required to adjust maintainability checks
+checks:
+  method-complexity:
+    config:
+      # https://eslint.org/docs/rules/complexity#rule-details
+      threshold: 20

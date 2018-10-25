@@ -1,6 +1,6 @@
 /** @module @ndk/ps/TaskMaster */
 'use strict';
-const { envKeys, appRoot } = require('@ndk/env');
+const { envKeys, appRoot } = require('@ndk/env/legacy');
 const { cpus } = require('os');
 const { fork } = require('child_process');
 const PromiseEventEmitter = require('@ndk/fn/PromiseEventEmitter');

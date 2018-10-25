@@ -7,6 +7,7 @@ const AllPackagesTests = createTest('All packages tests', {
 
   ['test: @ndk/all']: require('./@ndk/all'),
   ['test: @ndk/env']: require('./@ndk/env'),
+  ['test: @ndk/env/legacy']: require('./@ndk/env/legacy'),
   ['test: @ndk/fn']: require('./@ndk/fn'),
   ['test: @ndk/test']: require('./@ndk/test'),
   ['test: @ndk/type']: require('./@ndk/type')

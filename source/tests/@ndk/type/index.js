@@ -8,7 +8,7 @@ const { ok, equal, throws } = require('assert').strict;
 class NDKType extends Test {
 
   get name() {
-    return '@ndk/env';
+    return '@ndk/type';
   }
 
   ['test: getType / Primitive Type']() {

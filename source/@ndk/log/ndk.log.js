@@ -4,7 +4,7 @@ const { join, resolve } = require('path');
 const { existsSync, mkdirSync, openSync, closeSync, appendFileSync } = require('fs');
 const { inspect } = require('util');
 const { bindProperty } = require('@ndk/cfg');
-const { appHome } = require('@ndk/env');
+const { appHome } = require('@ndk/env/legacy');
 const { TimeLine, toDateString, toTimeStampString } = require('@ndk/fn/datetime');
 const ndk_console = require('@ndk/console');
 

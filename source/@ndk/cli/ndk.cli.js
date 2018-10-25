@@ -1,7 +1,7 @@
 /** @module @ndk/cli */
 'use strict';
 
-const { appArgs, appKwargs } = require('@ndk/env');
+const { appArgs, appKwargs } = require('@ndk/env/legacy');
 const { logError } = require('@ndk/console');
 const {
   INVALID_EXECUTOR_TYPE,

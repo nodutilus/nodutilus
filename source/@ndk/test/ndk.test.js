@@ -20,7 +20,7 @@ class Test extends EventEmitter {
 
   static getOwnTestNames() {
     return Object.getOwnPropertyNames(this.prototype)
-      .filter(name => name.startsWith('test'));
+      .filter(name => typeof this.prototype[name] === 'function' && name.startsWith('test'));
   }
 
   static getTestNames() {
@@ -38,12 +38,10 @@ class Test extends EventEmitter {
   static getTestLength() {
     return this.getTestNames().reduce((length, name) => {
       const test = this.prototype[name];
-      if (typeof test === 'function') {
-        if (Test.isPrototypeOf(test)) {
-          length += test.getTestLength();
-        } else {
-          length++;
-        }
+      if (Test.isPrototypeOf(test)) {
+        length += test.getTestLength();
+      } else {
+        length++;
       }
       return length;
     }, 0);
@@ -52,15 +50,13 @@ class Test extends EventEmitter {
   static getRecursiveTestNames() {
     return this.getTestNames().reduce((names, name) => {
       const test = this.prototype[name];
-      if (typeof test === 'function') {
-        if (Test.isPrototypeOf(test)) {
-          const subNames = test.getRecursiveTestNames();
-          for (const subName of subNames) {
-            names.push(`${name}.${subName}`);
-          }
-        } else {
-          names.push(name);
+      if (Test.isPrototypeOf(test)) {
+        const subNames = test.getRecursiveTestNames();
+        for (const subName of subNames) {
+          names.push(`${name}.${subName}`);
         }
+      } else {
+        names.push(name);
       }
       return names;
     }, []);
@@ -119,18 +115,16 @@ class Test extends EventEmitter {
     const testNames = this.constructor.getTestNames();
     for (const testName of testNames) {
       const test = this[testName];
-      if (typeof test === 'function') {
-        let testResult;
-        if (Test.isPrototypeOf(test)) {
-          testResult = await this.__runTestClass(result, test);
-        } else {
-          testResult = await this.__runTestFunction(result, testName);
-        }
-        if (testResult.error) {
-          this.emit(EVENT_ERROR, this, testName, testResult);
-        }
-        result.items[testName] = testResult;
+      let testResult;
+      if (Test.isPrototypeOf(test)) {
+        testResult = await this.__runTestClass(result, test);
+      } else {
+        testResult = await this.__runTestFunction(result, testName);
       }
+      if (testResult.error) {
+        this.emit(EVENT_ERROR, this, testName, testResult);
+      }
+      result.items[testName] = testResult;
     }
     result.ignore = result.total - result.done - result.fail;
     result.timeline.end();
@@ -171,7 +165,7 @@ class TestPrinter {
   }
 
   timeStyle(text) {
-    return this.console.style.yellow(text);
+    return this.console.style.yellow(String(text).padStart(10));
   }
 
   testNameStyle(text) {

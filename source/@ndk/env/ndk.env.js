@@ -1,7 +1,7 @@
 /** @module @ndk/env */
 'use strict';
 
-const { CLArguments } = require('./args');
+const { CLArguments, getProcessArgs } = require('./args');
 
 
 /**
@@ -9,3 +9,9 @@ const { CLArguments } = require('./args');
  * @type module:@ndk/env/args.CLArguments
  */
 exports.CLArguments = CLArguments;
+
+/**
+ * @name getProcessArgs
+ * @type module:@ndk/env/args.getProcessArgs
+ */
+exports.getProcessArgs = getProcessArgs;

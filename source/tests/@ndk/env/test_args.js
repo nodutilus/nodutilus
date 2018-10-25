@@ -3,7 +3,7 @@
 const { equal, deepEqual } = require('assert').strict;
 
 const { Test } = require('@ndk/test');
-const { CLArguments } = require('@ndk/env');
+const { CLArguments, getProcessArgs } = require('@ndk/env');
 
 
 class TestEnvArgs extends Test {
@@ -105,8 +105,8 @@ class TestEnvArgs extends Test {
 
   ['test: CLArguments.parse - base']() {
     // Пустые значения
-    deepEqual(CLArguments.parse(), { flags: {}, options: {}, args: [] });
-    deepEqual(CLArguments.parse(' ', {}), { flags: {}, options: {}, args: [] });
+    deepEqual(CLArguments.parse(), { flags: {}, options: {}, argv: [] });
+    deepEqual(CLArguments.parse(' ', {}), { flags: {}, options: {}, argv: [] });
     // Флаги
     deepEqual(CLArguments.parse('-a --b').flags, { a: true, b: true });
     // Опции
@@ -114,34 +114,34 @@ class TestEnvArgs extends Test {
     deepEqual(CLArguments.parse('--a==b').options, { a: '=b' });
     deepEqual(CLArguments.parse('--a=b=c').options, { a: 'b=c' });
     // Аргументы
-    deepEqual(CLArguments.parse('a b c').args, ['a', 'b', 'c']);
+    deepEqual(CLArguments.parse('a b c').argv, ['a', 'b', 'c']);
     // Флаги + опции
     deepEqual(CLArguments.parse('-a --b -c=d --e f'), {
       flags: { a: true, b: true },
       options: { c: 'd', e: 'f' },
-      args: []
+      argv: []
     });
     deepEqual(CLArguments.parse('-a=--b -c --d'), {
       flags: { c: true, d: true },
       options: { a: '--b' },
-      args: []
+      argv: []
     });
     deepEqual(CLArguments.parse('-a b --c=d -e'), {
       flags: { e: true },
       options: { a: 'b', c: 'd' },
-      args: []
+      argv: []
     });
     // Флаги + аргументы
     deepEqual(CLArguments.parse('a --b'), {
       flags: { b: true },
       options: {},
-      args: ['a']
+      argv: ['a']
     });
     // Флаги + опции + аргументы
     deepEqual(CLArguments.parse('x -a b y -z --c=d'), {
       flags: { z: true },
       options: { a: 'b', c: 'd' },
-      args: ['x', 'y']
+      argv: ['x', 'y']
     });
   }
 
@@ -152,7 +152,7 @@ class TestEnvArgs extends Test {
     }), {
       flags: { zz: true },
       options: { aa: 'b', cc: 'd' },
-      args: ['x', 'y']
+      argv: ['x', 'y']
     });
   }
 
@@ -160,12 +160,20 @@ class TestEnvArgs extends Test {
     // Типы, переопределение опции флагом, аргументом
     // 1. Опции -> Флаги = выталкивают value в аргументы
     // 2. Опции -> Аргументы = теряют name, выталкивая value в аргументы
-    deepEqual(CLArguments.parse('--a b --c=d --e=f -x y', {
-      types: { a: 'Flag', c: 'Flag', e: 'Argument', x: 'Argument' }
+    deepEqual(CLArguments.parse('--a b --c=d --e=f -x y -z zv', {
+      aliases: { 'zet': 'z' },
+      types: { a: 'Flag', c: 'Flag', e: 'Argument', x: 'Argument', zet: 'Flag' }
     }), {
-      flags: { a: true, c: true },
+      flags: { a: true, c: true, zet: true },
       options: {},
-      args: ['b', 'd', 'f', 'y']
+      argv: ['b', 'd', 'f', 'y', 'zv']
+    });
+    deepEqual(CLArguments.parse('--a --b', {
+      types: { a: 'Option', b: 'Argument' }
+    }), {
+      flags: {},
+      options: { a: undefined },
+      argv: [undefined]
     });
   }
 
@@ -177,7 +185,7 @@ class TestEnvArgs extends Test {
     }), {
       flags: {},
       options: { a: 'b', c: ['d', 'e', 'f'] },
-      args: ['g']
+      argv: ['g']
     });
   }
 
@@ -191,12 +199,12 @@ class TestEnvArgs extends Test {
     equal(CLArguments.stringify({ options: { 'a': 'b' } }), '--a=b');
     equal(CLArguments.stringify({ options: { 'a': true } }), '--a=true');
     // Аргументы
-    equal(CLArguments.stringify({ args: ['a', 'b', 'c'] }), 'a b c');
+    equal(CLArguments.stringify({ argv: ['a', 'b', 'c'] }), 'a b c');
     // Флаги + опции + аргументы
     equal(CLArguments.stringify({
       flags: { a: true },
       options: { b: 'c', d: '=e' },
-      args: ['f']
+      argv: ['f']
     }), '-a --b=c --d==e f');
   }
 
@@ -215,7 +223,7 @@ class TestEnvArgs extends Test {
     // parse c полным набором опций
     deepEqual(clArgs.flags, { a: true });
     deepEqual(clArgs.options, { b: 'c' });
-    deepEqual(clArgs.args, ['xyz']);
+    deepEqual(clArgs.argv, ['xyz']);
     // stringify c полным набором опций
     equal(clArgs.stringify(), argsString);
   }
@@ -233,7 +241,7 @@ class TestEnvArgs extends Test {
     // parse c облегченным набором опций
     deepEqual(clArgsFull.flags, { a: true });
     deepEqual(clArgsFull.options, { b: 'c' });
-    deepEqual(clArgsFull.args, ['xyz']);
+    deepEqual(clArgsFull.argv, ['xyz']);
     // stringify c облегченным набором опций
     equal(clArgsFull.stringify(), argsString);
   }
@@ -251,7 +259,7 @@ class TestEnvArgs extends Test {
     // parse c облегченным набором опций
     deepEqual(clArgsFull.flags, { a: true });
     deepEqual(clArgsFull.options, { b: 'c' });
-    deepEqual(clArgsFull.args, ['xyz']);
+    deepEqual(clArgsFull.argv, ['xyz']);
     // stringify c облегченным набором опций
     equal(clArgsFull.stringify(), argsString);
   }
@@ -275,10 +283,10 @@ class TestEnvArgs extends Test {
       }
     }
     const xclArgs = new XCLArgs();
-    const { flags, options, args } = xclArgs.parse('*a **b c *d:e f');
+    const { flags, options, argv } = xclArgs.parse('*a **b c *d:e f');
     deepEqual(flags, { a: true });
     deepEqual(options, { b: 'c', d: 'e' });
-    deepEqual(args, ['f']);
+    deepEqual(argv, ['f']);
   }
 
   ['test: class CLArguments - extends - user type']() {
@@ -295,6 +303,16 @@ class TestEnvArgs extends Test {
     });
     deepEqual(xclArgs.parse('--a 123').options, { a: 123 });
     deepEqual(xclArgs.parse('--a a').options, {});
+  }
+
+  ['test: getProcessArgs']() {
+    process.argv.push('--a', 'b', '--c=d', '--e=f', '-x', 'y');
+    const processArgs = getProcessArgs({
+      types: { a: 'Flag', c: 'Flag', e: 'Argument', x: 'Argument' }
+    });
+    deepEqual(processArgs.flags, { a: true, c: true });
+    deepEqual(processArgs.options, {});
+    deepEqual(processArgs.argv, ['b', 'd', 'f', 'y']);
   }
 
 }

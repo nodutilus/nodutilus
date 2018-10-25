@@ -219,10 +219,10 @@ class CLArguments {
    * @param {CLArguments~parsedArguments} parsedArguments
    * @param {CLArguments~solvedArgument} solvedArgument
    */
-  static setterTypeFlag({ flags, args }, { name, value }) {
+  static setterTypeFlag({ flags, argv }, { name, value }) {
     flags[name] = true;
     if (value) {
-      this.setterTypeArgument({ args }, { value });
+      this.setterTypeArgument({ argv }, { value });
     }
   }
 
@@ -231,15 +231,15 @@ class CLArguments {
    * @param {CLArguments~parsedArguments} parsedArguments
    * @param {CLArguments~solvedArgument} solvedArgument
    */
-  static setterTypeArgument({ args }, { value }) {
-    args.push(value);
+  static setterTypeArgument({ argv }, { value }) {
+    argv.push(value);
   }
 
   /**
    * @typedef CLArguments~parsedArguments
    * @prop {Object<boolean>} flags
    * @prop {Object<string>} options
-   * @prop {Array<string>} args
+   * @prop {Array<string>} argv
    */
   /**
    * @method CLArguments.parse
@@ -249,7 +249,7 @@ class CLArguments {
    */
   static parse(input = [], claOptions) {
     const inputArgs = typeof input === 'string' ? input.split(' ').filter(Boolean) : input;
-    const parsed = { flags: {}, options: {}, args: [] };
+    const parsed = { flags: {}, options: {}, argv: [] };
     for (let index = 0; index < inputArgs.length; index++) {
       const solvedArgument = this.resolveArgument(
         inputArgs[index], inputArgs[index + 1], claOptions
@@ -270,21 +270,21 @@ class CLArguments {
    */
   static stringify(parsedArguments, claOptions) {
     const { flagPrefix, optionPrefix, setter } = this.resolveCLAOptions(claOptions);
-    const args = [];
+    const argv = [];
     if ('flags' in parsedArguments) {
       for (const [name] of Object.entries(parsedArguments.flags)) {
-        args.push(flagPrefix + name);
+        argv.push(flagPrefix + name);
       }
     }
     if ('options' in parsedArguments) {
       for (const [name, value] of Object.entries(parsedArguments.options)) {
-        args.push(optionPrefix + name + setter + value);
+        argv.push(optionPrefix + name + setter + value);
       }
     }
-    if ('args' in parsedArguments) {
-      args.push(...parsedArguments.args);
+    if ('argv' in parsedArguments) {
+      argv.push(...parsedArguments.argv);
     }
-    return args.join(' ');
+    return argv.join(' ');
   }
 
   /**
@@ -293,7 +293,7 @@ class CLArguments {
    * @prop {CLArguments~claOptions} claOptions
    * @prop {Object<boolean>} flags
    * @prop {Object<string>} options
-   * @prop {Array<string>} args
+   * @prop {Array<string>} argv
    */
   constructor(claOptions) {
     this.claOptions = this.constructor.resolveCLAOptions(claOptions);
@@ -319,4 +319,15 @@ class CLArguments {
 }
 
 
+/**
+ * @method getProcessArgs
+ * @param {CLArguments~claOptions} claOptions
+ * @returns {CLArguments}
+ */
+function getProcessArgs(claOptions) {
+  return new CLArguments(claOptions).parse(process.argv.slice(2));
+}
+
+
 exports.CLArguments = CLArguments;
+exports.getProcessArgs = getProcessArgs;

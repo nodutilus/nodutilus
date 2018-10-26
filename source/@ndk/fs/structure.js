@@ -32,7 +32,7 @@ async function copy(source, target, options = { rewrite: false }) {
     });
   }
   await mkdir(target);
-  await walk(source, async(path, stat) => {
+  await walk(source, async (path, stat) => {
     let target_path = join(target, path);
     if (stat.isDirectory()) {
       await mkdir(target_path);
@@ -92,25 +92,34 @@ async function mkdir(path) {
 }
 
 /**
- * Удаляет каталог со всем содержимым, если он существует
+ * Удаляет файл или каталог со всем содержимым, если он существует
  *
- * @param {string} path Путь к каталогу
+ * @param {string} path Путь к каталогу или файлу
  * @returns {Promise<undefined>}
  */
 async function remove(path) {
-  await walk(path, async(item_path, stat) => {
-    let rm_path = join(path, item_path);
-    if (stat.isDirectory()) {
-      await rmdir(rm_path);
-    } else {
-      await unlink(rm_path);
-    }
-  }, { topdown: false }).catch(err => {
+  const stat = await ndk_fs_promisify.stat(path).catch(err => {
     if (err.code !== 'ENOENT') {
       throw err;
     }
   });
-  await rmdir(path);
+  if (stat && stat.isDirectory()) {
+    await walk(path, async (itemPath, stat) => {
+      const rmPath = join(path, itemPath);
+      if (stat.isDirectory()) {
+        await rmdir(rmPath);
+      } else {
+        await unlink(rmPath);
+      }
+    }, { topdown: false }).catch(err => {
+      if (err.code !== 'ENOENT') {
+        throw err;
+      }
+    });
+    await rmdir(path);
+  } else {
+    await unlink(path);
+  }
 }
 
 /**
@@ -144,7 +153,7 @@ async function symlink(target, path) {
     return await symlinkfile(target, path);
   }
   await mkdir(path);
-  await walk(target, async(sub_target, stat) => {
+  await walk(target, async (sub_target, stat) => {
     let sub_path = join(path, sub_target);
     if (stat.isDirectory()) {
       await mkdir(sub_path);

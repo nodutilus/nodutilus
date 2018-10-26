@@ -10,5 +10,10 @@
     "request": "launch",
     "name": "Tests",
     "program": "${workspaceFolder}/source/tests/index.js"
+  }, {
+    "type": "node",
+    "request": "launch",
+    "name": "Build",
+    "program": "${workspaceFolder}/node_modules/ndk-source-builder/builder.js"
   }]
 }

@@ -1,7 +1,7 @@
 language:       node_js
 node_js:        node
 cache:
-  directories:  node_modules
+  directories:  [node_modules, build/modules_repo]
 install:        npm install & npm update
 script:         npm run build
 notifications:

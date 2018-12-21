@@ -1,9 +1,9 @@
-workflow "New workflow" {
+workflow "Tests" {
   on = "push"
-  resolves = ["GitHub Action for npm"]
+  resolves = ["Run Tests"]
 }
 
-action "GitHub Action for npm" {
+action "Run Tests" {
   uses = "actions/npm@e7aaefe"
-  runs = "instull"
+  runs = "npm run test"
 }

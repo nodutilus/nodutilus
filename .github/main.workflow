@@ -1,6 +1,6 @@
 workflow "Tests & Coverage" {
   on = "push"
-  resolves = ["Run Coverage", "Install NYC"]
+  resolves = ["Run Coverage"]
 }
 
 action "Install Dependencies" {
@@ -9,21 +9,11 @@ action "Install Dependencies" {
   args = "install"
 }
 
-
-action "Install NYC" {
-  uses = "nd-toolkit/source-builder/github-actions/node@master"
-  runs = "npm"
-  args = "install -g nyc"
-  needs = [
-    "Install Dependencies",
-  ]
-}
-
 action "Run Coverage" {
   uses = "nd-toolkit/source-builder/github-actions/node@master"
   runs = "npm"
   args = "run coverage"
   needs = [
-    "Install NYC",
+    "Install Dependencies",
   ]
 }

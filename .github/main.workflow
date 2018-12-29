@@ -1,15 +1,17 @@
-workflow "Tests" {
+workflow "Tests & Coverage" {
   on = "push"
-  resolves = ["Run Tests"]
+  resolves = ["Run Coverage"]
 }
 
-action "Install" {
-  uses = "actions/npm@e7aaefe"
-  runs = "npm install"
+action "Install Dependencies" {
+  uses = "nd-toolkit/source-builder/github-actions/node@master"
+  runs = "npm"
+  args = "install"
 }
 
-action "Run Tests" {
-  uses = "actions/npm@e7aaefe"
-  runs = "npm run test"
-  needs = ["Install"]
+action "Run Coverage" {
+  uses = "nd-toolkit/source-builder/github-actions/node@master"
+  runs = "npm"
+  args = "run coverage"
+  needs = ["Install Dependencies"]
 }

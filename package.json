@@ -12,7 +12,8 @@
     "build": "node node_modules/ndk-source-builder",
     "test": "node node_modules/ndk-source-builder test",
     "coverage": "node node_modules/ndk-source-builder coverage",
-    "watch": "node node_modules/ndk-source-builder watch"
+    "watch": "node node_modules/ndk-source-builder watch",
+    "filtre-skip-ci": "node node_modules/ndk-source-builder filtre-skip-ci"
   },
   "dependencies": {
     "ndk-source-builder": "github:nd-toolkit/source-builder"

@@ -1,6 +1,0 @@
-version: "2"
-checks:
-  method-complexity:
-    config:
-      # https://eslint.org/docs/rules/complexity#rule-details
-      threshold: 20

@@ -1,6 +1,6 @@
 # [![LOGO][logo22]][home_org] NDK Source Code [![Build][ts_badge]][ts_home] [![Coverage Status][coveralls_badge]][coveralls_home]
 
-# Значки
+## Значки
 
 [![codecov][ccov_badge]][ccov_home]
 [![Code Climate Maintainability][cc_badge]][cc_home]

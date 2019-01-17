@@ -1,5 +1,7 @@
 # [![LOGO][logo22]][home_org] NDK Source Code [![Build][ts_badge]][ts_home] [![Coverage Status][coveralls_badge]][coveralls_home]
 
+Исходники модулей [npmjs.com/org/ndk](https://www.npmjs.com/org/ndk)
+
 ## Значки
 
 [![codecov][ccov_badge]][ccov_home]

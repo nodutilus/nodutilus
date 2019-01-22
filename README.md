@@ -2,7 +2,6 @@
 
 Исходники модулей [npmjs.com/org/ndk](https://www.npmjs.com/org/ndk)
 
-
 ## Значки
 
 [![codecov][ccov_badge]][ccov_home]

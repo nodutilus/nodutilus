@@ -9,11 +9,11 @@
     "source"
   ],
   "scripts": {
-    "build": "node node_modules/ndk-source-builder",
-    "test": "node node_modules/ndk-source-builder test",
-    "coverage": "node node_modules/ndk-source-builder coverage",
-    "watch": "node node_modules/ndk-source-builder watch",
-    "filtre-skip-ci": "node node_modules/ndk-source-builder filtre-skip-ci"
+    "build": "node .",
+    "test": "node . test",
+    "coverage": "node . coverage",
+    "watch": "node . watch",
+    "filtre-skip-ci": "node . filtre-skip-ci"
   },
   "dependencies": {
     "ndk-source-builder": "github:nd-toolkit/source-builder"

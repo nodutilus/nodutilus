@@ -13,9 +13,7 @@
 [![codebeat badge][codebeat_badge]][codebeat_home]
 [![BCH compliance][bch_badge]][bch_home]
 
-[logo_source]: https://www.tinygraphs.com/labs/isogrids/hexa16/igor?theme=frogideas&numcolors=4&size=48&fmt=svg
-
-[logo22]: ./source/logo/logo22.png
+[logo22]: https://raw.githubusercontent.com/nd-toolkit/ndk-project/master/bin/src/logo22.png
 
 [home_org]: https://github.com/nd-toolkit
 

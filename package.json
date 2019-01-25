@@ -1,5 +1,7 @@
 {
-  "main": "node_modules/ndk-source-builder/builder.js",
+  "name": "@ndk/source-code",
+  "version": "0.0.0",
+  "main": "node_modules/@ndk/source-builder/builder.js",
   "scripts": {
     "build": "node .",
     "test": "node . test",

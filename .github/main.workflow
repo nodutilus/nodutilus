@@ -1,10 +1,17 @@
-workflow "Build and deploy on push" {
+workflow "Tests & Coverage" {
   on = "push"
-  resolves = ["Tests > Coverage"]
+  resolves = ["Run tests"]
 }
 
-action "Tests > Coverage" {
+action "Install source-builder" {
   uses = "nd-toolkit/github-actions/node-current@master"
-  args = "--version"
-  runs = "node"
+  runs = "npm"
+  args = "i nd-toolkit/source-builder"
+}
+
+action "Run tests" {
+  uses = "nd-toolkit/github-actions/node-current@master"
+  needs = ["Install source-builder"]
+  runs = "npm"
+  args = "run test"
 }

@@ -1,22 +1,11 @@
 {
-  "name": "ndk-source-code",
-  "version": "0.0.93",
-  "description": "[REPO ONLY]",
-  "repository": "github:nd-toolkit/source-code",
-  "license": "Unlicense",
   "main": "node_modules/ndk-source-builder/builder.js",
-  "files": [
-    "source"
-  ],
   "scripts": {
     "build": "node .",
     "test": "node . test",
     "coverage": "node . coverage",
     "watch": "node . watch",
     "filtre-skip-ci": "node . filtre-skip-ci"
-  },
-  "dependencies": {
-    "ndk-source-builder": "github:nd-toolkit/source-builder"
   },
   "eslintIgnore": [
     "source/node_modules"

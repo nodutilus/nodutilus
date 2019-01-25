@@ -1,21 +1,10 @@
-workflow "Tests & Coverage" {
+workflow "Build and deploy on push" {
   on = "push"
-  resolves = ["nd-toolkit/github-actions/node-current@master"]
+  resolves = ["Tests > Coverage"]
 }
 
-action "Install Dependencies" {
+action "Tests > Coverage" {
   uses = "nd-toolkit/github-actions/node-current@master"
   args = "--version"
-}
-
-action "TEST" {
-  uses = "nd-toolkit/github-actions/node-current@master"
-  needs = ["Install Dependencies"]
-  runs = "npm"
-  args = "--version"
-}
-
-action "nd-toolkit/github-actions/node-current@master" {
-  uses = "nd-toolkit/github-actions/node-current@master"
-  needs = ["TEST"]
+  runs = "node"
 }

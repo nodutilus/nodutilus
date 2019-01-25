@@ -1,8 +1,8 @@
 language:       node_js
 node_js:        node
 cache:
-  directories:  [node_modules, build/modules_repo]
-install:        npm install && npm update
+  directories:  node_modules
+install:        npm install
 script:         npm run build
 notifications:
   email:        false

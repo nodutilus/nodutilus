@@ -1,9 +1,9 @@
 {
-  "name": "@ndk/source-code",
+  "name": "@nd-toolkit/source-code",
   "version": "0.0.0",
   "repository": "github:nd-toolkit/source-code",
   "license": "Unlicense",
-  "main": "node_modules/@ndk/source-builder/builder/index.js",
+  "main": "node_modules/@nd-toolkit/source-builder/builder.js",
   "scripts": {
     "build": "node .",
     "test": "node . test",

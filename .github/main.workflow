@@ -3,15 +3,15 @@ workflow "Tests & Coverage" {
   resolves = ["Run tests"]
 }
 
-action "Install source-builder" {
+action "Install dependencies" {
   uses = "nd-toolkit/github-actions/node-current@master"
-  runs = "npm"
-  args = "i nd-toolkit/source-builder"
+  runs = "node"
+  args = "bin/ci/install"
 }
 
 action "Run tests" {
   uses = "nd-toolkit/github-actions/node-current@master"
-  needs = ["Install source-builder"]
+  needs = ["Install dependencies"]
   runs = "npm"
   args = "run test"
 }

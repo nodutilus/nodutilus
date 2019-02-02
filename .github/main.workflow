@@ -5,8 +5,8 @@ workflow "Tests & Coverage" {
 
 action "Install dependencies" {
   uses = "nd-toolkit/github-actions/node-current@master"
-  runs = "node"
-  args = "bin/ci/install"
+  runs = "npm"
+  args = "install"
 }
 
 action "Run tests" {

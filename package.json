@@ -11,6 +11,9 @@
     "watch": "node . watch",
     "filtre-skip-ci": "node . filtre-skip-ci"
   },
+  "dependencies": {
+    "@nd-toolkit/source-builder": "github:nd-toolkit/source-builder"
+  },
   "nyc": {
     "exclude": [
       "!**/node_modules/@ndk/"

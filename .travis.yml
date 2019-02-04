@@ -4,6 +4,6 @@ cache:
   directories:  node_modules
 install:
   - npm install -g eslint nyc
-  - npm install
+  - npm udpate
   - npm run ci-prepare-build
 script: node node_modules/@nd-toolkit/source-builder/bin/travis-build-source-code.js

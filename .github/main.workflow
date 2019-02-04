@@ -9,9 +9,16 @@ action "Install dependencies" {
   args = "install"
 }
 
-action "Run tests" {
+action "ESLint Checks" {
   uses = "nd-toolkit/github-actions/node-current@master"
   needs = ["Install dependencies"]
+  runs = "eslint"
+  args = "."
+}
+
+action "Run tests" {
+  uses = "nd-toolkit/github-actions/node-current@master"
+  needs = ["ESLint Checks"]
   runs = "npm"
   args = "run test"
 }

@@ -5,6 +5,7 @@
   "license": "Unlicense",
   "main": "node_modules/@nd-toolkit/source-builder/builder.js",
   "scripts": {
+    "postinstall": "node node_modules/@nd-toolkit/source-builder/bin/postinstall-source-code.js",
     "build": "node .",
     "test": "node . test",
     "coverage": "node . coverage",
@@ -12,7 +13,8 @@
     "filtre-skip-ci": "node . filtre-skip-ci"
   },
   "dependencies": {
-    "@nd-toolkit/source-builder": "github:nd-toolkit/source-builder"
+    "@nd-toolkit/source-builder": "github:nd-toolkit/source-builder",
+    "@nd-toolkit/ndk-project": "github:nd-toolkit/ndk-project"
   },
   "nyc": {
     "exclude": [

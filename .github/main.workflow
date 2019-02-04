@@ -9,16 +9,23 @@ action "Install dependencies" {
   args = "install"
 }
 
-action "ESLint Checks" {
+action "Prepare build" {
   uses = "nd-toolkit/github-actions/node-current@master"
   needs = ["Install dependencies"]
+  runs = "npm"
+  args = "run ci-prepare-build"
+}
+
+action "ESLint checks" {
+  uses = "nd-toolkit/github-actions/node-current@master"
+  needs = ["Prepare build"]
   runs = "eslint"
   args = "."
 }
 
 action "Run tests" {
   uses = "nd-toolkit/github-actions/node-current@master"
-  needs = ["ESLint Checks"]
+  needs = ["ESLint checks"]
   runs = "npm"
   args = "run test"
 }

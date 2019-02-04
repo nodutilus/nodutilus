@@ -20,7 +20,7 @@ action "ESLint checks" {
   uses = "nd-toolkit/github-actions/node-current@master"
   needs = ["Prepare build"]
   runs = "eslint"
-  args = "."
+  args = ". --max-warnings 0"
 }
 
 action "Run tests" {

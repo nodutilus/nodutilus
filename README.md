@@ -13,7 +13,7 @@
 [![codebeat badge][codebeat_badge]][codebeat_home]
 [![BCH compliance][bch_badge]][bch_home]
 
-[logo22]: https://raw.githubusercontent.com/nd-toolkit/ndk-project/master/bin/src/logo22.png
+[logo22]: https://raw.githubusercontent.com/nd-toolkit/ndk-project/master/src/logo22.png
 
 [home_org]: https://github.com/nd-toolkit
 

@@ -1,5 +1,0 @@
-comment:
-  behavior: new
-parsers:
-  javascript:
-    enable_partials: yes

@@ -3,19 +3,13 @@
   "version": "0.0.0",
   "repository": "github:nd-toolkit/source-code",
   "license": "Unlicense",
-  "main": "node_modules/@nd-toolkit/source-builder/builder.js",
   "scripts": {
-    "ci-prepare-build": "node node_modules/@nd-toolkit/source-builder/bin/prepare-build-source-code.js",
-    "build": "node .",
     "test": "node . test",
     "coverage": "node . coverage",
     "watch": "node . watch",
-    "filtre-skip-ci": "node . filtre-skip-ci"
+    "build": "node ."
   },
-  "dependencies": {
-    "@nd-toolkit/source-builder": "github:nd-toolkit/source-builder",
-    "@nd-toolkit/ndk-project": "github:nd-toolkit/ndk-project"
-  },
+  "dependencies": {},
   "nyc": {
     "exclude": [
       "!**/node_modules/@ndk/"

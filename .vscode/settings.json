@@ -1,0 +1,26 @@
+{
+  "editor.tabSize": 2,
+  "editor.rulers": [110],
+  "editor.detectIndentation": false,
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 3000,
+  "files.trimTrailingWhitespace": true,
+  "files.eol": "\n",
+  "[javascript]": {
+    "files.insertFinalNewline": true,
+    "editor.defaultFormatter": "HookyQR.beautify"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "HookyQR.beautify"
+  },
+  "beautify.config": {
+    "indent_size": 2,
+    "brace_style": "collapse,preserve-inline"
+  },
+  "javascript.validate.enable": false,
+  "eslint.enable": true,
+  "eslint.options": {
+    "configFile": "./node_modules/@nd-toolkit/eslint-config/node.js"
+  },
+  "npm.enableScriptExplorer": true
+}

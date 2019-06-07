@@ -1,7 +1,7 @@
 {
-  "name": "@nd-toolkit/source-code",
+  "name": "@nd-toolkit/ndk-source",
   "version": "0.0.0",
-  "repository": "github:nd-toolkit/source-code",
+  "repository": "github:nd-toolkit/ndk-source",
   "license": "Unlicense",
   "scripts": {
     "test": "node . test",
@@ -9,7 +9,9 @@
     "watch": "node . watch",
     "build": "node ."
   },
-  "dependencies": {},
+  "dependencies": {
+    "@nd-toolkit/eslint-config": "github:nd-toolkit/eslint-config"
+  },
   "nyc": {
     "exclude": [
       "!**/node_modules/@ndk/"

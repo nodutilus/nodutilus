@@ -9,7 +9,7 @@
     "watch": "node . watch",
     "build": "node ."
   },
-  "dependencies": {
+  "devDependencies": {
     "@nd-toolkit/eslint-config": "github:nd-toolkit/eslint-config"
   },
   "nyc": {

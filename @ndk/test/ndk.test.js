@@ -1,192 +1,195 @@
 /** @module @ndk/test */
-'use strict';
+'use strict'
 
-const EventEmitter = require('events');
-const { TimeLinePoint } = require('@ndk/fn/datetime');
+const EventEmitter = require('events')
+const { TimeLinePoint } = require('@ndk/fn/datetime')
 
-const EVENT_ERROR = 'error';
-const EVENT_TESTED = 'tested';
-const EVENT_TESTED_CLASS = 'testedClass';
+const EVENT_ERROR = 'error'
+const EVENT_TESTED = 'tested'
+const EVENT_TESTED_CLASS = 'testedClass'
 
 
 class Test extends EventEmitter {
 
   constructor() {
-    super();
+    super()
     if (!('name' in this)) {
-      this.name = this.constructor.name;
+      this.name = this.constructor.name
     }
   }
 
   static getOwnTestNames() {
     return Object.getOwnPropertyNames(this.prototype)
-      .filter(name => typeof this.prototype[name] === 'function' && name.startsWith('test'));
+      .filter(name => typeof this.prototype[name] === 'function' && name.startsWith('test'))
   }
 
   static getTestNames() {
-    const names = this.getOwnTestNames();
-    let proto = this.__proto__;
-    let sanitize = false;
+    const names = this.getOwnTestNames()
+    let proto = this.__proto__
+    let sanitize = false
     while (proto !== Test) {
-      names.push(...proto.getOwnTestNames());
-      proto = proto.__proto__;
-      sanitize = true;
+      names.push(...proto.getOwnTestNames())
+      proto = proto.__proto__
+      sanitize = true
     }
-    return sanitize ? [...new Set(names)] : names;
+    return sanitize ? [...new Set(names)] : names
   }
 
   static getTestLength() {
     return this.getTestNames().reduce((length, name) => {
-      const test = this.prototype[name];
+      const test = this.prototype[name]
       if (Test.isPrototypeOf(test)) {
-        length += test.getTestLength();
+        length += test.getTestLength()
       } else {
-        length++;
+        length++
       }
-      return length;
-    }, 0);
+      return length
+    }, 0)
   }
 
   static getRecursiveTestNames() {
     return this.getTestNames().reduce((names, name) => {
-      const test = this.prototype[name];
+      const test = this.prototype[name]
       if (Test.isPrototypeOf(test)) {
-        const subNames = test.getRecursiveTestNames();
+        const subNames = test.getRecursiveTestNames()
         for (const subName of subNames) {
-          names.push(`${name}.${subName}`);
+          names.push(`${name}.${subName}`)
         }
       } else {
-        names.push(name);
+        names.push(name)
       }
-      return names;
-    }, []);
+      return names
+    }, [])
   }
 
   static runIsMainModule() {
     if (require.main.exports === this) {
       new TestPrinter(this).run().then(result => {
         if (!result.success) {
-          process.exit(1);
+          process.exit(1)
         }
-      });
+      })
     }
   }
 
   async __runTestClass(result, test) {
-    let testResult;
-    const timeline = new TimeLinePoint();
+    let testResult
+    const timeline = new TimeLinePoint()
     try {
       testResult = await new test()
         .on(EVENT_ERROR, (...args) => this.emit(EVENT_ERROR, ...args))
         .on(EVENT_TESTED, (...args) => this.emit(EVENT_TESTED, ...args))
         .on(EVENT_TESTED_CLASS, (...args) => this.emit(EVENT_TESTED_CLASS, ...args))
-        .run();
-      result.done += testResult.done;
-      result.fail += testResult.fail;
+        .run()
+      result.done += testResult.done
+      result.fail += testResult.fail
     } catch (error) {
-      timeline.end();
-      testResult = { timeline, type: 'class', error, success: false };
+      timeline.end()
+      testResult = { timeline, type: 'class', error, success: false }
     }
     if (!testResult.success) {
-      result.success = testResult.success;
+      result.success = testResult.success
     }
-    return testResult;
+    return testResult
   }
 
   async __runTestFunction(result, testName) {
-    const testResult = { timeline: new TimeLinePoint(), success: true, type: 'function' };
+    const testResult = { timeline: new TimeLinePoint(), success: true, type: 'function' }
     try {
-      await this[testName]();
-      result.done++;
+      await this[testName]()
+      result.done++
     } catch (error) {
-      testResult.success = false;
-      result.success = false;
-      testResult.error = error;
-      result.fail++;
+      testResult.success = false
+      result.success = false
+      testResult.error = error
+      result.fail++
     }
-    testResult.timeline.end();
-    this.emit(EVENT_TESTED, this, testName, testResult);
-    return testResult;
+    testResult.timeline.end()
+    this.emit(EVENT_TESTED, this, testName, testResult)
+    return testResult
   }
 
   async run() {
-    const result = { type: 'class', timeline: new TimeLinePoint(), success: true, done: 0, fail: 0, items: {} };
-    result.total = this.constructor.getTestLength();
-    const testNames = this.constructor.getTestNames();
+    const result = { type: 'class', timeline: new TimeLinePoint(), success: true, done: 0, fail: 0, items: {} }
+
+    result.total = this.constructor.getTestLength()
+
+    const testNames = this.constructor.getTestNames()
     for (const testName of testNames) {
-      const test = this[testName];
-      let testResult;
+      const test = this[testName]
+      let testResult
       if (Test.isPrototypeOf(test)) {
-        testResult = await this.__runTestClass(result, test);
+        testResult = await this.__runTestClass(result, test)
       } else {
-        testResult = await this.__runTestFunction(result, testName);
+        testResult = await this.__runTestFunction(result, testName)
       }
       if (testResult.error) {
-        this.emit(EVENT_ERROR, this, testName, testResult);
+        this.emit(EVENT_ERROR, this, testName, testResult)
       }
-      result.items[testName] = testResult;
+      result.items[testName] = testResult
     }
-    result.ignore = result.total - result.done - result.fail;
-    result.timeline.end();
-    this.emit(EVENT_TESTED_CLASS, this, result);
-    return result;
+    result.ignore = result.total - result.done - result.fail
+    result.timeline.end()
+    this.emit(EVENT_TESTED_CLASS, this, result)
+    return result
   }
 
 }
 
 
 function createTest(name, testObject) {
-  class CustomTest extends Test { get name() { return name; } }
-  Object.assign(CustomTest.prototype, testObject);
-  return CustomTest;
+  class CustomTest extends Test { get name() { return name } }
+
+  Object.assign(CustomTest.prototype, testObject)
+  return CustomTest
 }
 
 
 class TestPrinter {
 
   constructor(testClass) {
-    this.console = require('@ndk/console');
-    this.doneMsg = this.doneStyle('✔');
-    this.failMsg = this.failStyle('✘');
-    this.sepMsg = this.unimportantStyle('/');
-    this.ddotMsg = this.unimportantStyle(':');
+    this.console = require('@ndk/console')
+    this.doneMsg = this.doneStyle('✔')
+    this.failMsg = this.failStyle('✘')
+    this.sepMsg = this.unimportantStyle('/')
+    this.ddotMsg = this.unimportantStyle(':')
     this.test = new testClass()
       .on(EVENT_ERROR, (...args) => this[EVENT_ERROR](...args))
       .on(EVENT_TESTED, (...args) => this[EVENT_TESTED](...args))
-      .on(EVENT_TESTED_CLASS, (...args) => this[EVENT_TESTED_CLASS](...args));
+      .on(EVENT_TESTED_CLASS, (...args) => this[EVENT_TESTED_CLASS](...args))
   }
 
   unimportantStyle(text) {
-    return this.console.style.grey(text);
+    return this.console.style.grey(text)
   }
 
   importantStyle(text) {
-    return this.console.style.bold(text);
+    return this.console.style.bold(text)
   }
 
   timeStyle(text) {
-    return this.console.style.yellow(String(text).padStart(10));
+    return this.console.style.yellow(String(text).padStart(10))
   }
 
   testNameStyle(text) {
-    return this.console.style.bold(this.console.style.magenta(text));
+    return this.console.style.bold(this.console.style.magenta(text))
   }
 
   doneStyle(text) {
-    return this.console.style.bold(this.console.style.green(text));
+    return this.console.style.bold(this.console.style.green(text))
   }
 
   failStyle(text) {
-    return this.console.style.bold(this.console.style.red(text));
+    return this.console.style.bold(this.console.style.red(text))
   }
 
   ignoreStyle(text) {
-    return this.console.style.bold(this.console.style.yellow(text));
+    return this.console.style.bold(this.console.style.yellow(text))
   }
 
   run() {
-    this.progress = 0;
-    this.total = this.test.constructor.getTestLength();
+    this.progress = 0
+    this.total = this.test.constructor.getTestLength()
     return this.test.run().then((result) => this.console.logMessage(...[
       '    ',
       result.success ? this.doneMsg : this.failMsg,
@@ -194,12 +197,12 @@ class TestPrinter {
       this.doneStyle(`done: ${result.done}`),
       ...(result.fail ? [this.failStyle(` fail: ${result.fail}`)] : []),
       ...(result.ignore ? [this.ignoreStyle(` ignore: ${result.ignore}`)] : [])
-    ]) || result, this.console.logError);
+    ]) || result, this.console.logError)
   }
 
   [EVENT_ERROR](instance, testName, result) {
-    this.console.logError({ name: 'ExecutionError', message: `${instance.name}.${testName}` });
-    this.console.logError(result.error);
+    this.console.logError({ name: 'ExecutionError', message: `${instance.name}.${testName}` })
+    this.console.logError(result.error)
   }
 
   [EVENT_TESTED](instance, testName, result) {
@@ -210,7 +213,7 @@ class TestPrinter {
       this.testNameStyle(`${instance.name}`),
       this.ddotMsg,
       this.testNameStyle(`${testName}`)
-    ]);
+    ])
   }
 
   [EVENT_TESTED_CLASS](instance, result) {
@@ -224,12 +227,12 @@ class TestPrinter {
       this.doneStyle(result.done),
       ...(result.fail ? [this.sepMsg, this.failStyle(result.fail)] : []),
       ...(result.ignore ? [this.sepMsg, this.ignoreStyle(result.ignore)] : [])
-    ]);
+    ])
   }
 
 }
 
 
-module.exports.Test = Test;
-module.exports.createTest = createTest;
-module.exports.TestPrinter = TestPrinter;
+module.exports.Test = Test
+module.exports.createTest = createTest
+module.exports.TestPrinter = TestPrinter

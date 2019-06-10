@@ -1,4 +1,4 @@
-workflow "Tests & Coverage" {
+workflow "Main workflow" {
   on = "push"
   resolves = ["ESLint checks", "Tests & Coverage"]
 }
@@ -20,5 +20,5 @@ action "Tests & Coverage" {
   uses = "nd-toolkit/github-actions/node-current@master"
   needs = ["Install dependencies"]
   runs = "npm"
-  args = "install"
+  args = "test"
 }

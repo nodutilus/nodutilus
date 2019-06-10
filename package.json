@@ -4,16 +4,20 @@
   "repository": "github:nd-toolkit/ndk-source",
   "license": "Unlicense",
   "scripts": {
-    "test": "node . test",
-    "coverage": "node . coverage",
-    "watch": "node . watch",
-    "build": "node ."
+    "eslint": "eslint . --max-warnings 0",
+    "test": "(nyc node test || node test) && nyc report -r=text && nyc check-coverage"
   },
-  "devDependencies": {
+  "dependencies": {
     "@nd-toolkit/eslint-config": "github:nd-toolkit/eslint-config"
   },
   "nyc": {
+    "all": true,
+    "branches": 100,
+    "lines": 100,
+    "functions": 100,
+    "statements": 100,
     "exclude": [
+      "build",
       "!**/node_modules/@ndk/"
     ],
     "reporter": [

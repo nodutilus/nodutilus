@@ -1,6 +1,6 @@
-workflow "ESLint & Tests & Coverage" {
+workflow "Tests & Coverage" {
   on = "push"
-  resolves = ["ESLint checks"]
+  resolves = ["ESLint checks", "Tests & Coverage"]
 }
 
 action "Install dependencies" {
@@ -12,6 +12,13 @@ action "Install dependencies" {
 action "ESLint checks" {
   uses = "nd-toolkit/github-actions/node-current@master"
   needs = ["Install dependencies"]
-  runs = "eslint"
-  args = ". --max-warnings 0"
+  runs = "npm"
+  args = "run eslint"
+}
+
+action "Tests & Coverage" {
+  uses = "nd-toolkit/github-actions/node-current@master"
+  needs = ["Install dependencies"]
+  runs = "npm"
+  args = "install"
 }

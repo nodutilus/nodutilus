@@ -2,4 +2,4 @@
 
 console.log('test')
 
-//throw 'asd'
+throw 'asd'

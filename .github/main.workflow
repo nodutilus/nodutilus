@@ -4,20 +4,20 @@ workflow "Main workflow" {
 }
 
 action "Install dependencies" {
-  uses = "nd-toolkit/github-actions/node-current@master"
+  uses = "nd-toolkit/ci-cd/github-actions/node-current@master"
   runs = "npm"
   args = "install"
 }
 
 action "ESLint checks" {
-  uses = "nd-toolkit/github-actions/node-current@master"
+  uses = "nd-toolkit/ci-cd/github-actions/node-current@master"
   needs = ["Install dependencies"]
   runs = "npm"
   args = "run eslint"
 }
 
 action "Tests & Coverage" {
-  uses = "nd-toolkit/github-actions/node-current@master"
+  uses = "nd-toolkit/ci-cd/github-actions/node-current@master"
   needs = ["Install dependencies"]
   runs = "npm"
   args = "test"

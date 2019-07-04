@@ -1,6 +1,4 @@
 {
-  "name": "@nd-toolkit/ndk-source",
-  "version": "0.0.0",
   "repository": "github:nd-toolkit/ndk-source",
   "license": "Unlicense",
   "scripts": {
@@ -8,7 +6,7 @@
     "test": "(nyc node test || node test) && nyc report -r=text && nyc check-coverage"
   },
   "dependencies": {
-    "@nd-toolkit/eslint-config": "github:nd-toolkit/eslint-config"
+    "@nd-toolkit/eslint-config": "latest"
   },
   "nyc": {
     "all": true,

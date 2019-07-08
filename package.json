@@ -6,7 +6,10 @@
     "test": "(nyc node test || node test) && nyc report -r=text && nyc check-coverage"
   },
   "dependencies": {
-    "@nd-toolkit/eslint-config": "latest"
+    "@nd-toolkit/eslint-config": "latest",
+    "eslint": "latest",
+    "eslintcc": "latest",
+    "nyc": "latest"
   },
   "nyc": {
     "all": true,

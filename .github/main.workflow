@@ -20,5 +20,5 @@ action "Tests & Coverage" {
   uses = "nd-toolkit/ci-cd/github-actions/node-current@master"
   needs = ["Install dependencies"]
   runs = "npm"
-  args = "test"
+  args = "run test"
 }

@@ -1,6 +1,6 @@
 workflow "Main workflow" {
   on = "push"
-  resolves = ["ESLint checks", "Tests & Coverage"]
+  resolves = ["ESLint checks", "ESLintCC checks", "Tests & Coverage"]
 }
 
 action "Install dependencies" {
@@ -14,6 +14,13 @@ action "ESLint checks" {
   needs = ["Install dependencies"]
   runs = "npm"
   args = "run eslint"
+}
+
+action "ESLintCC checks" {
+  uses = "nd-toolkit/ci-cd/github-actions/node-current@master"
+  needs = ["Install dependencies"]
+  runs = "npm"
+  args = "run eslintcc"
 }
 
 action "Tests & Coverage" {

@@ -3,6 +3,7 @@
   "license": "Unlicense",
   "scripts": {
     "eslint": "eslint . --max-warnings 0",
+    "eslintcc": "eslintcc . --greater-than C --show-rules --average",
     "test": "(nyc node test || node test) && nyc report -r=text && nyc check-coverage"
   },
   "dependencies": {

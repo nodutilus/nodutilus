@@ -1,13 +1,18 @@
 {
+  "type": "module",
   "repository": "github:nd-toolkit/ndk-source",
   "license": "Unlicense",
   "scripts": {
+    "node": "node --experimental-modules",
     "eslint": "eslint . --max-warnings 0",
     "eslintcc": "eslintcc . --greater-than C --show-rules --average",
-    "test": "(nyc node test || node test) && nyc report -r=text && nyc check-coverage"
+    "link-for-test": "npm run node bin/link-for-test.js",
+    "test": "(nyc node test || node test) && nyc report -r=text && nyc check-coverage",
+    "postinstall": "npm run link-for-test"
   },
   "dependencies": {
     "@nd-toolkit/eslint-config": "latest",
+    "@nd-toolkit/ci-cd": "latest",
     "eslint": "latest",
     "eslintcc": "latest",
     "nyc": "latest"

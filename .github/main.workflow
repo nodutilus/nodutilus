@@ -23,9 +23,16 @@ action "ESLintCC checks" {
   args = "run eslintcc"
 }
 
-action "Tests & Coverage" {
+action "Prepare Tests" {
   uses = "nd-toolkit/ci-cd/github-actions/node-current@master"
   needs = ["Install dependencies"]
+  runs = "npm"
+  args = "run link-for-test"
+}
+
+action "Tests & Coverage" {
+  uses = "nd-toolkit/ci-cd/github-actions/node-current@master"
+  needs = ["Prepare Tests"]
   runs = "npm"
   args = "run test"
 }

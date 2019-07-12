@@ -23,6 +23,7 @@
     "functions": 100,
     "statements": 100,
     "exclude": [
+      "bin",
       "build",
       "!**/node_modules/@ndk/"
     ],

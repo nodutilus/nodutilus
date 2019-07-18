@@ -6,7 +6,7 @@
     "node": "node --experimental-modules",
     "eslint": "eslint . --max-warnings 0",
     "eslintcc": "eslintcc . --greater-than C --show-rules --average",
-    "link-for-test": "npm run node bin/link-for-test.js",
+    "link-for-test": "ndk-ci-cd link-for-test @ndk test",
     "test": "(nyc node test || node test) && nyc report -r=text && nyc check-coverage"
   },
   "dependencies": {

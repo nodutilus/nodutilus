@@ -11,6 +11,11 @@
   }, {
     "type": "node",
     "request": "launch",
+    "name": "Current file CJS",
+    "program": "${file}"
+  }, {
+    "type": "node",
+    "request": "launch",
     "name": "All Tests",
     "program": "${workspaceFolder}/test/all.js",
     "runtimeArgs": [

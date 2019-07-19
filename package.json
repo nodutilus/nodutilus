@@ -6,8 +6,9 @@
     "node": "node --experimental-modules",
     "eslint": "eslint . --max-warnings 0",
     "eslintcc": "eslintcc . --greater-than C --show-rules --average",
+    "test": "npm run node test/all.js",
     "link-for-test": "ndk-ci-cd link-for-test @ndk test",
-    "test": "(nyc node test || node test) && nyc report -r=text && nyc check-coverage"
+    "test-and-coverage": "(nyc node test || node test) && nyc report -r=text && nyc check-coverage"
   },
   "dependencies": {
     "@nd-toolkit/eslint-config": "latest",

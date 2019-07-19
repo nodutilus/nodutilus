@@ -8,5 +8,13 @@
     "runtimeArgs": [
       "--experimental-modules"
     ]
+  }, {
+    "type": "node",
+    "request": "launch",
+    "name": "All Tests",
+    "program": "${workspaceFolder}/test/all.js",
+    "runtimeArgs": [
+      "--experimental-modules"
+    ]
   }]
 }

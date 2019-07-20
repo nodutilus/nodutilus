@@ -3,6 +3,7 @@ import { Test } from '@ndk/test'
 
 const { equal } = assert
 
+
 class MyTestName extends Test {
 
   constructor() {
@@ -12,9 +13,9 @@ class MyTestName extends Test {
 
 }
 
-const allTests = {
+class allTests {
 
-  ['Test => name']() {
+  ['Test => name in constructor']() {
     const mt = new MyTestName()
 
     equal(mt.name, 'My Test')
@@ -22,6 +23,12 @@ const allTests = {
 
 }
 
-export function preparation() {
-  Object.values(allTests).forEach(fn => fn())
+
+export async function preparation() {
+  const tests = new allTests()
+  const testNames = Object.getOwnPropertyNames(tests.__proto__)
+    .filter(item => item !== 'constructor')
+  for (const testName of testNames) {
+    await tests[testName]()
+  }
 }

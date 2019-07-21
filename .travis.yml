@@ -7,4 +7,4 @@ script:
   - npm run eslint
   - npm run eslintcc
   - npm run link-for-test
-  - npm run test
+  - npm run test-and-coverage

@@ -1,9 +1,13 @@
 /** @module @ndk/test */
 
-export class Test {
+class Test {
 
   constructor() {
     this.name = this.constructor.name
   }
 
 }
+
+Object.assign(exports, {
+  Test
+})

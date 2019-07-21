@@ -34,5 +34,5 @@ action "Tests & Coverage" {
   uses = "nd-toolkit/ci-cd/github-actions/node-current@master"
   needs = ["Prepare Tests"]
   runs = "npm"
-  args = "run test"
+  args = "run test-and-coverage"
 }

@@ -1,12 +1,10 @@
 {
-  "type": "module",
   "repository": "github:nd-toolkit/ndk-source",
   "license": "Unlicense",
   "scripts": {
-    "node": "node --experimental-modules",
     "eslint": "eslint . --max-warnings 0",
     "eslintcc": "eslintcc . --greater-than C --show-rules --average",
-    "test": "npm run node test/all.js",
+    "test": "node test",
     "link-for-test": "ndk-ci-cd link-for-test @ndk test",
     "test-and-coverage": "(nyc node test || node test) && nyc report -r=text && nyc check-coverage"
   },
@@ -25,8 +23,7 @@
     "statements": 100,
     "exclude": [
       "bin",
-      "build",
-      "!**/node_modules/@ndk/"
+      "build"
     ],
     "reporter": [
       "lcovonly"

@@ -4,22 +4,11 @@
     "type": "node",
     "request": "launch",
     "name": "Current file",
-    "program": "${file}",
-    "runtimeArgs": [
-      "--experimental-modules"
-    ]
-  }, {
-    "type": "node",
-    "request": "launch",
-    "name": "Current file CJS",
     "program": "${file}"
   }, {
     "type": "node",
     "request": "launch",
     "name": "All Tests",
-    "program": "${workspaceFolder}/test/all.js",
-    "runtimeArgs": [
-      "--experimental-modules"
-    ]
+    "program": "${workspaceFolder}/test/index.js"
   }]
 }

@@ -1,5 +1,5 @@
-import { strict as assert } from 'assert'
-import { Test } from '@ndk/test'
+const { strict: assert } = require('assert')
+const { Test } = require('@ndk/test')
 
 const { equal } = assert
 
@@ -24,7 +24,7 @@ class allTests {
 }
 
 
-export async function preparation() {
+async function preparation() {
   const tests = new allTests()
   const testNames = Object.getOwnPropertyNames(tests.__proto__)
     .filter(item => item !== 'constructor')
@@ -32,3 +32,7 @@ export async function preparation() {
     await tests[testName]()
   }
 }
+
+Object.assign(exports, {
+  preparation
+})

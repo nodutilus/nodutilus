@@ -2,30 +2,34 @@
 
 class Test {
 
-  constructor() {
-    this.name = this.constructor.name
+  get name() {
+    return this.constructor.name
   }
 
   static _getTests() {
     const { prototype, __proto__ } = this
     const clsTests = Object.getOwnPropertyNames(prototype).filter(name => {
-      const isFn = typeof prototype[name] === 'function'
+      const descriptor = Object.getOwnPropertyDescriptor(prototype, name)
+      const isFn = typeof descriptor.value === 'function'
       const isProtect = name.startsWith('_')
       const isConstructor = name === 'constructor'
 
       return isFn && !isProtect && !isConstructor
     })
     const prtTests = __proto__ === Test ? [] : __proto__._getTests()
+    const tests = new Set([...clsTests, ...prtTests])
 
-    return new Set([...clsTests, ...prtTests])
+    return tests
   }
 
   _getTests() {
     const ownTests = Object.getOwnPropertyNames(this).filter(name => {
-      const isFn = typeof this[name] === 'function'
+      const descriptor = Object.getOwnPropertyDescriptor(this, name)
+      const isFn = typeof descriptor.value === 'function'
       const isProtect = name.startsWith('_')
+      const isTestClass = Object.isPrototypeOf.call(Test, descriptor.value)
 
-      return isFn && !isProtect
+      return isFn && !isProtect && !isTestClass || this[name] instanceof Test
     })
     const clsTests = this.constructor._getTests()
     const tests = new Set([...ownTests, ...clsTests])

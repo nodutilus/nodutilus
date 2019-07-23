@@ -8,7 +8,6 @@ class MyTestName extends Test {
 
   constructor() {
     super()
-    this.name = 'My Test'
     this.inConstructor = () => {}
   }
 
@@ -24,14 +23,33 @@ class MyTestNameExt extends MyTestName {
 }
 
 
+class MyTestNameInc extends Test {
+
+  constructor() {
+    super()
+    this.include = new MyTestName()
+    this.notInclude1 = MyTestName
+  }
+
+  get notInclude2() {
+    return MyTestName
+  }
+
+  get notInclude3() {
+    return new MyTestName()
+  }
+
+}
+
+
 class allTests {
 
   ['Test => name in constructor']() {
     const mt = new MyTestName()
     const mte = new MyTestNameExt()
 
-    equal(mt.name, 'My Test')
-    equal(mte.name, 'My Test')
+    equal(mt.name, 'MyTestName')
+    equal(mte.name, 'MyTestNameExt')
   }
 
   ['Test => _getTests']() {
@@ -46,6 +64,13 @@ class allTests {
     const tests = mt._getTests()
 
     deepEqual(tests, new Set(['inConstructor', 'baseTest', 'baseTestExt']))
+  }
+
+  ['Test => _getTests | include']() {
+    const mt = new MyTestNameInc()
+    const tests = mt._getTests()
+
+    deepEqual(tests, new Set(['include']))
   }
 
 }

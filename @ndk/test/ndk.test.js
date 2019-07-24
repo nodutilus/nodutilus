@@ -28,8 +28,9 @@ class Test {
       const isFn = typeof descriptor.value === 'function'
       const isProtect = name.startsWith('_')
       const isTestClass = Object.isPrototypeOf.call(Test, descriptor.value)
+      const isTestInstance = descriptor.value instanceof Test
 
-      return isFn && !isProtect && !isTestClass || this[name] instanceof Test
+      return isFn && !isProtect && !isTestClass || isTestInstance
     })
     const clsTests = this.constructor._getTests()
     const tests = new Set([...ownTests, ...clsTests])

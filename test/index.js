@@ -1,3 +1,5 @@
+'use strict'
+
 const { preparation } = require('./preparation.js')
 
 preparation().then(() => {

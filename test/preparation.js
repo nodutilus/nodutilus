@@ -1,3 +1,5 @@
+'use strict'
+
 const { strict: assert } = require('assert')
 const { Test } = require('@ndk/test')
 
@@ -80,6 +82,7 @@ async function preparation() {
   const tests = new allTests()
   const testNames = Object.getOwnPropertyNames(tests.__proto__)
     .filter(item => item !== 'constructor')
+
   for (const testName of testNames) {
     await tests[testName]()
   }

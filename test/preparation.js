@@ -15,6 +15,8 @@ class MyTestName extends Test {
 
   baseTest() {}
 
+  static notTest() {}
+
 }
 
 
@@ -23,6 +25,10 @@ class MyTestNameExt extends MyTestName {
   baseTestExt() {}
 
 }
+
+
+MyTestNameExt.xxx = MyTestName
+MyTestNameExt.fff = new MyTestName()
 
 
 class MyTestNameInc extends Test {
@@ -56,7 +62,7 @@ class allTests {
 
   ['Test => _getTests']() {
     const mt = new MyTestName()
-    const tests = mt._getTests()
+    const { tests } = mt
 
     deepEqual(tests, new Set(['inConstructor', 'baseTest']))
   }

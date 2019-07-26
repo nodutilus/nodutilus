@@ -15,6 +15,7 @@
     "eslintcc": "latest",
     "nyc": "latest"
   },
+  "eslintIgnore": ["test/node_modules"],
   "nyc": {
     "all": true,
     "branches": 100,

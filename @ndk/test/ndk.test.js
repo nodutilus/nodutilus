@@ -73,6 +73,14 @@ class Test {
     return tests
   }
 
+  static async run(testInstance) {
+    const { tests } = testInstance
+
+    for (const testName of tests) {
+      await testInstance[testName]()
+    }
+  }
+
 }
 
 Object.assign(exports, {

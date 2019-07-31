@@ -3,7 +3,7 @@
 const { strict: assert } = require('assert')
 const { Test } = require('@ndk/test')
 
-const { ok, equal, deepEqual, doesNotThrow } = assert
+const { ok, deepEqual, doesNotThrow } = assert
 
 
 class MyTestName extends Test {
@@ -126,6 +126,11 @@ class allTests {
     ok(MyTestNameIncludeExt.notTest instanceof Test)
   }
 
+  async ['Test => run ClassMethods']() {
+    const mt = new MyTestName()
+    const result = await Test.run(mt)
+  }
+
 }
 
 
@@ -140,6 +145,4 @@ async function preparation() {
 }
 
 
-Object.assign(exports, {
-  preparation
-})
+exports.preparation = preparation

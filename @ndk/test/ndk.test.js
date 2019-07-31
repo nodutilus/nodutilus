@@ -57,6 +57,23 @@ function getInstanceTests(tests, instance) {
 }
 
 
+class TestReporter {
+
+  constructor() {
+    this.report = {}
+  }
+
+  success(testName) {
+    this.report[testName] = { success: true }
+  }
+
+  failure(testName, error) {
+    this.report[testName] = { success: false, error }
+  }
+
+}
+
+
 class Test {
 
   get tests() {
@@ -71,14 +88,19 @@ class Test {
 
   static async run(testInstance) {
     const { tests } = testInstance
+    const testReporter = new TestReporter()
 
     for (const testName of tests) {
-      await testInstance[testName]()
+      try {
+        await testInstance[testName]()
+        testReporter.success(testName)
+      } catch (error) {
+        testReporter.failure(testName, error)
+      }
     }
   }
 
 }
 
-Object.assign(exports, {
-  Test
-})
+
+exports.Test = Test

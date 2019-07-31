@@ -72,16 +72,26 @@ function getInstanceTests(tests, instance) {
 
 class TestReporter {
 
+  /**
+   * @typedef {object} TestResult
+   * @property {boolean} success
+   * @property {Error} [error]
+   */
+  /**
+   * @typedef TestReport
+   * @type {Map.<string, TestResult>}
+   */
   /** */
   constructor() {
-    this.report = {}
+    /** @type {TestReport} */
+    this.report = new Map()
   }
 
   /**
    * @param {string} testName
    */
   success(testName) {
-    this.report[testName] = { success: true }
+    this.report.set(testName, { success: true })
   }
 
   /**
@@ -89,7 +99,7 @@ class TestReporter {
    * @param {Error} error
    */
   failure(testName, error) {
-    this.report[testName] = { success: false, error }
+    this.report.set(testName, { success: false, error })
   }
 
 }
@@ -110,8 +120,10 @@ class Test {
     return tests
   }
 
+
   /**
    * @param {Test} testInstance
+   * @returns {TestReport}
    */
   static async run(testInstance) {
     const { tests } = testInstance
@@ -125,6 +137,8 @@ class Test {
         testReporter.failure(testName, error)
       }
     }
+
+    return testReporter.report
   }
 
 }

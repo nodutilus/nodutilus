@@ -129,6 +129,7 @@ class allTests {
   async ['Test => run ClassMethods']() {
     const mt = new MyTestName()
     const result = await Test.run(mt)
+    const baseTest = result.get('baseTest')
   }
 
 }

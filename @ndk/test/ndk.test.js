@@ -2,6 +2,10 @@
 'use strict'
 
 
+/**
+ * @param {Set<string>} tests
+ * @param {Test} instance
+ */
 function getClassMethods(tests, instance) {
   const { __proto__ } = instance
   const classMethods = Object.getOwnPropertyNames(__proto__)
@@ -23,6 +27,10 @@ function getClassMethods(tests, instance) {
 }
 
 
+/**
+ * @param {Set<string>} tests
+ * @param {Function} constructor
+ */
 function getNestedStaticTests(tests, constructor) {
   const nestedStaticTests = Object.getOwnPropertyNames(constructor)
 
@@ -41,6 +49,11 @@ function getNestedStaticTests(tests, constructor) {
 }
 
 
+/**
+ *
+ * @param {Set<string>} tests
+ * @param {Test} instance
+ */
 function getInstanceTests(tests, instance) {
   const instanceTests = Object.getOwnPropertyNames(instance)
 
@@ -59,14 +72,22 @@ function getInstanceTests(tests, instance) {
 
 class TestReporter {
 
+  /** */
   constructor() {
     this.report = {}
   }
 
+  /**
+   * @param {string} testName
+   */
   success(testName) {
     this.report[testName] = { success: true }
   }
 
+  /**
+   * @param {string} testName
+   * @param {Error} error
+   */
   failure(testName, error) {
     this.report[testName] = { success: false, error }
   }
@@ -76,6 +97,9 @@ class TestReporter {
 
 class Test {
 
+  /**
+   * @returns {Set<string>}
+   */
   get tests() {
     const tests = new Set()
 
@@ -86,6 +110,9 @@ class Test {
     return tests
   }
 
+  /**
+   * @param {Test} testInstance
+   */
   static async run(testInstance) {
     const { tests } = testInstance
     const testReporter = new TestReporter()

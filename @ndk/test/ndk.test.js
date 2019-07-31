@@ -59,10 +59,6 @@ function getInstanceTests(tests, instance) {
 
 class Test {
 
-  get name() {
-    return this.constructor.name
-  }
-
   get tests() {
     const tests = new Set()
 

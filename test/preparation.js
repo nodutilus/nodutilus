@@ -67,14 +67,6 @@ MyTestNameIncludeExt.includeExt = MyTestName
 
 class allTests {
 
-  ['Test => test name']() {
-    const mt = new MyTestName()
-    const mte = new MyTestConstructor()
-
-    equal(mt.name, 'MyTestName')
-    equal(mte.name, 'MyTestConstructor')
-  }
-
   ['Test => getClassMethods']() {
     const mt = new MyTestName()
     const { tests } = mt

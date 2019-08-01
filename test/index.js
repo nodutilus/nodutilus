@@ -2,6 +2,7 @@
 
 const { preparation } = require('./preparation.js')
 
-preparation().then(() => {
-  console.log('done!')
+preparation().catch(error => {
+  console.error(error)
+  process.exit(1)
 })

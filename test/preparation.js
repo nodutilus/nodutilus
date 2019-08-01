@@ -3,7 +3,7 @@
 const { strict: assert } = require('assert')
 const { Test } = require('@ndk/test')
 
-const { ok, deepEqual, doesNotThrow } = assert
+const { ok, equal, deepEqual, doesNotThrow } = assert
 
 
 class MyTestName extends Test {
@@ -19,6 +19,13 @@ class MyTestName extends Test {
   get notTest3() {
     return new class Mtest extends Test {}()
   }
+
+}
+
+
+class MyTestFailure extends Test {
+
+  baseTest() { throw new Error('Test Error') }
 
 }
 
@@ -130,6 +137,28 @@ class allTests {
     const mt = new MyTestName()
     const result = await Test.run(mt)
     const baseTest = result.get('baseTest')
+
+    equal(baseTest.success, true)
+  }
+
+  async ['Test => run ClassMethods failure']() {
+    const mt = new MyTestFailure()
+    const result = await Test.run(mt)
+    const baseTest = result.get('baseTest')
+
+    equal(baseTest.success, false)
+    equal(baseTest.error.message, 'Test Error')
+  }
+
+  async ['Test => run getInstanceTests']() {
+    const mt = new MyTestConstructor()
+    const result = await Test.run(mt)
+    const myTest = result.get('myTest')
+    const mySubTest = result.get('mySubTest')
+
+    equal(result.size, 2)
+    equal(myTest.success, true)
+    equal(mySubTest.success, true)
   }
 
 }

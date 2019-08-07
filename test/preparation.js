@@ -42,6 +42,17 @@ class MyTestConstructor extends Test {
 }
 
 
+class MyTestConstructorFailure extends Test {
+
+  constructor() {
+    super()
+    this.myTest = () => {}
+    this.mySubTest = new MyTestFailure()
+  }
+
+}
+
+
 class MyTestNameInclude extends Test {}
 
 
@@ -136,16 +147,18 @@ class allTests {
   async ['Test => run ClassMethods']() {
     const mt = new MyTestName()
     const result = await Test.run(mt)
-    const baseTest = result.get('baseTest')
+    const baseTest = result.tests.get('baseTest')
 
+    equal(result.success, true)
     equal(baseTest.success, true)
   }
 
   async ['Test => run ClassMethods failure']() {
     const mt = new MyTestFailure()
     const result = await Test.run(mt)
-    const baseTest = result.get('baseTest')
+    const baseTest = result.tests.get('baseTest')
 
+    equal(result.success, false)
     equal(baseTest.success, false)
     equal(baseTest.error.message, 'Test Error')
   }
@@ -153,12 +166,30 @@ class allTests {
   async ['Test => run getInstanceTests']() {
     const mt = new MyTestConstructor()
     const result = await Test.run(mt)
-    const myTest = result.get('myTest')
-    const mySubTest = result.get('mySubTest')
+    const myTest = result.tests.get('myTest')
+    const mySubTest = result.tests.get('mySubTest')
+    const baseTest = mySubTest.nested.tests.get('baseTest')
 
-    equal(result.size, 2)
+    equal(result.success, true)
+    equal(result.tests.size, 2)
     equal(myTest.success, true)
     equal(mySubTest.success, true)
+    equal(baseTest.success, true)
+  }
+
+  async ['Test => run getInstanceTests failure']() {
+    const mt = new MyTestConstructorFailure()
+    const result = await Test.run(mt)
+    const myTest = result.tests.get('myTest')
+    const mySubTest = result.tests.get('mySubTest')
+    const baseTest = mySubTest.nested.tests.get('baseTest')
+
+    equal(result.success, false)
+    equal(result.tests.size, 2)
+    equal(myTest.success, true)
+    equal(mySubTest.success, false)
+    equal(baseTest.success, false)
+    equal(baseTest.error.message, 'Test Error')
   }
 
 }

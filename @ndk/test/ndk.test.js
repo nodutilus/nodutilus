@@ -75,23 +75,25 @@ class TestReporter {
   /**
    * @typedef {object} TestResult
    * @property {boolean} success
+   * @property {TestReport} [nested]
    * @property {Error} [error]
    */
   /**
-   * @typedef TestReport
-   * @type {Map.<string, TestResult>}
+   * @typedef {object} TestReport
+   * @property {Map.<string, TestResult>} tests
+   * @property {boolean} success
    */
   /** */
   constructor() {
     /** @type {TestReport} */
-    this.report = new Map()
+    this.report = { tests: new Map(), success: true }
   }
 
   /**
    * @param {string} testName
    */
   success(testName) {
-    this.report.set(testName, { success: true })
+    this.report.tests.set(testName, { success: true })
   }
 
   /**
@@ -99,7 +101,20 @@ class TestReporter {
    * @param {Error} error
    */
   failure(testName, error) {
-    this.report.set(testName, { success: false, error })
+    this.report.tests.set(testName, { success: false, error })
+    this.report.success = false
+  }
+
+  /**
+   * @param {string} testName
+   * @param {TestReport} testReport
+   */
+  nested(testName, testReport) {
+    this.report.tests.set(testName, {
+      success: testReport.success,
+      nested: testReport
+    })
+    this.report.success = this.report.success && testReport.success
   }
 
 }
@@ -130,11 +145,17 @@ class Test {
     const testReporter = new TestReporter()
 
     for (const testName of tests) {
-      try {
-        await testInstance[testName]()
-        testReporter.success(testName)
-      } catch (error) {
-        testReporter.failure(testName, error)
+      const test = testInstance[testName]
+
+      if (test instanceof Test) {
+        testReporter.nested(testName, await this.run(test))
+      } else {
+        try {
+          await test()
+          testReporter.success(testName)
+        } catch (error) {
+          testReporter.failure(testName, error)
+        }
       }
     }
 

@@ -162,8 +162,6 @@ class Test {
     return testReporter.report
   }
 
-  test(){}
-
 }
 
 

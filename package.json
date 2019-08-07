@@ -3,7 +3,7 @@
   "license": "Unlicense",
   "scripts": {
     "eslint": "eslint . --max-warnings 0",
-    "eslintcc": "eslintcc . --greater-than C --show-rules --average",
+    "eslintcc": "eslintcc . --greater-than C --show-rules",
     "test": "node test",
     "link-for-test": "ndk-ci-cd link-for-test @ndk test",
     "test-and-coverage": "(nyc node test || node test) && (nyc check-coverage || nyc report -r=text && nyc check-coverage)",

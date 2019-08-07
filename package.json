@@ -6,7 +6,7 @@
     "eslintcc": "eslintcc . --greater-than C --show-rules --average",
     "test": "node test",
     "link-for-test": "ndk-ci-cd link-for-test @ndk test",
-    "test-and-coverage": "(nyc node test || node test) && nyc report -r=text && nyc check-coverage",
+    "test-and-coverage": "(nyc node test || node test) && (nyc check-coverage || nyc report -r=text && nyc check-coverage)",
     "coverage-html": "nyc -r=html node test"
   },
   "dependencies": {

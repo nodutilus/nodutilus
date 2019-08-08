@@ -6,7 +6,7 @@
  * @param {Set<string>} tests
  * @param {Test} instance
  */
-function getClassMethods(tests, instance) {
+function getOwnClassMethods(tests, instance) {
   const { __proto__ } = instance
   const classMethods = Object.getOwnPropertyNames(__proto__)
 
@@ -20,7 +20,16 @@ function getClassMethods(tests, instance) {
       tests.add(name)
     }
   })
+}
 
+/**
+ * @param {Set<string>} tests
+ * @param {Test} instance
+ */
+function getClassMethods(tests, instance) {
+  const { __proto__ } = instance
+
+  getOwnClassMethods(tests, instance)
   if (__proto__.__proto__ instanceof Test) {
     getClassMethods(tests, __proto__)
   }
@@ -31,7 +40,7 @@ function getClassMethods(tests, instance) {
  * @param {Set<string>} tests
  * @param {Function} constructor
  */
-function getNestedStaticTests(tests, constructor) {
+function getOwnNestedStaticTests(tests, constructor) {
   const nestedStaticTests = Object.getOwnPropertyNames(constructor)
 
   nestedStaticTests.forEach(name => {
@@ -42,10 +51,48 @@ function getNestedStaticTests(tests, constructor) {
       tests.add(name)
     }
   })
+}
 
+
+/**
+ * @param {Set<string>} tests
+ * @param {Function} constructor
+ */
+function getNestedStaticTests(tests, constructor) {
+  getOwnNestedStaticTests(tests, constructor)
   if (Object.isPrototypeOf.call(Test, constructor.__proto__)) {
     getNestedStaticTests(tests, constructor.__proto__)
   }
+}
+
+
+/**
+ * @param {Test} instance
+ * @returns {Map<string, typeof Test>}
+ */
+function getNestedStaticTestsClasses(instance) {
+  /** @type {Map<string, typeof Test>} */
+  const tests = new Map()
+  let curentInstanse = instance.__proto__
+
+  while (curentInstanse instanceof Test) {
+    const curentStaticTests = new Set()
+
+    getOwnNestedStaticTests(curentStaticTests, curentInstanse.constructor)
+    if (curentStaticTests.size > 0) {
+      const curentClassMethods = new Set()
+
+      getOwnClassMethods(curentClassMethods, curentInstanse)
+      for (const staticTest of curentStaticTests) {
+        if (!curentClassMethods.has(staticTest)) {
+          tests.set(staticTest, curentInstanse.constructor[staticTest])
+        }
+      }
+    }
+    curentInstanse = curentInstanse.constructor.__proto__
+  }
+
+  return tests
 }
 
 
@@ -75,17 +122,12 @@ class TestReporter {
   /**
    * @typedef {object} TestResult
    * @property {boolean} success
-   * @property {TestReport} [nested]
+   * @property {Map.<string, TestResult>} [tests]
    * @property {Error} [error]
-   */
-  /**
-   * @typedef {object} TestReport
-   * @property {Map.<string, TestResult>} tests
-   * @property {boolean} success
    */
   /** */
   constructor() {
-    /** @type {TestReport} */
+    /** @type {TestResult} */
     this.report = { tests: new Map(), success: true }
   }
 
@@ -107,20 +149,28 @@ class TestReporter {
 
   /**
    * @param {string} testName
-   * @param {TestReport} testReport
+   * @param {TestResult} testResult
    */
-  nested(testName, testReport) {
-    this.report.tests.set(testName, {
-      success: testReport.success,
-      nested: testReport
-    })
-    this.report.success = this.report.success && testReport.success
+  nested(testName, testResult) {
+    this.report.tests.set(testName, testResult)
+    this.report.success = this.report.success && testResult.success
   }
 
 }
 
 
 class Test {
+
+  /**
+   * @returns {Test}
+   */
+  constructor() {
+    const tests = getNestedStaticTestsClasses(this)
+
+    for (const [testName, testClass] of tests) {
+      this[testName] = new testClass()
+    }
+  }
 
   /**
    * @returns {Set<string>}
@@ -138,7 +188,7 @@ class Test {
 
   /**
    * @param {Test} testInstance
-   * @returns {TestReport}
+   * @returns {TestResult}
    */
   static async run(testInstance) {
     const { tests } = testInstance

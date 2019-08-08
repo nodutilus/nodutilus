@@ -60,6 +60,12 @@ MyTestNameInclude.include = MyTestName
 MyTestNameInclude.notTest = new MyTestName()
 
 
+class MyTestNameIncludeFailure extends MyTestNameInclude {}
+
+
+MyTestNameIncludeFailure.include = MyTestFailure
+
+
 class MyTestNameExt extends MyTestName {
 
   baseTestExt() {}
@@ -168,7 +174,7 @@ class allTests {
     const result = await Test.run(mt)
     const myTest = result.tests.get('myTest')
     const mySubTest = result.tests.get('mySubTest')
-    const baseTest = mySubTest.nested.tests.get('baseTest')
+    const baseTest = mySubTest.tests.get('baseTest')
 
     equal(result.success, true)
     equal(result.tests.size, 2)
@@ -182,12 +188,38 @@ class allTests {
     const result = await Test.run(mt)
     const myTest = result.tests.get('myTest')
     const mySubTest = result.tests.get('mySubTest')
-    const baseTest = mySubTest.nested.tests.get('baseTest')
+    const baseTest = mySubTest.tests.get('baseTest')
 
     equal(result.success, false)
     equal(result.tests.size, 2)
     equal(myTest.success, true)
     equal(mySubTest.success, false)
+    equal(baseTest.success, false)
+    equal(baseTest.error.message, 'Test Error')
+  }
+
+  async ['Test => run getNestedStaticTests']() {
+    const mt = new MyTestNameInclude()
+    const result = await Test.run(mt)
+    const include = result.tests.get('include')
+    const baseTest = include.tests.get('baseTest')
+
+    equal(result.success, true)
+    equal(result.tests.size, 1)
+    equal(include.success, true)
+    equal(baseTest.success, true)
+  }
+
+  async ['Test => run getNestedStaticTests failure']() {
+    const mt = new MyTestNameIncludeFailure()
+    const result = await Test.run(mt)
+    const include = result.tests.get('include')
+    const baseTest = include.tests.get('baseTest')
+
+    equal(result.success, false)
+    equal(result.tests.size, 1)
+    equal(include.success, false)
+    equal(include.tests.size, 1)
     equal(baseTest.success, false)
     equal(baseTest.error.message, 'Test Error')
   }

@@ -20,6 +20,7 @@ function getOwnClassMethods(tests, proto) {
   })
 }
 
+
 /**
  * @param {Set<string>} tests
  * @param {Test} proto
@@ -69,23 +70,28 @@ function getNestedStaticTests(tests, constructor) {
 function getNestedStaticTestsClasses(instance) {
   /** @type {Map<string, typeof Test>} */
   const tests = new Map()
-  let curentInstanse = instance.__proto__
+  let { __proto__, constructor } = instance
 
-  while (curentInstanse instanceof Test) {
+  while (__proto__ instanceof Test) {
+    /** @type {Set<string>} */
     const curentStaticTests = new Set()
 
-    getOwnNestedStaticTests(curentStaticTests, curentInstanse.constructor)
+    getOwnNestedStaticTests(curentStaticTests, constructor)
     if (curentStaticTests.size > 0) {
+      /** @type {Set<string>} */
       const curentClassMethods = new Set()
 
-      getOwnClassMethods(curentClassMethods, curentInstanse)
+      getOwnClassMethods(curentClassMethods, __proto__)
       for (const staticTest of curentStaticTests) {
-        if (!curentClassMethods.has(staticTest)) {
-          tests.set(staticTest, curentInstanse.constructor[staticTest])
+        const notClassMethods = !curentClassMethods.has(staticTest)
+        const notExists = !tests.has(staticTest)
+
+        if (notClassMethods && notExists) {
+          tests.set(staticTest, constructor[staticTest])
         }
       }
     }
-    curentInstanse = curentInstanse.constructor.__proto__
+    ({ __proto__: { constructor } } = { __proto__ } = __proto__)
   }
 
   return tests
@@ -181,7 +187,6 @@ class Test {
 
     return tests
   }
-
 
   /**
    * @param {Test} testInstance

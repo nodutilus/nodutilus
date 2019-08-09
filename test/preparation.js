@@ -37,6 +37,7 @@ class MyTestConstructor extends Test {
     this.myTest = () => {}
     this.notTest = MyTestName
     this.mySubTest = new MyTestName()
+    this.muOpt = 123
   }
 
 }
@@ -64,6 +65,22 @@ class MyTestNameIncludeFailure extends MyTestNameInclude {}
 
 
 MyTestNameIncludeFailure.include = MyTestFailure
+
+
+class MyTestNameIncludeExtends extends MyTestNameIncludeFailure {}
+
+
+MyTestNameIncludeExtends.includeExt = MyTestName
+
+
+class MyTestNameIncludeRedefine extends Test {
+
+  include() {}
+
+}
+
+
+MyTestNameIncludeRedefine.include = MyTestFailure
 
 
 class MyTestNameExt extends MyTestName {
@@ -222,6 +239,37 @@ class allTests {
     equal(include.tests.size, 1)
     equal(baseTest.success, false)
     equal(baseTest.error.message, 'Test Error')
+  }
+
+  async ['Test => run getNestedStaticTests extends']() {
+    const mt = new MyTestNameIncludeExtends()
+    const result = await Test.run(mt)
+    const include = result.tests.get('include')
+    const baseTest = include.tests.get('baseTest')
+    const includeExt = result.tests.get('includeExt')
+    const baseTestExt = includeExt.tests.get('baseTest')
+
+    equal(result.success, false)
+    equal(result.tests.size, 2)
+    equal(include.success, false)
+    equal(include.tests.size, 1)
+    equal(baseTest.success, false)
+    equal(baseTest.error.message, 'Test Error')
+    equal(includeExt.success, true)
+    equal(includeExt.tests.size, 1)
+    equal(baseTestExt.success, true)
+  }
+
+  async ['Test => run getNestedStaticTests redefine']() {
+    const mt = new MyTestNameIncludeRedefine()
+    const result = await Test.run(mt)
+    const include = result.tests.get('include')
+
+    equal(Object.isPrototypeOf.call(Test, MyTestNameIncludeRedefine.include), true)
+    equal(typeof mt.include, 'function')
+    equal(result.success, true)
+    equal(result.tests.size, 1)
+    equal(include.success, true)
   }
 
 }

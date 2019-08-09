@@ -37,10 +37,16 @@ class MyTestConstructor extends Test {
     this.myTest = () => {}
     this.notTest = MyTestName
     this.mySubTest = new MyTestName()
+    this.sizeBeforeRedefined = this.tests.size
     this.muOpt = 123
   }
 
+  notTest() {}
+
 }
+
+
+MyTestConstructor.muOpt = MyTestName
 
 
 class MyTestConstructorFailure extends Test {
@@ -135,6 +141,9 @@ class allTests {
     doesNotThrow(mt.myTest)
     ok(mt.mySubTest instanceof Test)
     doesNotThrow(() => ok(new mt.notTest() instanceof Test))
+    doesNotThrow(mt.__proto__.notTest)
+    equal(mt.sizeBeforeRedefined, 3)
+    equal(tests.size, 2)
   }
 
   ['Test => getInstanceTests extends']() {

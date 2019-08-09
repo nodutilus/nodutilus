@@ -114,6 +114,8 @@ function getInstanceTests(tests, instance) {
 
     if (isFunction && !isTestClass || isTestInstance) {
       tests.add(name)
+    } else {
+      tests.delete(name)
     }
   })
 }

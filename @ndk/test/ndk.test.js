@@ -4,19 +4,17 @@
 
 /**
  * @param {Set<string>} tests
- * @param {Test} instance
+ * @param {Test} proto
  */
-function getOwnClassMethods(tests, instance) {
-  const { __proto__ } = instance
-  const classMethods = Object.getOwnPropertyNames(__proto__)
+function getOwnClassMethods(tests, proto) {
+  const classMethods = Object.getOwnPropertyNames(proto)
 
   classMethods.forEach(name => {
-    const { value } = Object.getOwnPropertyDescriptor(__proto__, name)
+    const { value } = Object.getOwnPropertyDescriptor(proto, name)
     const isFunction = typeof value === 'function'
     const isTestClass = Object.isPrototypeOf.call(Test, value)
-    const isTestInstance = value instanceof Test
 
-    if (isFunction && !isTestClass || isTestInstance) {
+    if (isFunction && !isTestClass) {
       tests.add(name)
     }
   })
@@ -24,14 +22,12 @@ function getOwnClassMethods(tests, instance) {
 
 /**
  * @param {Set<string>} tests
- * @param {Test} instance
+ * @param {Test} proto
  */
-function getClassMethods(tests, instance) {
-  const { __proto__ } = instance
-
-  getOwnClassMethods(tests, instance)
-  if (__proto__.__proto__ instanceof Test) {
-    getClassMethods(tests, __proto__)
+function getClassMethods(tests, proto) {
+  getOwnClassMethods(tests, proto)
+  if (proto.__proto__ instanceof Test) {
+    getClassMethods(tests, proto.__proto__)
   }
 }
 
@@ -177,9 +173,10 @@ class Test {
    */
   get tests() {
     const tests = new Set()
+    const { __proto__, constructor } = this
 
-    getClassMethods(tests, this)
-    getNestedStaticTests(tests, this.constructor)
+    getClassMethods(tests, __proto__)
+    getNestedStaticTests(tests, constructor)
     getInstanceTests(tests, this)
 
     return tests

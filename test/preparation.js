@@ -3,7 +3,7 @@
 const { strict: assert } = require('assert')
 const { Test } = require('@ndk/test')
 
-const { ok, equal, deepEqual, doesNotThrow } = assert
+const { ok, equal, deepEqual, throws, doesNotThrow } = assert
 
 
 class MyTestName extends Test {
@@ -87,6 +87,26 @@ class MyTestNameIncludeRedefine extends Test {
 
 
 MyTestNameIncludeRedefine.include = MyTestFailure
+
+
+class MyTestNameIncludeRedefineExt0 extends Test {
+
+  includeExt() { throw new Error('Test Error') }
+
+}
+
+
+MyTestNameIncludeRedefineExt0.include = MyTestFailure
+
+
+class MyTestNameIncludeRedefineExt extends MyTestNameIncludeRedefineExt0 {
+
+  include() {}
+
+}
+
+
+MyTestNameIncludeRedefineExt.includeExt = MyTestName
 
 
 class MyTestNameExt extends MyTestName {
@@ -279,6 +299,23 @@ class allTests {
     equal(result.success, true)
     equal(result.tests.size, 1)
     equal(include.success, true)
+  }
+
+  async ['Test => run getNestedStaticTests redefine with extends']() {
+    const mt = new MyTestNameIncludeRedefineExt()
+    const result = await Test.run(mt)
+    const include = result.tests.get('include')
+    const includeExt = result.tests.get('includeExt')
+
+    equal(Object.isPrototypeOf.call(Test, MyTestNameIncludeRedefineExt.include), true)
+    equal(typeof mt.include, 'function')
+    equal(mt.includeExt instanceof Test, true)
+    equal(result.success, true)
+    equal(result.tests.size, 2)
+    equal(include.success, true)
+    equal(includeExt.success, true)
+    equal(includeExt.tests.size, 1)
+    throws(mt.__proto__.includeExt, { message: 'Test Error' })
   }
 
 }

@@ -70,6 +70,8 @@ function getNestedStaticTests(tests, constructor) {
 function getNestedStaticTestsClasses(instance) {
   /** @type {Map<string, typeof Test>} */
   const tests = new Map()
+  /** @type {Set<string>} */
+  const classMethods = new Set()
   let { __proto__, constructor } = instance
 
   while (__proto__ instanceof Test) {
@@ -77,13 +79,10 @@ function getNestedStaticTestsClasses(instance) {
     const curentStaticTests = new Set()
 
     getOwnNestedStaticTests(curentStaticTests, constructor)
+    getOwnClassMethods(classMethods, __proto__)
     if (curentStaticTests.size > 0) {
-      /** @type {Set<string>} */
-      const curentClassMethods = new Set()
-
-      getOwnClassMethods(curentClassMethods, __proto__)
       for (const staticTest of curentStaticTests) {
-        const notClassMethods = !curentClassMethods.has(staticTest)
+        const notClassMethods = !classMethods.has(staticTest)
         const notExists = !tests.has(staticTest)
 
         if (notClassMethods && notExists) {

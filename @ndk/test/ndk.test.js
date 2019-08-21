@@ -98,7 +98,6 @@ function getNestedStaticTestsClasses(instance) {
 
 
 /**
- *
  * @param {Set<string>} tests
  * @param {Test} instance
  */
@@ -120,25 +119,45 @@ function getInstanceTests(tests, instance) {
 }
 
 
-class TestReporter {
+class TestResult {
 
   /**
-   * @typedef {object} TestResult
-   * @property {boolean} success
-   * @property {Map.<string, TestResult>} [tests]
+   * @typedef {object} TestResultOptions
    * @property {Error} [error]
+   * @property {boolean} [hasNested]
    */
+  /**
+   * @param {TestResultOptions} options
+   */
+  constructor({ error, hasNested } = {}) {
+    /** @type {boolean} success */
+    this.success = true
+    if (error) {
+      /** @type {Error} */
+      this.error = error
+      this.success = false
+    }
+    if (hasNested) {
+      /** @type {Map.<string, TestResult>} */
+      this.tests = new Map()
+    }
+  }
+
+}
+
+
+class TestReporter {
+
   /** */
   constructor() {
-    /** @type {TestResult} */
-    this.report = { tests: new Map(), success: true }
+    this.report = new TestResult({ hasNested: true })
   }
 
   /**
    * @param {string} testName
    */
   success(testName) {
-    this.report.tests.set(testName, { success: true })
+    this.report.tests.set(testName, new TestResult())
   }
 
   /**
@@ -146,7 +165,7 @@ class TestReporter {
    * @param {Error} error
    */
   failure(testName, error) {
-    this.report.tests.set(testName, { success: false, error })
+    this.report.tests.set(testName, new TestResult({ error }))
     this.report.success = false
   }
 

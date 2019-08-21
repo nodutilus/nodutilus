@@ -132,6 +132,19 @@ class MyTestNameIncludeExt extends MyTestNameInclude {}
 MyTestNameIncludeExt.includeExt = MyTestName
 
 
+class MyTestReturnTest extends Test {
+
+  async myTest1() {
+    return await Test.run(new MyTestName())
+  }
+
+  myTest2() {
+    return Test.run(new MyTestName())
+  }
+
+}
+
+
 class allTests {
 
   ['Test => getClassMethods']() {
@@ -316,6 +329,21 @@ class allTests {
     equal(includeExt.success, true)
     equal(includeExt.tests.size, 1)
     throws(mt.__proto__.includeExt, { message: 'Test Error' })
+  }
+
+  async ['Test => return TestResult']() {
+    const mt = new MyTestReturnTest()
+    const result = await Test.run(mt)
+    const myTest1 = result.tests.get('myTest1')
+    const myTest2 = result.tests.get('myTest2')
+    const baseTest1 = myTest1.tests.get('baseTest')
+    const baseTest2 = myTest2.tests.get('baseTest')
+
+    equal(result.success, true)
+    equal(myTest1.success, true)
+    equal(myTest2.success, true)
+    equal(baseTest1.success, true)
+    equal(baseTest2.success, true)
   }
 
 }

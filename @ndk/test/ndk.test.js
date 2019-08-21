@@ -223,8 +223,13 @@ class Test {
         testReporter.nested(testName, await this.run(test))
       } else {
         try {
-          await test()
-          testReporter.success(testName)
+          const testResult = await test()
+
+          if (testResult instanceof TestResult) {
+            testReporter.nested(testName, testResult)
+          } else {
+            testReporter.success(testName)
+          }
         } catch (error) {
           testReporter.failure(testName, error)
         }

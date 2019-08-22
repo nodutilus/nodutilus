@@ -17,13 +17,10 @@ jobs:
           node-version: 12
 
       - name: Install dependencies
-        run: |
-          npm install
+        run: npm install
 
-      - name: Code Checks
-        run: |
-          npm run eslint
-          npm run eslintcc
+      - run: npm run eslint
+      - run: npm run eslintcc
 
   tests:
     name: Tests
@@ -45,10 +42,10 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Install dependencies
-        run: |
-          npm install
-          npm run link-for-test
+        run: npm install
+
+      - name: Prepare Tests
+        run: npm run link-for-test
 
       - name: Tests & Coverage
-        run: |
-          npm run test-and-coverage
+        run: npm run test-and-coverage

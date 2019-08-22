@@ -1,0 +1,54 @@
+name: Checks & Tests
+
+on: push
+
+jobs:
+  checks:
+    name: Checks
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Use Node.js 12
+        uses: actions/setup-node@master
+        with:
+          node-version: 12
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Code Checks
+        run: |
+          npm run eslint
+          npm run eslintcc
+
+  tests:
+    name: Tests
+    needs: checks
+
+    strategy:
+      matrix:
+        node: [10, 12]
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@master
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm run link-for-test
+
+      - name: Tests & Coverage
+        run: |
+          npm run test-and-coverage

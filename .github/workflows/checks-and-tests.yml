@@ -23,7 +23,7 @@ jobs:
       - run: npm run eslintcc
 
   tests:
-    name: Test on node ${{ matrix.node }} and ${{ matrix.os }}
+    name: Test, node ${{ matrix.node }}, ${{ matrix.os }}
     needs: checks
 
     strategy:

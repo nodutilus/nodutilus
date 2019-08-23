@@ -1,7 +1,7 @@
-# NDK Source Code [![Build][ts_badge]][ts_home]
+# NDK Source Code ![Build][badge]
 
 Исходники модулей [npmjs.com/org/ndk](https://www.npmjs.com/org/ndk)
 
-[ts_badge]: https://travis-ci.com/nd-toolkit/ndk-source.svg?branch=master
+[badge]: https://github.com/nd-toolkit/ndk-source/workflows/Checks%20%26%20Tests/badge.svg
 
-[ts_home]: https://travis-ci.com/nd-toolkit/ndk-source
+

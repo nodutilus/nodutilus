@@ -7,7 +7,8 @@
     "test": "node test",
     "link-for-test": "ndk-ci-cd link-for-test @ndk test",
     "test-and-coverage": "(nyc node test || node test) && (nyc check-coverage || nyc report -r=text && nyc check-coverage)",
-    "coverage-html": "nyc -r=html node test"
+    "coverage-html": "nyc -r=html node test",
+    "build": "ndk-ci-cd build-multi-package multi-package.json"
   },
   "dependencies": {
     "@nd-toolkit/eslint-config": "latest",

@@ -49,3 +49,22 @@ jobs:
 
       - name: Tests & Coverage
         run: npm run test-and-coverage
+
+  build:
+    name: Build
+    needs: tests
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Use Node.js 12
+        uses: actions/setup-node@master
+        with:
+          node-version: 12
+
+      - name: Install dependencies
+        run: npm install
+
+      - run: npm run build

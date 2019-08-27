@@ -145,6 +145,17 @@ class MyTestReturnTest extends Test {
 }
 
 
+class TestEvents extends Test {
+
+  baseTest1() {}
+
+  baseTest2() {
+    equal(this.beforeEach, true)
+  }
+
+}
+
+
 class allTests {
 
   ['Test => getClassMethods']() {
@@ -359,6 +370,35 @@ class allTests {
     equal(result.success, true)
     equal(result.tests.size, 1)
     equal(myTest.success, true)
+  }
+
+  async ['Test => TestEvents']() {
+    const mt = new TestEvents()
+    const tests = []
+
+    equal(TestEvents.events in mt, false)
+
+    mt.event.on(Test.beforeEach, ({ instance }) => {
+      instance.beforeEach = true
+    })
+    mt.event.on(Test.before, ({ name }) => {
+      tests.push(name)
+    })
+    mt.event.on(Test.after, ({ name }) => {
+      tests.push(name)
+    })
+    mt.event.on(Test.afterEach, ({ instance }) => {
+      instance.beforeEach = false
+    })
+
+    equal(TestEvents.events in mt, true)
+    equal(mt.beforeEach, undefined)
+
+    const result = await Test.run(mt)
+
+    equal(mt.beforeEach, false)
+    equal(result.success, true)
+    deepEqual(tests, ['baseTest1', 'baseTest1', 'baseTest2', 'baseTest2'])
   }
 
 }

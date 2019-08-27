@@ -1,6 +1,8 @@
 /** @module @ndk/test */
 'use strict'
 
+const { EventEmitter } = require('events')
+
 
 /**
  * @param {Set<string>} tests
@@ -154,27 +156,27 @@ class TestReporter {
   }
 
   /**
-   * @param {string} testName
+   * @param {string} name
    */
-  success(testName) {
-    this.report.tests.set(testName, new TestResult())
+  success(name) {
+    this.report.tests.set(name, new TestResult())
   }
 
   /**
-   * @param {string} testName
+   * @param {string} name
    * @param {Error} error
    */
-  failure(testName, error) {
-    this.report.tests.set(testName, new TestResult({ error }))
+  failure(name, error) {
+    this.report.tests.set(name, new TestResult({ error }))
     this.report.success = false
   }
 
   /**
-   * @param {string} testName
+   * @param {string} name
    * @param {TestResult} testResult
    */
-  nested(testName, testResult) {
-    this.report.tests.set(testName, testResult)
+  nested(name, testResult) {
+    this.report.tests.set(name, testResult)
     this.report.success = this.report.success && testResult.success
   }
 
@@ -189,8 +191,8 @@ class Test {
   constructor() {
     const tests = getNestedStaticTestsClasses(this)
 
-    for (const [testName, testClass] of tests) {
-      this[testName] = new testClass()
+    for (const [name, testClass] of tests) {
+      this[name] = new testClass()
     }
   }
 
@@ -211,6 +213,37 @@ class Test {
   }
 
   /**
+   * @returns {EventEmitter}
+   */
+  get event() {
+    if (!(Test.events in this)) {
+      this[Test.events] = new EventEmitter()
+    }
+
+    return this[Test.events]
+  }
+
+  /**
+   * @typedef {object} EventData
+   * @property {Test} instance
+   * @property {string} name
+   */
+  /**
+   * @param {Test} testInstance
+   * @param {string} event https://github.com/gajus/eslint-plugin-jsdoc/pull/371
+   * @param {EventData} data
+   */
+  static notify(testInstance, event, data = {}) {
+    /** @type {EventEmitter} */
+    const events = testInstance[Test.events]
+
+    if (events) {
+      data.instance = testInstance
+      events.emit(event, data)
+    }
+  }
+
+  /**
    * @param {Test} testInstance
    * @returns {TestResult}
    */
@@ -218,30 +251,42 @@ class Test {
     const { tests } = testInstance
     const testReporter = new TestReporter()
 
-    for (const testName of tests) {
-      const test = testInstance[testName]
+    this.notify(testInstance, Test.beforeEach)
+
+    for (const name of tests) {
+      const test = testInstance[name]
 
       if (test instanceof Test) {
-        testReporter.nested(testName, await this.run(test))
+        testReporter.nested(name, await this.run(test))
       } else {
+        this.notify(testInstance, Test.before, { name })
         try {
-          const testResult = await test()
+          const testResult = await Reflect.apply(test, testInstance, [])
 
           if (testResult instanceof TestResult) {
-            testReporter.nested(testName, testResult)
+            testReporter.nested(name, testResult)
           } else {
-            testReporter.success(testName)
+            testReporter.success(name)
           }
         } catch (error) {
-          testReporter.failure(testName, error)
+          testReporter.failure(name, error)
         }
+        this.notify(testInstance, Test.after, { name })
       }
     }
+
+    this.notify(testInstance, Test.afterEach)
 
     return testReporter.report
   }
 
 }
+
+Test.events = Symbol('events')
+Test.before = Symbol('event:before')
+Test.after = Symbol('event:after')
+Test.beforeEach = Symbol('event:beforeEach')
+Test.afterEach = Symbol('event:afterEach')
 
 
 exports.Test = Test

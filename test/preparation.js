@@ -346,6 +346,21 @@ class allTests {
     equal(baseTest2.success, true)
   }
 
+  async ['Test => dynamic test from Test']() {
+    const dtm = new Test()
+
+    dtm.myTest = () => {}
+
+    const { tests } = dtm
+    const result = await Test.run(dtm)
+    const myTest = result.tests.get('myTest')
+
+    deepEqual(Array.from(tests), ['myTest'])
+    equal(result.success, true)
+    equal(result.tests.size, 1)
+    equal(myTest.success, true)
+  }
+
 }
 
 

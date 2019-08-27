@@ -201,8 +201,10 @@ class Test {
     const tests = new Set()
     const { __proto__, constructor } = this
 
-    getClassMethods(tests, __proto__)
-    getNestedStaticTests(tests, constructor)
+    if (__proto__ instanceof Test) {
+      getClassMethods(tests, __proto__)
+      getNestedStaticTests(tests, constructor)
+    }
     getInstanceTests(tests, this)
 
     return tests

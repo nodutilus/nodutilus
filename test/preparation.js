@@ -156,6 +156,22 @@ class TestEvents extends Test {
 }
 
 
+class TestOrder1 extends Test {
+
+  constructor() {
+    super()
+    this.test3 = new Test()
+    this.test3.test4 = () => {}
+  }
+
+  test1() {}
+
+}
+
+
+TestOrder1.test2 = MyTestName
+
+
 class allTests {
 
   ['Test => getClassMethods']() {
@@ -400,6 +416,15 @@ class allTests {
     equal(mt.beforeEach, false)
     equal(result.success, true)
     deepEqual(tests, ['baseTest1', 'baseTest1', 'baseTest2', 'baseTest2'])
+  }
+
+  async ['Test => TestOrder1']() {
+    const mt = new TestOrder1()
+    const { tests } = mt
+    const result = await Test.run(mt)
+
+    deepEqual(Array.from(tests), ['test1', 'test2', 'test3', ])
+    equal(result.success, true)
   }
 
 }

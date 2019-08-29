@@ -257,7 +257,9 @@ class Test {
       const test = testInstance[name]
 
       if (test instanceof Test) {
+        await this.notify(testInstance, Test.beforeNested, { name })
         testReporter.nested(name, await this.run(test))
+        await this.notify(testInstance, Test.afterNested, { name })
       } else {
         await this.notify(testInstance, Test.before, { name })
         try {
@@ -283,10 +285,12 @@ class Test {
 }
 
 Test.events = Symbol('Test~events')
-Test.before = Symbol('Test#event:before')
-Test.after = Symbol('Test#event:after')
 Test.beforeEach = Symbol('Test#event:beforeEach')
 Test.afterEach = Symbol('Test#event:afterEach')
+Test.before = Symbol('Test#event:before')
+Test.after = Symbol('Test#event:after')
+Test.beforeNested = Symbol('Test#event:beforeNested')
+Test.afterNested = Symbol('Test#event:afterNested')
 
 
 exports.Test = Test

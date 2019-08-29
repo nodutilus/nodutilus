@@ -147,6 +147,11 @@ class MyTestReturnTest extends Test {
 
 class TestEvents extends Test {
 
+  constructor() {
+    super()
+    this.testNested3 = new Test()
+  }
+
   baseTest1() {}
 
   baseTest2() {
@@ -409,19 +414,16 @@ class allTests {
 
     equal(TestEvents.events in mt, false)
 
-    mt.event.on(Test.beforeEach, async ({ instance }) => {
-      await new Promise(resolve => setTimeout(resolve, 1))
-      instance.beforeEach = true
-    })
-    mt.event.on(Test.before, ({ name }) => {
-      tests.push(name)
-    })
-    mt.event.on(Test.after, ({ name }) => {
-      tests.push(name)
-    })
-    mt.event.on(Test.afterEach, ({ instance }) => {
-      instance.beforeEach = false
-    })
+    mt.event
+      .on(Test.beforeEach, async ({ instance }) => {
+        await new Promise(resolve => setTimeout(resolve, 1))
+        instance.beforeEach = true
+      })
+      .on(Test.before, ({ name }) => { tests.push(name) })
+      .on(Test.after, ({ name }) => { tests.push(name) })
+      .on(Test.beforeNested, ({ name }) => { tests.push(name) })
+      .on(Test.afterNested, ({ name }) => { tests.push(name) })
+      .on(Test.afterEach, ({ instance }) => { instance.beforeEach = false })
 
     equal(TestEvents.events in mt, true)
     equal(mt.beforeEach, undefined)
@@ -430,7 +432,7 @@ class allTests {
 
     equal(mt.beforeEach, false)
     equal(result.success, true)
-    deepEqual(tests, ['baseTest1', 'baseTest1', 'baseTest2', 'baseTest2'])
+    deepEqual(tests, ['baseTest1', 'baseTest1', 'baseTest2', 'baseTest2', 'testNested3', 'testNested3'])
   }
 
   async ['Test => TestOrder1']() {

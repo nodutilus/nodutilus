@@ -19,6 +19,7 @@ class EventEmitter {
   /**
    * @param {Event} event
    * @param  {...any} args
+   * @returns {EventEmitter}
    */
   async emit(event, ...args) {
     const listeners = privateEventsMap.get(this).get(event)
@@ -28,12 +29,15 @@ class EventEmitter {
         await listener(...args)
       }
     }
+
+    return this
   }
 
 
   /**
    * @param {Event} event
    * @param  {Listener} listener
+   * @returns {EventEmitter}
    */
   on(event, listener) {
     const events = privateEventsMap.get(this)
@@ -43,6 +47,8 @@ class EventEmitter {
     }
 
     events.get(event).add(listener)
+
+    return this
   }
 
 }

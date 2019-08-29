@@ -1,7 +1,7 @@
 /** @module @ndk/test */
 'use strict'
 
-const { EventEmitter } = require('events')
+const { EventEmitter } = require('@ndk/fn/events')
 
 
 /**
@@ -233,13 +233,13 @@ class Test {
    * @param {string} event https://github.com/gajus/eslint-plugin-jsdoc/pull/371
    * @param {EventData} data
    */
-  static notify(testInstance, event, data = {}) {
+  static async notify(testInstance, event, data = {}) {
     /** @type {EventEmitter} */
     const events = testInstance[Test.events]
 
     if (events) {
       data.instance = testInstance
-      events.emit(event, data)
+      await events.emit(event, data)
     }
   }
 
@@ -251,7 +251,7 @@ class Test {
     const { tests } = testInstance
     const testReporter = new TestReporter()
 
-    this.notify(testInstance, Test.beforeEach)
+    await this.notify(testInstance, Test.beforeEach)
 
     for (const name of tests) {
       const test = testInstance[name]
@@ -259,7 +259,7 @@ class Test {
       if (test instanceof Test) {
         testReporter.nested(name, await this.run(test))
       } else {
-        this.notify(testInstance, Test.before, { name })
+        await this.notify(testInstance, Test.before, { name })
         try {
           const testResult = await Reflect.apply(test, testInstance, [])
 
@@ -271,22 +271,22 @@ class Test {
         } catch (error) {
           testReporter.failure(name, error)
         }
-        this.notify(testInstance, Test.after, { name })
+        await this.notify(testInstance, Test.after, { name })
       }
     }
 
-    this.notify(testInstance, Test.afterEach)
+    await this.notify(testInstance, Test.afterEach)
 
     return testReporter.report
   }
 
 }
 
-Test.events = Symbol('events')
-Test.before = Symbol('event:before')
-Test.after = Symbol('event:after')
-Test.beforeEach = Symbol('event:beforeEach')
-Test.afterEach = Symbol('event:afterEach')
+Test.events = Symbol('Test~events')
+Test.before = Symbol('Test#event:before')
+Test.after = Symbol('Test#event:after')
+Test.beforeEach = Symbol('Test#event:beforeEach')
+Test.afterEach = Symbol('Test#event:afterEach')
 
 
 exports.Test = Test

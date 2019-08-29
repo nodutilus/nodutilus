@@ -1,5 +1,0 @@
-{
-  "packages": "@ndk",
-  "versions": "versions.json",
-  "buildFolder": "build/@ndk"
-}

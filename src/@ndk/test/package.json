@@ -1,0 +1,13 @@
+{
+  "name": "@ndk/test",
+  "description": "Тесты на классах. Агрегация, наследование, события",
+  "keywords": [
+    "test",
+    "tests",
+    "testing",
+    "test-class",
+    "async-test",
+    "test utils"
+  ],
+  "main": "ndk.test.js"
+}

@@ -4,7 +4,7 @@ on: push
 
 jobs:
   checks:
-    name: Checks
+    name: Checks with Linters
 
     runs-on: ubuntu-latest
 
@@ -47,12 +47,32 @@ jobs:
       - name: Prepare Tests
         run: npm run link-for-test
 
-      - name: Tests & Coverage
-        run: npm run test-and-coverage
+      - name: Run Tests
+        run: npm test
+
+  coverage:
+    name: Check Coverage
+    needs: tests
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: Use Node.js 12
+        uses: actions/setup-node@master
+        with:
+          node-version: 12
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Coverage
+        run: npm run coverage
 
   build:
     name: Build
-    needs: tests
+    needs: coverage
 
     runs-on: ubuntu-latest
 

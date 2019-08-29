@@ -1,0 +1,13 @@
+{
+  "name": "@ndk/fn",
+  "description": "Вспомогательные функции, обобщенные алгоритмы и методики",
+  "keywords": [
+    "helpers",
+    "functions",
+    "utils",
+    "async",
+    "promises",
+    "events"
+  ],
+  "main": "ndk.fn.js"
+}

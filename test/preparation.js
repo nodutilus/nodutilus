@@ -378,7 +378,8 @@ class allTests {
 
     equal(TestEvents.events in mt, false)
 
-    mt.event.on(Test.beforeEach, ({ instance }) => {
+    mt.event.on(Test.beforeEach, async ({ instance }) => {
+      await new Promise(resolve => setTimeout(resolve, 1))
       instance.beforeEach = true
     })
     mt.event.on(Test.before, ({ name }) => {

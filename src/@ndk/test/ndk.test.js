@@ -183,6 +183,27 @@ class TestReporter {
 }
 
 
+/**
+ * @typedef {object} EventData
+ * @property {Test} instance
+ * @property {string} name
+ */
+/**
+ * @param {Test} testInstance
+ * @param {string} event https://github.com/gajus/eslint-plugin-jsdoc/pull/371
+ * @param {EventData} data
+ */
+async function __notify(testInstance, event, data = {}) {
+  /** @type {EventEmitter} */
+  const events = testInstance[Test.events]
+
+  if (events) {
+    data.instance = testInstance
+    await events.emit(event, data)
+  }
+}
+
+
 class Test {
 
   /**
@@ -224,26 +245,6 @@ class Test {
   }
 
   /**
-   * @typedef {object} EventData
-   * @property {Test} instance
-   * @property {string} name
-   */
-  /**
-   * @param {Test} testInstance
-   * @param {string} event https://github.com/gajus/eslint-plugin-jsdoc/pull/371
-   * @param {EventData} data
-   */
-  static async notify(testInstance, event, data = {}) {
-    /** @type {EventEmitter} */
-    const events = testInstance[Test.events]
-
-    if (events) {
-      data.instance = testInstance
-      await events.emit(event, data)
-    }
-  }
-
-  /**
    * @param {Test} testInstance
    * @returns {TestResult}
    */
@@ -251,17 +252,17 @@ class Test {
     const { tests } = testInstance
     const testReporter = new TestReporter()
 
-    await this.notify(testInstance, Test.beforeEach)
+    await __notify(testInstance, Test.beforeEach)
 
     for (const name of tests) {
       const test = testInstance[name]
 
       if (test instanceof Test) {
-        await this.notify(testInstance, Test.beforeNested, { name })
+        await __notify(testInstance, Test.beforeNested, { name })
         testReporter.nested(name, await this.run(test))
-        await this.notify(testInstance, Test.afterNested, { name })
+        await __notify(testInstance, Test.afterNested, { name })
       } else {
-        await this.notify(testInstance, Test.before, { name })
+        await __notify(testInstance, Test.before, { name })
         try {
           const testResult = await Reflect.apply(test, testInstance, [])
 
@@ -273,11 +274,11 @@ class Test {
         } catch (error) {
           testReporter.failure(name, error)
         }
-        await this.notify(testInstance, Test.after, { name })
+        await __notify(testInstance, Test.after, { name })
       }
     }
 
-    await this.notify(testInstance, Test.afterEach)
+    await __notify(testInstance, Test.afterEach)
 
     return testReporter.report
   }

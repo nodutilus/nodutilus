@@ -414,16 +414,17 @@ class allTests {
 
     equal(TestEvents.events in mt, false)
 
+    mt.event.on(Test.beforeEach, async ({ instance }) => {
+      await new Promise(resolve => setTimeout(resolve, 1))
+      instance.beforeEach = true
+    })
     mt.event
-      .on(Test.beforeEach, async ({ instance }) => {
-        await new Promise(resolve => setTimeout(resolve, 1))
-        instance.beforeEach = true
-      })
       .on(Test.before, ({ name }) => { tests.push(name) })
       .on(Test.after, ({ name }) => { tests.push(name) })
       .on(Test.beforeNested, ({ name }) => { tests.push(name) })
       .on(Test.afterNested, ({ name }) => { tests.push(name) })
       .on(Test.afterEach, ({ instance }) => { instance.beforeEach = false })
+      .on(Test.afterEach, ({ instance }) => { equal(instance.beforeEach, false) })
 
     equal(TestEvents.events in mt, true)
     equal(mt.beforeEach, undefined)

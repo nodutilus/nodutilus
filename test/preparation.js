@@ -160,8 +160,23 @@ class TestOrder1 extends Test {
 
   constructor() {
     super()
-    this.test3 = new Test()
-    this.test3.test4 = () => {}
+    this.test5 = new Test()
+  }
+
+  test2() {}
+
+}
+
+
+TestOrder1.test4 = MyTestName
+
+
+class TestOrder2 extends TestOrder1 {
+
+  constructor() {
+    super()
+    this.test6 = new Test()
+    this.test7 = () => {}
   }
 
   test1() {}
@@ -169,7 +184,7 @@ class TestOrder1 extends Test {
 }
 
 
-TestOrder1.test2 = MyTestName
+TestOrder2.test3 = MyTestName
 
 
 class allTests {
@@ -423,7 +438,16 @@ class allTests {
     const { tests } = mt
     const result = await Test.run(mt)
 
-    deepEqual(Array.from(tests), ['test1', 'test2', 'test3', ])
+    deepEqual(Array.from(tests), ['test2', 'test4', 'test5'])
+    equal(result.success, true)
+  }
+
+  async ['Test => TestOrder2']() {
+    const mt = new TestOrder2()
+    const { tests } = mt
+    const result = await Test.run(mt)
+
+    deepEqual(Array.from(tests), ['test1', 'test2', 'test3', 'test4', 'test5', 'test6', 'test7'])
     equal(result.success, true)
   }
 

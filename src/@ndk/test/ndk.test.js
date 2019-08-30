@@ -190,7 +190,7 @@ class TestReporter {
  */
 /**
  * @param {Test} testInstance
- * @param {string} event https://github.com/gajus/eslint-plugin-jsdoc/pull/371
+ * @param {symbol} event
  * @param {EventData} data
  */
 async function __notify(testInstance, event, data = {}) {

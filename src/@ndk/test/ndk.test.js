@@ -148,41 +148,6 @@ class TestResult {
 }
 
 
-class TestReporter {
-
-  /** */
-  constructor() {
-    this.report = new TestResult({ hasNested: true })
-  }
-
-  /**
-   * @param {string} name
-   */
-  success(name) {
-    this.report.tests.set(name, new TestResult())
-  }
-
-  /**
-   * @param {string} name
-   * @param {Error} error
-   */
-  failure(name, error) {
-    this.report.tests.set(name, new TestResult({ error }))
-    this.report.success = false
-  }
-
-  /**
-   * @param {string} name
-   * @param {TestResult} testResult
-   */
-  nested(name, testResult) {
-    this.report.tests.set(name, testResult)
-    this.report.success = this.report.success && testResult.success
-  }
-
-}
-
-
 /**
  * @typedef {object} EventData
  * @property {Test} instance
@@ -246,41 +211,56 @@ class Test {
 
   /**
    * @param {Test} testInstance
+   * @param {string} name
+   * @returns {TestResult}
+   */
+  static async runTest(testInstance, name) {
+    const test = testInstance[name]
+    let result
+
+    if (test instanceof Test) {
+      await __notify(testInstance, Test.beforeNested, { name })
+      result = await this.run(test)
+      await __notify(testInstance, Test.afterNested, { name })
+    } else {
+      await __notify(testInstance, Test.before, { name })
+      try {
+        const testResult = await Reflect.apply(test, testInstance, [])
+
+        if (testResult instanceof TestResult) {
+          result = testResult
+        } else {
+          result = new TestResult()
+        }
+      } catch (error) {
+        result = new TestResult({ error })
+      }
+      await __notify(testInstance, Test.after, { name })
+    }
+
+    return result
+  }
+
+  /**
+   * @param {Test} testInstance
    * @returns {TestResult}
    */
   static async run(testInstance) {
     const { tests } = testInstance
-    const testReporter = new TestReporter()
+    const result = new TestResult({ hasNested: true })
 
     await __notify(testInstance, Test.beforeEach)
 
     for (const name of tests) {
-      const test = testInstance[name]
+      const testResult = await this.runTest(testInstance, name)
 
-      if (test instanceof Test) {
-        await __notify(testInstance, Test.beforeNested, { name })
-        testReporter.nested(name, await this.run(test))
-        await __notify(testInstance, Test.afterNested, { name })
-      } else {
-        await __notify(testInstance, Test.before, { name })
-        try {
-          const testResult = await Reflect.apply(test, testInstance, [])
-
-          if (testResult instanceof TestResult) {
-            testReporter.nested(name, testResult)
-          } else {
-            testReporter.success(name)
-          }
-        } catch (error) {
-          testReporter.failure(name, error)
-        }
-        await __notify(testInstance, Test.after, { name })
-      }
+      result.tests.set(name, testResult)
+      result.success = result.success && testResult.success
     }
 
     await __notify(testInstance, Test.afterEach)
 
-    return testReporter.report
+    return result
   }
 
 }

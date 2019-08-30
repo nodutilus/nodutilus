@@ -33,6 +33,13 @@ class EventEmitter {
     return this
   }
 
+  /**
+   * @param {Event} event
+   * @returns {boolean}
+   */
+  has(event) {
+    return privateEventsMap.get(this).has(event)
+  }
 
   /**
    * @param {Event} event
@@ -49,6 +56,26 @@ class EventEmitter {
     events.get(event).add(listener)
 
     return this
+  }
+
+  /**
+   * @param {Event} event
+   * @param  {Listener} listener
+   * @returns {boolean}
+   */
+  delete(event, listener) {
+    const events = privateEventsMap.get(this)
+    const listeners = events.get(event)
+    let result = false
+
+    if (listeners) {
+      result = listeners.delete(listener)
+      if (!listeners.size) {
+        events.delete(event)
+      }
+    }
+
+    return result
   }
 
 }

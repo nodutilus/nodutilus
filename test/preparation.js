@@ -161,6 +161,39 @@ class TestEvents extends Test {
 }
 
 
+class TestDeepEvents0 extends Test {
+
+  baseTest4() {}
+
+}
+
+
+class TestDeepEvents1 extends Test {
+
+  baseTest8() {}
+
+}
+
+
+class TestDeepEvents extends Test {
+
+  constructor() {
+    super()
+    this.testNested5 = new Test()
+    this.testNested5.baseTest6 = () => {}
+    this.testNested5.baseTest7 = new TestDeepEvents1()
+  }
+
+  baseTest1() {}
+
+  baseTest2() {}
+
+}
+
+
+TestDeepEvents.testNested3 = TestDeepEvents0
+
+
 class TestOrder1 extends Test {
 
   constructor() {
@@ -414,17 +447,17 @@ class allTests {
 
     equal(TestEvents.events in mt, false)
 
-    mt.event.on(Test.beforeEach, async ({ instance }) => {
+    mt.event.on(Test.before, async ({ instance }) => {
       await new Promise(resolve => setTimeout(resolve, 1))
       instance.beforeEach = true
     })
     mt.event
-      .on(Test.before, ({ name }) => { tests.push(name) })
-      .on(Test.after, ({ name }) => { tests.push(name) })
-      .on(Test.beforeNested, ({ name }) => { tests.push(name) })
-      .on(Test.afterNested, ({ name }) => { tests.push(name) })
-      .on(Test.afterEach, ({ instance }) => { instance.beforeEach = false })
-      .on(Test.afterEach, ({ instance }) => { equal(instance.beforeEach, false) })
+      .on(Test.beforeEach, ({ name }) => { tests.push(name) })
+      .on(Test.afterEach, ({ name }) => { tests.push(name) })
+      .on(Test.beforeEachNested, ({ name }) => { tests.push(name) })
+      .on(Test.afterEachNested, ({ name }) => { tests.push(name) })
+      .on(Test.after, ({ instance }) => { instance.beforeEach = false })
+      .on(Test.after, ({ instance }) => { equal(instance.beforeEach, false) })
 
     equal(TestEvents.events in mt, true)
     equal(mt.beforeEach, undefined)
@@ -434,6 +467,28 @@ class allTests {
     equal(mt.beforeEach, false)
     equal(result.success, true)
     deepEqual(tests, ['baseTest1', 'baseTest1', 'baseTest2', 'baseTest2', 'testNested3', 'testNested3'])
+  }
+
+  async ['Test => TestDeepEvents']() {
+    const mt = new TestDeepEvents()
+    const beforeTests = []
+    const afterests = []
+
+    mt.event
+      .on(Test.beforeEachDeep, ({ path, name }) => { beforeTests.push([...path, name].join(',')) })
+      .on(Test.afterEachDeep, ({ path, name }) => { afterests.push([...path, name].join(',')) })
+
+    const result = await Test.run(mt)
+
+    equal(result.success, true)
+    deepEqual(beforeTests, [
+      'baseTest1',
+      'baseTest2',
+      'testNested3,baseTest4',
+      'testNested5,baseTest6',
+      'testNested5,baseTest7,baseTest8'
+    ])
+    deepEqual(afterests, beforeTests)
   }
 
   async ['Test => TestOrder1']() {

@@ -149,8 +149,44 @@ class TestResult {
 
 
 /**
+ * @param {{testInstance:Test, name:string, test:Test, deepEvents:Array<symbol>}} optioms
+ * @param {Function} fn
+ * @returns {TestResult}
+ */
+async function __deepEventsWrapper({ testInstance, name, test, deepEvents }, fn) {
+  /** @type {EventEmitter} */
+  const events = testInstance[Test.events]
+  let result
+
+  if (events) {
+    const deepEventsWrapper = deepEvents
+      .filter(events.has.bind(events))
+      .map(event => [event, data => {
+        data.path.unshift(name)
+        events.emit(event, data)
+      }])
+
+    deepEventsWrapper.forEach(([event, wrapper]) => {
+      test.event.on(event, wrapper)
+    })
+
+    result = await fn()
+
+    deepEventsWrapper.forEach(([event, wrapper]) => {
+      test.event.delete(event, wrapper)
+    })
+  } else {
+    result = await fn()
+  }
+
+  return result
+}
+
+
+/**
  * @typedef {object} EventData
  * @property {Test} instance
+ * @property {Array<string>} [path]
  * @property {string} name
  */
 /**
@@ -219,11 +255,17 @@ class Test {
     let result
 
     if (test instanceof Test) {
-      await __notify(testInstance, Test.beforeNested, { name })
-      result = await this.run(test)
-      await __notify(testInstance, Test.afterNested, { name })
+      await __notify(testInstance, Test.beforeEachNested, { name })
+      result = await __deepEventsWrapper({
+        testInstance,
+        name,
+        test,
+        deepEvents: [Test.beforeEachDeep, Test.afterEachDeep]
+      }, async () => await this.run(test))
+      await __notify(testInstance, Test.afterEachNested, { name })
     } else {
-      await __notify(testInstance, Test.before, { name })
+      await __notify(testInstance, Test.beforeEach, { name })
+      await __notify(testInstance, Test.beforeEachDeep, { path: [], name })
       try {
         const testResult = await Reflect.apply(test, testInstance, [])
 
@@ -235,7 +277,8 @@ class Test {
       } catch (error) {
         result = new TestResult({ error })
       }
-      await __notify(testInstance, Test.after, { name })
+      await __notify(testInstance, Test.afterEach, { name })
+      await __notify(testInstance, Test.afterEachDeep, { path: [], name })
     }
 
     return result
@@ -249,7 +292,7 @@ class Test {
     const { tests } = testInstance
     const result = new TestResult({ hasNested: true })
 
-    await __notify(testInstance, Test.beforeEach)
+    await __notify(testInstance, Test.before)
 
     for (const name of tests) {
       const testResult = await this.runTest(testInstance, name)
@@ -258,7 +301,7 @@ class Test {
       result.success = result.success && testResult.success
     }
 
-    await __notify(testInstance, Test.afterEach)
+    await __notify(testInstance, Test.after)
 
     return result
   }
@@ -266,12 +309,14 @@ class Test {
 }
 
 Test.events = Symbol('Test~events')
-Test.beforeEach = Symbol('Test#event:beforeEach')
-Test.afterEach = Symbol('Test#event:afterEach')
 Test.before = Symbol('Test#event:before')
 Test.after = Symbol('Test#event:after')
-Test.beforeNested = Symbol('Test#event:beforeNested')
-Test.afterNested = Symbol('Test#event:afterNested')
+Test.beforeEach = Symbol('Test#event:beforeEach')
+Test.afterEach = Symbol('Test#event:afterEach')
+Test.beforeEachDeep = Symbol('Test#event:beforeEachDeep')
+Test.afterEachDeep = Symbol('Test#event:afterEachDeep')
+Test.beforeEachNested = Symbol('Test#event:beforeEachNested')
+Test.afterEachNested = Symbol('Test#event:afterEachNested')
 
 
 exports.Test = Test

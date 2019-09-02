@@ -1,6 +1,7 @@
 /** @module @ndk/test */
 'use strict'
 
+const { strict: assert } = require('assert')
 const { EventEmitter } = require('@ndk/fn/events')
 
 
@@ -319,4 +320,5 @@ Test.beforeEachNested = Symbol('Test#event:beforeEachNested')
 Test.afterEachNested = Symbol('Test#event:afterEachNested')
 
 
+exports.assert = assert
 exports.Test = Test

@@ -188,7 +188,8 @@ async function __deepEventsWrapper({ testInstance, name, test, deepEvents }, fn)
  * @typedef {object} EventData
  * @property {Test} instance
  * @property {Array<string>} [path]
- * @property {string} name
+ * @property {string} [name]
+ * @property {TestResult} [result]
  */
 /**
  * @param {Test} testInstance
@@ -263,7 +264,7 @@ class Test {
         test,
         deepEvents: [Test.beforeEachDeep, Test.afterEachDeep]
       }, async () => await this.run(test))
-      await __notify(testInstance, Test.afterEachNested, { name })
+      await __notify(testInstance, Test.afterEachNested, { name, result })
     } else {
       await __notify(testInstance, Test.beforeEach, { name })
       await __notify(testInstance, Test.beforeEachDeep, { path: [], name })
@@ -278,8 +279,8 @@ class Test {
       } catch (error) {
         result = new TestResult({ error })
       }
-      await __notify(testInstance, Test.afterEach, { name })
-      await __notify(testInstance, Test.afterEachDeep, { path: [], name })
+      await __notify(testInstance, Test.afterEach, { name, result })
+      await __notify(testInstance, Test.afterEachDeep, { path: [], name, result })
     }
 
     return result
@@ -302,7 +303,7 @@ class Test {
       result.success = result.success && testResult.success
     }
 
-    await __notify(testInstance, Test.after)
+    await __notify(testInstance, Test.after, { result })
 
     return result
   }

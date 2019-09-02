@@ -490,6 +490,54 @@ class allTests {
     deepEqual(afterests, beforeTests)
   }
 
+  async ['Test => TestEventsResult']() {
+    const mt = new TestDeepEvents()
+    const testResult = {}
+    const testNames = []
+    const testNamesDeep = []
+    let result
+
+    mt.event.on(Test.after, (data => {
+      ({ result } = data)
+    }))
+    mt.event
+      .on(Test.afterEach, (data => {
+        testResult[data.name] = data.result
+        testNames.push(data.name)
+      }))
+      .on(Test.afterEachNested, (data => {
+        testResult[data.name] = data.result
+        testNames.push(data.name)
+      }))
+      .on(Test.afterEachDeep, data => {
+        if (!testNames.includes(data.name)) {
+          testNamesDeep.push(data.name)
+        }
+        equal(data.result.success, true, `Неверный результат теста "${data.name}"`)
+      })
+
+    const aResult = await Test.run(mt)
+
+    equal(result === aResult, true)
+    for (const name in testResult) {
+      const result = testResult[name]
+      const aTestResult = aResult.tests.get(name)
+
+      equal(result === aTestResult, true, `Неверный результат теста "${name}"`)
+    }
+    deepEqual(testNames, [
+      'baseTest1',
+      'baseTest2',
+      'testNested3',
+      'testNested5'
+    ])
+    deepEqual(testNamesDeep, [
+      'baseTest4',
+      'baseTest6',
+      'baseTest8'
+    ])
+  }
+
   async ['Test => TestOrder1']() {
     const mt = new TestOrder1()
     const { tests } = mt

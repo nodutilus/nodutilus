@@ -35,6 +35,32 @@ function getClassMethods(tests, proto) {
   }
 }
 
+/**
+ * @typedef {Map<symbol, function(EventData)>} EventListeners
+ */
+/**
+ * @param {EventListeners} events
+ * @param {Test} proto
+ */
+function getOwnClassEvents(events, proto) {
+
+}
+
+
+/**
+ * @param {EventListeners} events
+ * @param {Test} proto
+ * @returns {EventListeners}
+ */
+function getClassEvents(events, proto) {
+  if (proto.__proto__ instanceof Test) {
+    getClassEvents(events, proto.__proto__)
+  }
+  getOwnClassEvents(events, proto)
+
+  return events
+}
+
 
 /**
  * @param {Set<string>} tests
@@ -214,6 +240,7 @@ class Test {
    */
   constructor() {
     const tests = getNestedStaticTestsClasses(this)
+    const events = getClassEvents(new Map(), this.__proto__)
 
     for (const [name, testClass] of tests) {
       this[name] = new testClass()

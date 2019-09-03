@@ -193,6 +193,60 @@ class TestDeepEvents extends Test {
 TestDeepEvents.testNested3 = TestDeepEvents0
 
 
+class TestClassEvents0 extends Test {
+
+  baseTest2() {}
+
+}
+
+
+class TestClassEvents extends Test {
+
+  async [Test.before]() {
+    await new Promise(resolve => setTimeout(resolve, 1))
+    this.before = true
+    this.own = new Map()
+    this.nested = new Map()
+    this.all = new Map()
+  }
+
+  [Test.beforeEach]({ name }) {
+    this.own.set(name, {})
+  }
+
+  [Test.beforeEachNested]({ name }) {
+    this.nested.set(name, {})
+  }
+
+  [Test.beforeEachDeep]({ name }) {
+    this.all.set(name, {})
+  }
+
+  baseTest1() {}
+
+  [Test.afterEach]({ name, result }) {
+    this.own[name].success = result.success
+  }
+
+  [Test.afterEachNested]({ name, result }) {
+    this.nested[name].success = result.success
+  }
+
+  [Test.afterEachDeep]({ name, result }) {
+    this.all.get(name).success = result.success
+  }
+
+  [Test.after]() {
+    equal(this.before === true, true)
+    this.before = false
+  }
+
+}
+
+
+TestClassEvents.nested = TestClassEvents0
+
+
 class TestOrder1 extends Test {
 
   constructor() {
@@ -536,6 +590,16 @@ class allTests {
       'baseTest6',
       'baseTest8'
     ])
+  }
+
+  async ['Test => TestClassEvents']() {
+    const mt = new TestClassEvents()
+
+    equal(mt.before === undefined, true)
+
+    await Test.run(mt)
+
+    deepEqual(mt.own, ['baseTest1'])
   }
 
   async ['Test => TestOrder1']() {

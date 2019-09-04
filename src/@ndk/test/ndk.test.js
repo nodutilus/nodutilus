@@ -4,6 +4,17 @@
 const { strict: assert } = require('assert')
 const { EventEmitter } = require('@ndk/fn/events')
 
+const baseEvents = {
+  before: Symbol('Test#event:before'),
+  after: Symbol('Test#event:after'),
+  beforeEach: Symbol('Test#event:beforeEach'),
+  afterEach: Symbol('Test#event:afterEach'),
+  beforeEachDeep: Symbol('Test#event:beforeEachDeep'),
+  afterEachDeep: Symbol('Test#event:afterEachDeep'),
+  beforeEachNested: Symbol('Test#event:beforeEachNested'),
+  afterEachNested: Symbol('Test#event:afterEachNested')
+}
+
 
 /**
  * @param {Set<string>} tests
@@ -337,15 +348,16 @@ class Test {
 
 }
 
+
 Test.events = Symbol('Test~events')
-Test.before = Symbol('Test#event:before')
-Test.after = Symbol('Test#event:after')
-Test.beforeEach = Symbol('Test#event:beforeEach')
-Test.afterEach = Symbol('Test#event:afterEach')
-Test.beforeEachDeep = Symbol('Test#event:beforeEachDeep')
-Test.afterEachDeep = Symbol('Test#event:afterEachDeep')
-Test.beforeEachNested = Symbol('Test#event:beforeEachNested')
-Test.afterEachNested = Symbol('Test#event:afterEachNested')
+Test.before = baseEvents.before
+Test.after = baseEvents.after
+Test.beforeEach = baseEvents.beforeEach
+Test.afterEach = baseEvents.afterEach
+Test.beforeEachDeep = baseEvents.beforeEachDeep
+Test.afterEachDeep = baseEvents.afterEachDeep
+Test.beforeEachNested = baseEvents.beforeEachNested
+Test.afterEachNested = baseEvents.afterEachNested
 
 
 exports.assert = assert

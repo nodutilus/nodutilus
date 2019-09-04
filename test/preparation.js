@@ -225,11 +225,11 @@ class TestClassEvents extends Test {
   baseTest1() {}
 
   [Test.afterEach]({ name, result }) {
-    this.own[name].success = result.success
+    this.own.get(name).success = result.success
   }
 
   [Test.afterEachNested]({ name, result }) {
-    this.nested[name].success = result.success
+    this.nested.get(name).success = result.success
   }
 
   [Test.afterEachDeep]({ name, result }) {
@@ -244,7 +244,7 @@ class TestClassEvents extends Test {
 }
 
 
-TestClassEvents.nested = TestClassEvents0
+TestClassEvents.nestedEvents = TestClassEvents0
 
 
 class TestOrder1 extends Test {
@@ -599,7 +599,18 @@ class allTests {
 
     await Test.run(mt)
 
-    deepEqual(mt.own, ['baseTest1'])
+    equal(mt.before === false, true)
+
+    deepEqual(mt.own, new Map([
+      ['baseTest1', { success: true }]
+    ]))
+    deepEqual(mt.nested, new Map([
+      ['nestedEvents', { success: true }]
+    ]))
+    deepEqual(mt.all, new Map([
+      ['baseTest1', { success: true }],
+      ['baseTest2', { success: true }]
+    ]))
   }
 
   async ['Test => TestOrder1']() {

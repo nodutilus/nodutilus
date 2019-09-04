@@ -14,6 +14,7 @@ const baseEvents = {
   beforeEachNested: Symbol('Test#event:beforeEachNested'),
   afterEachNested: Symbol('Test#event:afterEachNested')
 }
+const baseEventsList = Object.values(baseEvents)
 
 
 /**
@@ -46,6 +47,7 @@ function getClassMethods(tests, proto) {
   }
 }
 
+
 /**
  * @typedef {Map<symbol, function(EventData)>} EventListeners
  */
@@ -54,7 +56,17 @@ function getClassMethods(tests, proto) {
  * @param {Test} proto
  */
 function getOwnClassEvents(events, proto) {
+  const classEvents = Object.getOwnPropertySymbols(proto)
 
+  classEvents.forEach(event => {
+    const { value } = Object.getOwnPropertyDescriptor(proto, event)
+    const isEvent = baseEventsList.includes(event)
+    const isFunction = typeof value === 'function'
+
+    if (isEvent && isFunction) {
+      events.set(event, value)
+    }
+  })
 }
 
 
@@ -255,6 +267,9 @@ class Test {
 
     for (const [name, testClass] of tests) {
       this[name] = new testClass()
+    }
+    for (const [event, listener] of events) {
+      this.event.on(event, listener.bind(this))
     }
   }
 

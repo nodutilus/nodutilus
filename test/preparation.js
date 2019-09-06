@@ -193,6 +193,71 @@ class TestDeepEvents extends Test {
 TestDeepEvents.testNested3 = TestDeepEvents0
 
 
+class TestClassEvents0 extends Test {
+
+  baseTest2() {}
+
+}
+
+
+class TestClassEvents extends Test {
+
+  async [Test.before]() {
+    await new Promise(resolve => setTimeout(resolve, 1))
+    this.before = true
+    this.own = new Map()
+    this.nested = new Map()
+    this.all = new Map()
+  }
+
+  [Test.beforeEach]({ name }) {
+    this.own.set(name, {})
+  }
+
+  [Test.beforeEachNested]({ name }) {
+    this.nested.set(name, {})
+  }
+
+  [Test.beforeEachDeep]({ name }) {
+    this.all.set(name, {})
+  }
+
+  baseTest1() {}
+
+  [Test.afterEach]({ name, result }) {
+    this.own.get(name).success = result.success
+  }
+
+  [Test.afterEachNested]({ name, result }) {
+    this.nested.get(name).success = result.success
+  }
+
+  [Test.afterEachDeep]({ name, result }) {
+    this.all.get(name).success = result.success
+  }
+
+  [Test.after]() {
+    equal(this.before === true, true)
+    this.before = false
+  }
+
+}
+
+
+TestClassEvents.nestedEvents = TestClassEvents0
+
+
+class TestClassEventsNotFuction extends Test {
+
+  get[Test.beforeEach]() {
+    return (() => {
+      throw new Error('test')
+    })()
+  }
+
+}
+
+
 class TestOrder1 extends Test {
 
   constructor() {
@@ -536,6 +601,37 @@ class allTests {
       'baseTest6',
       'baseTest8'
     ])
+  }
+
+  async ['Test => TestClassEvents']() {
+    const mt = new TestClassEvents()
+
+    equal(mt.before === undefined, true)
+
+    await Test.run(mt)
+
+    equal(mt.before === false, true)
+
+    deepEqual(mt.own, new Map([
+      ['baseTest1', { success: true }]
+    ]))
+    deepEqual(mt.nested, new Map([
+      ['nestedEvents', { success: true }]
+    ]))
+    deepEqual(mt.all, new Map([
+      ['baseTest1', { success: true }],
+      ['baseTest2', { success: true }]
+    ]))
+  }
+
+  async ['Test => TestClassEventsNotFuction']() {
+    const mt = new TestClassEventsNotFuction()
+    const result = await Test.run(mt)
+
+    equal(result.success, true)
+    equal(Test.beforeEach in mt, true)
+    equal(mt.event.has(Test.beforeEach), false)
+    throws(() => mt[Test.beforeEach], { message: 'test' })
   }
 
   async ['Test => TestOrder1']() {

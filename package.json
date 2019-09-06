@@ -8,7 +8,7 @@
     "test": "node test",
     "coverage": "(nyc node test || node test) && (nyc check-coverage || nyc report -r=text && nyc check-coverage)",
     "coverage-html": "nyc -r=html node test",
-    "build": "ndk-ci-cd link-for-test @ndk bin && node bin/build-multi-package multi-package.json",
+    "build": "ndk-ci-cd link-for-test src/@ndk bin && node bin/build-multi-package src/multi-package.json",
     "build-real": "ndk-ci-cd build-multi-package multi-package.json"
   },
   "dependencies": {

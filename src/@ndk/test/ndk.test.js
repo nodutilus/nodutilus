@@ -4,6 +4,18 @@
 const { strict: assert } = require('assert')
 const { EventEmitter } = require('@ndk/fn/events')
 
+const baseEvents = {
+  before: Symbol('Test#event:before'),
+  after: Symbol('Test#event:after'),
+  beforeEach: Symbol('Test#event:beforeEach'),
+  afterEach: Symbol('Test#event:afterEach'),
+  beforeEachDeep: Symbol('Test#event:beforeEachDeep'),
+  afterEachDeep: Symbol('Test#event:afterEachDeep'),
+  beforeEachNested: Symbol('Test#event:beforeEachNested'),
+  afterEachNested: Symbol('Test#event:afterEachNested')
+}
+const baseEventsList = Object.values(baseEvents)
+
 
 /**
  * @param {Set<string>} tests
@@ -33,6 +45,43 @@ function getClassMethods(tests, proto) {
   if (proto.__proto__ instanceof Test) {
     getClassMethods(tests, proto.__proto__)
   }
+}
+
+
+/**
+ * @typedef {Map<symbol, function(EventData)>} EventListeners
+ */
+/**
+ * @param {EventListeners} events
+ * @param {Test} proto
+ */
+function getOwnClassEvents(events, proto) {
+  const classEvents = Object.getOwnPropertySymbols(proto)
+
+  classEvents.forEach(event => {
+    const { value } = Object.getOwnPropertyDescriptor(proto, event)
+    const isEvent = baseEventsList.includes(event)
+    const isFunction = typeof value === 'function'
+
+    if (isEvent && isFunction) {
+      events.set(event, value)
+    }
+  })
+}
+
+
+/**
+ * @param {EventListeners} events
+ * @param {Test} proto
+ * @returns {EventListeners}
+ */
+function getClassEvents(events, proto) {
+  if (proto.__proto__ instanceof Test) {
+    getClassEvents(events, proto.__proto__)
+  }
+  getOwnClassEvents(events, proto)
+
+  return events
 }
 
 
@@ -214,9 +263,13 @@ class Test {
    */
   constructor() {
     const tests = getNestedStaticTestsClasses(this)
+    const events = getClassEvents(new Map(), this.__proto__)
 
     for (const [name, testClass] of tests) {
       this[name] = new testClass()
+    }
+    for (const [event, listener] of events) {
+      this.event.on(event, listener.bind(this))
     }
   }
 
@@ -310,15 +363,16 @@ class Test {
 
 }
 
+
 Test.events = Symbol('Test~events')
-Test.before = Symbol('Test#event:before')
-Test.after = Symbol('Test#event:after')
-Test.beforeEach = Symbol('Test#event:beforeEach')
-Test.afterEach = Symbol('Test#event:afterEach')
-Test.beforeEachDeep = Symbol('Test#event:beforeEachDeep')
-Test.afterEachDeep = Symbol('Test#event:afterEachDeep')
-Test.beforeEachNested = Symbol('Test#event:beforeEachNested')
-Test.afterEachNested = Symbol('Test#event:afterEachNested')
+Test.before = baseEvents.before
+Test.after = baseEvents.after
+Test.beforeEach = baseEvents.beforeEach
+Test.afterEach = baseEvents.afterEach
+Test.beforeEachDeep = baseEvents.beforeEachDeep
+Test.afterEachDeep = baseEvents.afterEachDeep
+Test.beforeEachNested = baseEvents.beforeEachNested
+Test.afterEachNested = baseEvents.afterEachNested
 
 
 exports.assert = assert

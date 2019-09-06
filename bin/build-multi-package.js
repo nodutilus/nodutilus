@@ -16,4 +16,7 @@ async function buildMultiPackage(optionsFile) {
 
 (async () => {
   await buildMultiPackage(...process.argv.slice(2, 3))
-})().catch(console.error)
+})().catch(error => {
+  console.error(error)
+  process.exit(1)
+})

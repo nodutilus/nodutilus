@@ -247,6 +247,17 @@ class TestClassEvents extends Test {
 TestClassEvents.nestedEvents = TestClassEvents0
 
 
+class TestClassEventsNotFuction extends Test {
+
+  get[Test.beforeEach]() {
+    return (() => {
+      throw new Error('test')
+    })()
+  }
+
+}
+
+
 class TestOrder1 extends Test {
 
   constructor() {
@@ -611,6 +622,16 @@ class allTests {
       ['baseTest1', { success: true }],
       ['baseTest2', { success: true }]
     ]))
+  }
+
+  async ['Test => TestClassEventsNotFuction']() {
+    const mt = new TestClassEventsNotFuction()
+    const result = await Test.run(mt)
+
+    equal(result.success, true)
+    equal(Test.beforeEach in mt, true)
+    equal(mt.event.has(Test.beforeEach), false)
+    throws(() => mt[Test.beforeEach], { message: 'test' })
   }
 
   async ['Test => TestOrder1']() {

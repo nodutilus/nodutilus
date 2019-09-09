@@ -10,9 +10,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-
-      - name: Use Node.js 12
-        uses: actions/setup-node@master
+      - uses: actions/setup-node@master
         with:
           node-version: 12
 
@@ -35,9 +33,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-
-      - name: Use Node.js ${{ matrix.node }}
-        uses: actions/setup-node@master
+      - uses: actions/setup-node@master
         with:
           node-version: ${{ matrix.node }}
 
@@ -58,9 +54,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-
-      - name: Use Node.js 12
-        uses: actions/setup-node@master
+      - uses: actions/setup-node@master
         with:
           node-version: 12
 
@@ -81,9 +75,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-
-      - name: Use Node.js 12
-        uses: actions/setup-node@master
+      - uses: actions/setup-node@master
         with:
           node-version: 12
 

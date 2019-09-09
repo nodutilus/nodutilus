@@ -1,6 +1,6 @@
 {
-  "packages": "@ndk",
-  "versions": "versions.json",
+  "packages": "src/@ndk",
+  "versions": "src/versions.json",
   "buildFolder": "build/@ndk",
   "crossDependencies": {
     "@ndk/test": ["@ndk/fn"]

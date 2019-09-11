@@ -25,7 +25,7 @@ function getOwnClassMethods(tests, proto) {
   const classMethods = Object.getOwnPropertyNames(proto)
 
   classMethods.forEach(name => {
-    const { value } = Object.getOwnPropertyDescriptor(proto, name)
+    const { value } = Reflect.getOwnPropertyDescriptor(proto, name)
     const isFunction = typeof value === 'function'
     const isTestClass = Object.isPrototypeOf.call(Test, value)
 
@@ -59,7 +59,7 @@ function getOwnClassEvents(events, proto) {
   const classEvents = Object.getOwnPropertySymbols(proto)
 
   classEvents.forEach(event => {
-    const { value } = Object.getOwnPropertyDescriptor(proto, event)
+    const { value } = Reflect.getOwnPropertyDescriptor(proto, event)
     const isEvent = baseEventsList.includes(event)
     const isFunction = typeof value === 'function'
 
@@ -93,7 +93,7 @@ function getOwnNestedStaticTests(tests, constructor) {
   const nestedStaticTests = Object.getOwnPropertyNames(constructor)
 
   nestedStaticTests.forEach(name => {
-    const { value } = Object.getOwnPropertyDescriptor(constructor, name)
+    const { value } = Reflect.getOwnPropertyDescriptor(constructor, name)
     const isTestClass = Object.isPrototypeOf.call(Test, value)
 
     if (isTestClass) {
@@ -157,7 +157,7 @@ function getInstanceTests(tests, instance) {
   const instanceTests = Object.getOwnPropertyNames(instance)
 
   instanceTests.forEach(name => {
-    const { value } = Object.getOwnPropertyDescriptor(instance, name)
+    const { value } = Reflect.getOwnPropertyDescriptor(instance, name)
     const isFunction = typeof value === 'function'
     const isTestClass = Object.isPrototypeOf.call(Test, value)
     const isTestInstance = value instanceof Test

@@ -1,0 +1,11 @@
+{
+  "name": "@ndk/fs",
+  "description": "Методы для работы с файлами, которых нет в стандартной библиотеке fs",
+  "keywords": [
+    "fs",
+    "files",
+    "directories",
+    "filesystem"
+  ],
+  "main": "ndk.fs.js"
+}

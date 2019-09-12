@@ -7,7 +7,7 @@ const { EventEmitter } = require('@ndk/fn/events')
 exports['@ndk/fn/events'] = class FnEventsTest extends Test {
 
   /** Попытка удаление события до подписки не должна падать */
-  ['Удаление события до подписки']() {
+  ['EventEmitter - удаление события до подписки']() {
     const em = new EventEmitter()
     const fn = () => em.delete('test', fn)
 
@@ -16,7 +16,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
 
   /** После отписки от последнего события сет со слушателями удаляется.
    * На данное поведение опирается метод "has" */
-  ['Удаление события после удаления последнего слушателя']() {
+  ['EventEmitter - удаление события после удаления последнего слушателя']() {
     const em = new EventEmitter()
     const fn1 = () => em.delete('test', fn1)
     const fn2 = () => em.delete('test', fn2)

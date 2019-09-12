@@ -174,7 +174,7 @@ function getInstanceTests(tests, instance) {
 class TestResult {
 
   /**
-   * @typedef {object} TestResultOptions
+   * @typedef TestResultOptions
    * @property {Error} [error]
    * @property {boolean} [hasNested]
    */
@@ -234,7 +234,7 @@ async function __deepEventsWrapper({ testInstance, name, test, deepEvents }, fn)
 
 
 /**
- * @typedef {object} EventData
+ * @typedef EventData
  * @property {Test} instance
  * @property {Array<string>} [path]
  * @property {string} [name]

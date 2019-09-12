@@ -1,10 +1,10 @@
 # Зависимости для сборки
-/node_modules
+node_modules
 
 # Зависимости для тестирования и сборки
-/src/node_modules
-/test/node_modules
-/bin/node_modules
+src/node_modules
+test/node_modules
+bin/node_modules
 
 # Папка сборки модулей, хранения отчетов и пр.
-/build
+build

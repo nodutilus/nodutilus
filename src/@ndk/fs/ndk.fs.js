@@ -22,17 +22,22 @@ async function walk(path, flags, walker) {
   if (typeof flags === 'function') {
     [flags, walker] = [walker, flags]
   }
-  await __walk(path, '.', flags, walker)
+  await __walk('.', { root: path, flags, walker })
 }
 
 
 /**
- * @param {string} root
- * @param {string} path
- * @param {number} flags
- * @param {Walker} walker
+ * @typedef WalkOptions
+ * @property {string} options.root
+ * @property {number} options.flags
+ * @property {Walker} options.walker
  */
-async function __walk(root, path, flags, walker) {
+/**
+ * @param {string} path
+ * @param {WalkOptions} options
+ */
+async function __walk(path, options) {
+  const { root, flags, walker } = options
   const files = await readdir(join(root, path), { withFileTypes: true })
 
   for (const file of files) {
@@ -40,13 +45,13 @@ async function __walk(root, path, flags, walker) {
 
     if (file.isDirectory()) {
       if ((flags & WALK_FILE_FIRST)) {
-        await __walk(root, filePath, flags, walker)
+        await __walk(filePath, options)
         await walker(filePath, file)
       } else {
         const needNested = await walker(filePath, file)
 
         if (needNested !== false) {
-          await __walk(root, filePath, flags, walker)
+          await __walk(filePath, options)
         }
       }
     } else {

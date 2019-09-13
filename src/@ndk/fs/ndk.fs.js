@@ -3,7 +3,7 @@
 
 const { dirname, join } = require('path')
 const {
-  promises: { copyFile, mkdir, readdir, rmdir, stat },
+  promises: { copyFile, mkdir, readdir, readFile, rmdir, stat },
   constants: { COPYFILE_EXCL }
 } = require('fs')
 
@@ -113,7 +113,23 @@ async function remove(path) {
 }
 
 
+/**
+ * @param {string} path
+ * @param {string} defaultValue
+ * @returns {Promise<string>}
+ */
+async function readText(path, defaultValue) {
+  return await readFile(path, 'utf8').catch(error => {
+    if (error.code === 'ENOENT' && typeof defaultValue !== 'undefined') {
+      return defaultValue
+    }
+    throw error
+  })
+}
+
+
 exports.copy = copy
+exports.readText = readText
 exports.remove = remove
 exports.walk = walk
 exports.WALK_FILE_FIRST = WALK_FILE_FIRST

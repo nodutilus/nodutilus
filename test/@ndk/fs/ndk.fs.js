@@ -2,11 +2,24 @@
 
 const { Test, assert } = require('@ndk/test')
 const { copy, walk, WALK_FILE_FIRST } = require('@ndk/fs')
-const { normalize } = require('path')
-const { mkdir, rmdir } = require('fs').promises
+const { normalize, relative } = require('path')
+const {
+  promises: { mkdir, rmdir },
+  constants: { COPYFILE_EXCL }
+} = require('fs')
 
 
 exports['@ndk/fs'] = class FsTest extends Test {
+
+  /** Перед запуском очистим временные данные */
+  async [Test.before]() {
+    await rmdir('test/example/fs/copy', { recursive: true })
+  }
+
+  /** Удалим временные данные после тестов */
+  async [Test.afterEach]() {
+    await rmdir('test/example/fs/copy', { recursive: true })
+  }
 
   /** перебираем сначала папки затем вложенные файлы */
   async ['walk - базовый проход']() {
@@ -78,13 +91,41 @@ exports['@ndk/fs'] = class FsTest extends Test {
     await copy('test/example/fs/walk', 'test/example/fs/copy')
     await walk('test/example/fs/walk', path => filesA.push(path))
     await walk('test/example/fs/copy', path => filesB.push(path))
-    await rmdir('test/example/fs/copy', { recursive: true })
 
     assert.deepEqual(filesB, filesA)
   }
 
-  /** купируем в существующую папку с заменой */
-  /** купируем в существующую папку с ошибкой */
+  /** купируем в существующую папку с заменой файлов */
+  async ['copy - базовый с заменой']() {
+    const filesA = []
+    const filesB = []
+
+    await copy('test/example/fs/walk', 'test/example/fs/copy')
+    await copy('test/example/fs/walk', 'test/example/fs/copy')
+    await walk('test/example/fs/walk', path => filesA.push(path))
+    await walk('test/example/fs/copy', path => filesB.push(path))
+
+    assert.deepEqual(filesB, filesA)
+  }
+
+  /** купируем в существующую папку с ошибкой на папке */
+  async ['copy - базовый с ошибкой на папке']() {
+    await copy('test/example/fs/walk', 'test/example/fs/copy')
+    await copy('test/example/fs/walk', 'test/example/fs/copy', COPYFILE_EXCL).catch(error => {
+      assert.equal(error.code, 'EEXIST')
+      assert.equal(relative('.', error.path), normalize('test/example/fs/copy'))
+    })
+  }
+
+  /** купируем в существующую папку с ошибкой на файле */
+  async ['copy - базовый с ошибкой на файле']() {
+    await copy('test/example/fs/walk', 'test/example/fs/copy')
+    await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt', COPYFILE_EXCL).catch(error => {
+      assert.equal(error.code, 'EEXIST')
+      assert.equal(relative('.', error.path), normalize('test/example/fs/walk/f1.txt'))
+      assert.equal(relative('.', error.dest), normalize('test/example/fs/copy/f1.txt'))
+    })
+  }
 
   /** копируем файл */
   async ['copy - файл']() {
@@ -93,7 +134,6 @@ exports['@ndk/fs'] = class FsTest extends Test {
     await mkdir('test/example/fs/copy')
     await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt')
     await walk('test/example/fs/copy', path => files.push(path))
-    await rmdir('test/example/fs/copy', { recursive: true })
 
     assert.deepEqual(files, ['f1.txt'])
   }
@@ -104,7 +144,6 @@ exports['@ndk/fs'] = class FsTest extends Test {
 
     await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt')
     await walk('test/example/fs/copy', path => files.push(path))
-    await rmdir('test/example/fs/copy', { recursive: true })
 
     assert.deepEqual(files, ['f1.txt'])
   }

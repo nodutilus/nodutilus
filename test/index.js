@@ -19,7 +19,8 @@ class AllTests extends Test {
 
 
 Object.assign(AllTests,
-  require('./@ndk/fn')
+  require('./@ndk/fn'),
+  require('./@ndk/fs')
 )
 
 

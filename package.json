@@ -19,7 +19,11 @@
     "eslintcc": "latest",
     "nyc": "latest"
   },
-  "eslintIgnore": ["test/node_modules"],
+  "eslintIgnore": [
+    "bin/node_modules",
+    "src/node_modules",
+    "test/node_modules"
+  ],
   "nyc": {
     "all": true,
     "branches": 100,

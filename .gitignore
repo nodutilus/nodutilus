@@ -6,5 +6,8 @@ src/node_modules
 test/node_modules
 bin/node_modules
 
+# Промежуточные данные для тестов
+test/example/fs/copy
+
 # Папка сборки модулей, хранения отчетов и пр.
 build

@@ -1,9 +1,10 @@
 'use strict'
 
 const { Test, assert } = require('@ndk/test')
-const { copy, walk, WALK_FILE_FIRST } = require('@ndk/fs')
+const { copy, remove, walk, WALK_FILE_FIRST } = require('@ndk/fs')
 const { normalize, relative } = require('path')
 const {
+  existsSync,
   promises: { mkdir, rmdir },
   constants: { COPYFILE_EXCL }
 } = require('fs')
@@ -14,11 +15,13 @@ exports['@ndk/fs'] = class FsTest extends Test {
   /** Перед запуском очистим временные данные */
   async [Test.before]() {
     await rmdir('test/example/fs/copy', { recursive: true })
+    await rmdir('test/example/fs/remove', { recursive: true })
   }
 
   /** Удалим временные данные после тестов */
   async [Test.afterEach]() {
     await rmdir('test/example/fs/copy', { recursive: true })
+    await rmdir('test/example/fs/remove', { recursive: true })
   }
 
   /** перебираем сначала папки затем вложенные файлы */
@@ -146,6 +149,34 @@ exports['@ndk/fs'] = class FsTest extends Test {
     await walk('test/example/fs/copy', path => files.push(path))
 
     assert.deepEqual(files, ['f1.txt'])
+  }
+
+  /** удаление пустой папки */
+  async ['remove - пустая папка']() {
+    await mkdir('test/example/fs/remove')
+    assert(existsSync('test/example/fs/remove'))
+
+    await remove('test/example/fs/remove')
+    assert(!existsSync('test/example/fs/remove'))
+  }
+
+  /** удаление непустой папки */
+  async ['remove - непустая папка']() {
+    await copy('test/example/fs/walk/f1.txt', 'test/example/fs/remove/f1.txt')
+    assert(existsSync('test/example/fs/remove/f1.txt'))
+
+    await remove('test/example/fs/remove')
+    assert(!existsSync('test/example/fs/remove'))
+  }
+
+  /** удаление файла */
+  async ['remove - файл']() {
+    await copy('test/example/fs/walk/f1.txt', 'test/example/fs/remove/f1.txt')
+    assert(existsSync('test/example/fs/remove/f1.txt'))
+
+    await remove('test/example/fs/remove/f1.txt')
+    assert(existsSync('test/example/fs/remove'))
+    assert(!existsSync('test/example/fs/remove/f1.txt'))
   }
 
 }

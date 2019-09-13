@@ -3,7 +3,7 @@
 
 const { dirname, join } = require('path')
 const {
-  promises: { copyFile, mkdir, readdir, stat },
+  promises: { copyFile, mkdir, readdir, rmdir, stat },
   constants: { COPYFILE_EXCL }
 } = require('fs')
 
@@ -105,6 +105,15 @@ async function __copy(src, dest, flags) {
 }
 
 
+/**
+ * @param {string} path
+ */
+async function remove(path) {
+  await rmdir(path, { recursive: true })
+}
+
+
 exports.copy = copy
+exports.remove = remove
 exports.walk = walk
 exports.WALK_FILE_FIRST = WALK_FILE_FIRST

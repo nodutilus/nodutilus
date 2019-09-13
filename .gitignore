@@ -8,6 +8,7 @@ bin/node_modules
 
 # Промежуточные данные для тестов
 test/example/fs/copy
+test/example/fs/remove
 
 # Папка сборки модулей, хранения отчетов и пр.
 build

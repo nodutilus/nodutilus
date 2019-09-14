@@ -14,12 +14,13 @@ const WALK_FILE_FIRST = 0b1
  * @callback Walker
  * @param {string} path
  * @param {import('fs').Dirent} dirent
- * @returns {boolean}
+ * @returns {boolean|Promise<boolean>}
  */
 /**
  * @param {string} path
  * @param {number|Walker} [flags]
  * @param {Walker} [walker]
+ * @returns {Promise<void>}
  */
 async function walk(path, flags, walker) {
   if (typeof flags === 'function') {
@@ -38,6 +39,7 @@ async function walk(path, flags, walker) {
 /**
  * @param {string} path
  * @param {WalkOptions} options
+ * @returns {Promise<void>}
  */
 async function __walk(path, options) {
   const { root, flags, walker } = options
@@ -68,6 +70,7 @@ async function __walk(path, options) {
  * @param {string} src
  * @param {string} dest
  * @param {number} flags
+ * @returns {Promise<void>}
  */
 async function copy(src, dest, flags) {
   const srcStat = await stat(src)
@@ -87,6 +90,7 @@ async function copy(src, dest, flags) {
  * @param {string} src
  * @param {string} dest
  * @param {number} flags
+ * @returns {Promise<void>}
  */
 async function __copy(src, dest, flags) {
   const mkdirOptions = { recursive: !(flags & COPYFILE_EXCL) }
@@ -107,6 +111,7 @@ async function __copy(src, dest, flags) {
 
 /**
  * @param {string} path
+ * @returns {Promise<void>}
  */
 async function remove(path) {
   await rmdir(path, { recursive: true })

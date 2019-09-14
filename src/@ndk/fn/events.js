@@ -19,7 +19,7 @@ class EventEmitter {
   /**
    * @param {Event} event
    * @param  {...any} args
-   * @returns {EventEmitter}
+   * @returns {Promise<EventEmitter>}
    */
   async emit(event, ...args) {
     const listeners = privateEventsMap.get(this).get(event)

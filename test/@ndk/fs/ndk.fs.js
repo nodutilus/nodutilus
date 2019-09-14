@@ -1,7 +1,7 @@
 'use strict'
 
 const { Test, assert } = require('@ndk/test')
-const { copy, remove, walk, WALK_FILE_FIRST } = require('@ndk/fs')
+const { copy, readText, remove, walk, WALK_FILE_FIRST } = require('@ndk/fs')
 const { normalize, relative } = require('path')
 const {
   existsSync,
@@ -177,6 +177,34 @@ exports['@ndk/fs'] = class FsTest extends Test {
     await remove('test/example/fs/remove/f1.txt')
     assert(existsSync('test/example/fs/remove'))
     assert(!existsSync('test/example/fs/remove/f1.txt'))
+  }
+
+  /** чтение существующего файла */
+  async ['readText - файл существует']() {
+    const data = await readText('test/example/fs/read/text')
+
+    assert.equal(data, 'test read')
+  }
+
+  /** чтение несуществующего файла с генерацией ошибки */
+  async ['readText - файл не существует']() {
+    let result = false
+
+    try {
+      await readText('test/example/fs/read/nonexistent')
+    } catch (error) {
+      assert.equal(error.code, 'ENOENT')
+      result = true
+    }
+
+    assert.equal(result, true)
+  }
+
+  /** чтение несуществующего файла с установкой значения по умолчанию */
+  async ['readText - значение по умолчанию']() {
+    const data = await readText('test/example/fs/read/nonexistent', 'defaultValue')
+
+    assert.equal(data, 'defaultValue')
   }
 
 }

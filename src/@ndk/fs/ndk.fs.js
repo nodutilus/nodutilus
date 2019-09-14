@@ -137,4 +137,7 @@ exports.copy = copy
 exports.readText = readText
 exports.remove = remove
 exports.walk = walk
-exports.WALK_FILE_FIRST = WALK_FILE_FIRST
+exports.constants = {
+  COPYFILE_EXCL,
+  WALK_FILE_FIRST
+}

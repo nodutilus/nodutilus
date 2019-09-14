@@ -1,12 +1,17 @@
 'use strict'
 
 const { Test, assert } = require('@ndk/test')
-const { copy, readText, remove, walk, WALK_FILE_FIRST } = require('@ndk/fs')
+const {
+  copy,
+  readText,
+  remove,
+  walk,
+  constants: { COPYFILE_EXCL, WALK_FILE_FIRST }
+} = require('@ndk/fs')
 const { normalize, relative } = require('path')
 const {
   existsSync,
-  promises: { mkdir, rmdir },
-  constants: { COPYFILE_EXCL }
+  promises: { mkdir, rmdir }
 } = require('fs')
 
 

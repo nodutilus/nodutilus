@@ -3,11 +3,20 @@
 
 const { dirname, join } = require('path')
 const {
-  promises: { copyFile, mkdir, readdir, readFile, rmdir, stat },
+  promises: {
+    copyFile,
+    mkdir,
+    readdir,
+    readFile,
+    rmdir,
+    stat,
+    writeFile
+  },
   constants: { COPYFILE_EXCL }
 } = require('fs')
 
-const WALK_FILE_FIRST = 0b1
+const WALK_FILEFIRST = 0b1
+const WRITEFILE_EXCL = 0b1
 
 
 /**
@@ -49,7 +58,7 @@ async function __walk(path, options) {
     const filePath = join(path, file.name)
 
     if (file.isDirectory()) {
-      if ((flags & WALK_FILE_FIRST)) {
+      if (flags & WALK_FILEFIRST) {
         await __walk(filePath, options)
         await walker(filePath, file)
       } else {
@@ -148,12 +157,48 @@ async function readText(path, defaultValue) {
 }
 
 
+/**
+ * @param {string} path
+ * @param {object} data
+ * @param {number} flags
+ * @returns {Promise<void>}
+ */
+async function writeJSON(path, data, flags) {
+  const jsonData = JSON.stringify(data, null, 2)
+
+  return await writeText(path, jsonData, flags)
+}
+
+
+/**
+ * @param {string} path
+ * @param {string} data
+ * @param {number} flags
+ * @returns {Promise<void>}
+ */
+async function writeText(path, data, flags) {
+  const recursive = !(flags & WRITEFILE_EXCL)
+
+  if (recursive) {
+    await mkdir(dirname(path), { recursive })
+  }
+
+  return await writeFile(path, data, {
+    encoding: 'utf8',
+    flag: recursive ? 'w' : 'wx'
+  })
+}
+
+
 exports.copy = copy
 exports.readJSON = readJSON
 exports.readText = readText
 exports.remove = remove
 exports.walk = walk
+exports.writeJSON = writeJSON
+exports.writeText = writeText
 exports.constants = {
   COPYFILE_EXCL,
-  WALK_FILE_FIRST
+  WALK_FILEFIRST,
+  WRITEFILE_EXCL
 }

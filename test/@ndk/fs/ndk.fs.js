@@ -7,7 +7,8 @@ const {
   readText,
   remove,
   walk,
-  constants: { COPYFILE_EXCL, WALK_FILE_FIRST }
+  writeJSON,
+  constants: { COPYFILE_EXCL, WALK_FILEFIRST, WRITEFILE_EXCL }
 } = require('@ndk/fs')
 const { normalize, relative } = require('path')
 const {
@@ -22,12 +23,14 @@ exports['@ndk/fs'] = class FsTest extends Test {
   async [Test.before]() {
     await rmdir('test/example/fs/copy', { recursive: true })
     await rmdir('test/example/fs/remove', { recursive: true })
+    await rmdir('test/example/fs/write', { recursive: true })
   }
 
   /** Удалим временные данные после тестов */
   async [Test.afterEach]() {
     await rmdir('test/example/fs/copy', { recursive: true })
     await rmdir('test/example/fs/remove', { recursive: true })
+    await rmdir('test/example/fs/write', { recursive: true })
   }
 
   /** перебираем сначала папки затем вложенные файлы */
@@ -83,7 +86,7 @@ exports['@ndk/fs'] = class FsTest extends Test {
       'p2', false
     ]
 
-    await walk('test/example/fs/walk', WALK_FILE_FIRST, async (path, dirent) => {
+    await walk('test/example/fs/walk', WALK_FILEFIRST, async (path, dirent) => {
       await new Promise(resolve => setTimeout(resolve, 1))
       files.push(path)
       files.push(dirent.isFile())
@@ -240,6 +243,64 @@ exports['@ndk/fs'] = class FsTest extends Test {
     const data = await readText('test/example/fs/read/nonexistent', 'defaultValue')
 
     assert.equal(data, 'defaultValue')
+  }
+
+  /** запись нового файла с созданием каталога */
+  async ['write[Text/JSON] - нет файла и папки']() {
+    await writeJSON('test/example/fs/write/test.json', { test: true })
+
+    const data = await readText('test/example/fs/write/test.json')
+
+    assert.equal(data, '{\n  "test": true\n}')
+  }
+
+  /** запись нового файла в созданном каталоге */
+  async ['write[Text/JSON] - нет файла']() {
+    await mkdir('test/example/fs/write')
+    await writeJSON('test/example/fs/write/test.json', { test: 1 })
+
+    const data = await readText('test/example/fs/write/test.json')
+
+    assert.equal(data, '{\n  "test": 1\n}')
+  }
+
+  /** перезапись существующего файла по умолчанию */
+  async ['write[Text/JSON] - перезапись файла']() {
+    await writeJSON('test/example/fs/write/test.json', { test: 2 })
+
+    const data = await readText('test/example/fs/write/test.json')
+
+    assert.equal(data, '{\n  "test": 2\n}')
+
+    await writeJSON('test/example/fs/write/test.json', { test: 3 })
+
+    const data3 = await readText('test/example/fs/write/test.json')
+
+    assert.equal(data3, '{\n  "test": 3\n}')
+  }
+
+  /** не даем перезаписывать, если передали флаг WRITEFILE_EXCL */
+  async ['write[Text/JSON] - ошибка при перезаписи файла']() {
+    await writeJSON('test/example/fs/write/test.json', { test: 2 })
+
+    const data = await readText('test/example/fs/write/test.json')
+
+    assert.equal(data, '{\n  "test": 2\n}')
+
+    const error = await writeJSON('test/example/fs/write/test.json', { test: 3 }, WRITEFILE_EXCL)
+      .catch(error => error)
+
+    assert.equal(error.code, 'EEXIST')
+    assert.equal(relative('.', error.path), normalize('test/example/fs/write/test.json'))
+  }
+
+  /** не даем создавать новый каталог, если передали флаг WRITEFILE_EXCL */
+  async ['write[Text/JSON] - ошибка - нет папки']() {
+    const error = await writeJSON('test/example/fs/write/test.json', { test: true }, WRITEFILE_EXCL)
+      .catch(error => error)
+
+    assert.equal(error.code, 'ENOENT')
+    assert.equal(relative('.', error.path), normalize('test/example/fs/write/test.json'))
   }
 
 }

@@ -120,6 +120,21 @@ async function remove(path) {
 
 /**
  * @param {string} path
+ * @param {object} defaultValue
+ * @returns {Promise<object>}
+ */
+async function readJSON(path, defaultValue) {
+  return await readFile(path, 'utf8').then(JSON.parse).catch(error => {
+    if (error.code === 'ENOENT' && typeof defaultValue !== 'undefined') {
+      return defaultValue
+    }
+    throw error
+  })
+}
+
+
+/**
+ * @param {string} path
  * @param {string} defaultValue
  * @returns {Promise<string>}
  */
@@ -134,6 +149,7 @@ async function readText(path, defaultValue) {
 
 
 exports.copy = copy
+exports.readJSON = readJSON
 exports.readText = readText
 exports.remove = remove
 exports.walk = walk

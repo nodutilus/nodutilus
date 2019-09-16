@@ -3,6 +3,7 @@
 const { Test, assert } = require('@ndk/test')
 const {
   copy,
+  readJSON,
   readText,
   remove,
   walk,
@@ -182,6 +183,35 @@ exports['@ndk/fs'] = class FsTest extends Test {
     await remove('test/example/fs/remove/f1.txt')
     assert(existsSync('test/example/fs/remove'))
     assert(!existsSync('test/example/fs/remove/f1.txt'))
+  }
+
+
+  /** чтение существующего файла */
+  async ['readJSON - файл существует']() {
+    const data = await readJSON('test/example/fs/read/test.json')
+
+    assert.deepEqual(data, { test: true })
+  }
+
+  /** чтение несуществующего файла с генерацией ошибки */
+  async ['readJSON - файл не существует']() {
+    let result = false
+
+    try {
+      await readJSON('test/example/fs/read/nonexistent')
+    } catch (error) {
+      assert.equal(error.code, 'ENOENT')
+      result = true
+    }
+
+    assert.equal(result, true)
+  }
+
+  /** чтение несуществующего файла с установкой значения по умолчанию */
+  async ['readJSON - значение по умолчанию']() {
+    const data = await readJSON('test/example/fs/read/nonexistent', { defaultValue: true })
+
+    assert.deepEqual(data, { defaultValue: true })
   }
 
   /** чтение существующего файла */

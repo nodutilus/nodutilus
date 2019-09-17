@@ -123,20 +123,24 @@ exports['@ndk/fs'] = class FsTest extends Test {
   /** купируем в существующую папку с ошибкой на папке */
   async ['copy - базовый с ошибкой на папке']() {
     await copy('test/example/fs/walk', 'test/example/fs/copy')
-    await copy('test/example/fs/walk', 'test/example/fs/copy', COPYFILE_EXCL).catch(error => {
-      assert.equal(error.code, 'EEXIST')
-      assert.equal(relative('.', error.path), normalize('test/example/fs/copy'))
-    })
+
+    const error = await copy('test/example/fs/walk', 'test/example/fs/copy', COPYFILE_EXCL)
+      .catch(error => error)
+
+    assert.equal(error.code, 'EEXIST')
+    assert.equal(relative('.', error.path), normalize('test/example/fs/copy'))
   }
 
   /** купируем в существующую папку с ошибкой на файле */
   async ['copy - базовый с ошибкой на файле']() {
     await copy('test/example/fs/walk', 'test/example/fs/copy')
-    await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt', COPYFILE_EXCL).catch(error => {
-      assert.equal(error.code, 'EEXIST')
-      assert.equal(relative('.', error.path), normalize('test/example/fs/walk/f1.txt'))
-      assert.equal(relative('.', error.dest), normalize('test/example/fs/copy/f1.txt'))
-    })
+
+    const error = await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt', COPYFILE_EXCL)
+      .catch(error => error)
+
+    assert.equal(error.code, 'EEXIST')
+    assert.equal(relative('.', error.path), normalize('test/example/fs/walk/f1.txt'))
+    assert.equal(relative('.', error.dest), normalize('test/example/fs/copy/f1.txt'))
   }
 
   /** копируем файл */
@@ -198,16 +202,10 @@ exports['@ndk/fs'] = class FsTest extends Test {
 
   /** чтение несуществующего файла с генерацией ошибки */
   async ['readJSON - файл не существует']() {
-    let result = false
+    const error = await readJSON('test/example/fs/read/nonexistent')
+      .catch(error => error)
 
-    try {
-      await readJSON('test/example/fs/read/nonexistent')
-    } catch (error) {
-      assert.equal(error.code, 'ENOENT')
-      result = true
-    }
-
-    assert.equal(result, true)
+    assert.equal(error.code, 'ENOENT')
   }
 
   /** чтение несуществующего файла с установкой значения по умолчанию */
@@ -226,16 +224,10 @@ exports['@ndk/fs'] = class FsTest extends Test {
 
   /** чтение несуществующего файла с генерацией ошибки */
   async ['readText - файл не существует']() {
-    let result = false
+    const error = await readText('test/example/fs/read/nonexistent')
+      .catch(error => error)
 
-    try {
-      await readText('test/example/fs/read/nonexistent')
-    } catch (error) {
-      assert.equal(error.code, 'ENOENT')
-      result = true
-    }
-
-    assert.equal(result, true)
+    assert.equal(error.code, 'ENOENT')
   }
 
   /** чтение несуществующего файла с установкой значения по умолчанию */

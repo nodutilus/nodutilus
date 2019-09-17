@@ -8,7 +8,7 @@ const {
   remove,
   walk,
   writeJSON,
-  constants: { COPYFILE_EXCL, WALK_FILEFIRST, WRITEFILE_EXCL }
+  constants: { COPY_EXCL, WALK_FILEFIRST, WRITE_EXCL }
 } = require('@ndk/fs')
 const { normalize, relative } = require('path')
 const {
@@ -124,7 +124,7 @@ exports['@ndk/fs'] = class FsTest extends Test {
   async ['copy - базовый с ошибкой на папке']() {
     await copy('test/example/fs/walk', 'test/example/fs/copy')
 
-    const error = await copy('test/example/fs/walk', 'test/example/fs/copy', COPYFILE_EXCL)
+    const error = await copy('test/example/fs/walk', 'test/example/fs/copy', COPY_EXCL)
       .catch(error => error)
 
     assert.equal(error.code, 'EEXIST')
@@ -135,7 +135,7 @@ exports['@ndk/fs'] = class FsTest extends Test {
   async ['copy - базовый с ошибкой на файле']() {
     await copy('test/example/fs/walk', 'test/example/fs/copy')
 
-    const error = await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt', COPYFILE_EXCL)
+    const error = await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt', COPY_EXCL)
       .catch(error => error)
 
     assert.equal(error.code, 'EEXIST')
@@ -271,7 +271,7 @@ exports['@ndk/fs'] = class FsTest extends Test {
     assert.equal(data3, '{\n  "test": 3\n}')
   }
 
-  /** не даем перезаписывать, если передали флаг WRITEFILE_EXCL */
+  /** не даем перезаписывать, если передали флаг WRITE_EXCL */
   async ['write[Text/JSON] - ошибка при перезаписи файла']() {
     await writeJSON('test/example/fs/write/test.json', { test: 2 })
 
@@ -279,16 +279,16 @@ exports['@ndk/fs'] = class FsTest extends Test {
 
     assert.equal(data, '{\n  "test": 2\n}')
 
-    const error = await writeJSON('test/example/fs/write/test.json', { test: 3 }, WRITEFILE_EXCL)
+    const error = await writeJSON('test/example/fs/write/test.json', { test: 3 }, WRITE_EXCL)
       .catch(error => error)
 
     assert.equal(error.code, 'EEXIST')
     assert.equal(relative('.', error.path), normalize('test/example/fs/write/test.json'))
   }
 
-  /** не даем создавать новый каталог, если передали флаг WRITEFILE_EXCL */
+  /** не даем создавать новый каталог, если передали флаг WRITE_EXCL */
   async ['write[Text/JSON] - ошибка - нет папки']() {
-    const error = await writeJSON('test/example/fs/write/test.json', { test: true }, WRITEFILE_EXCL)
+    const error = await writeJSON('test/example/fs/write/test.json', { test: true }, WRITE_EXCL)
       .catch(error => error)
 
     assert.equal(error.code, 'ENOENT')

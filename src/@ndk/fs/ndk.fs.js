@@ -15,8 +15,10 @@ const {
   constants: { COPYFILE_EXCL }
 } = require('fs')
 
-const WALK_FILEFIRST = 0b1
-const WRITEFILE_EXCL = 0b1
+const constants = Object.create(null)
+const COPY_EXCL = constants.COPY_EXCL = 0b1
+const WALK_FILEFIRST = constants.WALK_FILEFIRST = 0b1
+const WRITE_EXCL = constants.WRITE_EXCL = 0b1
 
 
 /**
@@ -87,10 +89,13 @@ async function copy(src, dest, flags) {
   if (srcStat.isDirectory()) {
     await __copy(src, dest, flags)
   } else {
-    if (!(flags & COPYFILE_EXCL)) {
+    const excl = flags & COPY_EXCL
+    const fsFlags = excl ? COPYFILE_EXCL : 0
+
+    if (!excl) {
       await mkdir(dirname(dest), { recursive: true })
     }
-    await copyFile(src, dest, flags)
+    await copyFile(src, dest, fsFlags)
   }
 }
 
@@ -102,7 +107,7 @@ async function copy(src, dest, flags) {
  * @returns {Promise<void>}
  */
 async function __copy(src, dest, flags) {
-  const mkdirOptions = { recursive: !(flags & COPYFILE_EXCL) }
+  const mkdirOptions = { recursive: !(flags & COPY_EXCL) }
 
   await mkdir(dest, mkdirOptions)
   await __walk('.', {
@@ -111,7 +116,7 @@ async function __copy(src, dest, flags) {
       if (dirent.isDirectory()) {
         await mkdir(join(dest, path), mkdirOptions)
       } else {
-        await copyFile(join(src, path), join(dest, path), flags)
+        await copyFile(join(src, path), join(dest, path))
       }
     }
   })
@@ -177,7 +182,7 @@ async function writeJSON(path, data, flags) {
  * @returns {Promise<void>}
  */
 async function writeText(path, data, flags) {
-  const recursive = !(flags & WRITEFILE_EXCL)
+  const recursive = !(flags & WRITE_EXCL)
 
   if (recursive) {
     await mkdir(dirname(path), { recursive })
@@ -190,6 +195,7 @@ async function writeText(path, data, flags) {
 }
 
 
+exports.constants = constants
 exports.copy = copy
 exports.readJSON = readJSON
 exports.readText = readText
@@ -197,8 +203,3 @@ exports.remove = remove
 exports.walk = walk
 exports.writeJSON = writeJSON
 exports.writeText = writeText
-exports.constants = {
-  COPYFILE_EXCL,
-  WALK_FILEFIRST,
-  WRITEFILE_EXCL
-}

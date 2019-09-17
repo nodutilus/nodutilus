@@ -201,7 +201,7 @@ class TestResult {
 /**
  * @param {{testInstance:Test, name:string, test:Test, deepEvents:Array<symbol>}} optioms
  * @param {Function} fn
- * @returns {TestResult}
+ * @returns {Promise<TestResult>}
  */
 async function __deepEventsWrapper({ testInstance, name, test, deepEvents }, fn) {
   /** @type {EventEmitter} */
@@ -244,6 +244,7 @@ async function __deepEventsWrapper({ testInstance, name, test, deepEvents }, fn)
  * @param {Test} testInstance
  * @param {symbol} event
  * @param {EventData} data
+ * @returns {Promise<void>}
  */
 async function __notify(testInstance, event, data = {}) {
   /** @type {EventEmitter} */
@@ -303,7 +304,7 @@ class Test {
   /**
    * @param {Test} testInstance
    * @param {string} name
-   * @returns {TestResult}
+   * @returns {Promise<TestResult>}
    */
   static async runTest(testInstance, name) {
     const test = testInstance[name]
@@ -341,7 +342,7 @@ class Test {
 
   /**
    * @param {Test} testInstance
-   * @returns {TestResult}
+   * @returns {Promise<TestResult>}
    */
   static async run(testInstance) {
     const { tests } = testInstance

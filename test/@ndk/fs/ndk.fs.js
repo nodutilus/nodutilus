@@ -8,7 +8,12 @@ const {
   remove,
   walk,
   writeJSON,
-  constants: { COPY_EXCL, WALK_FILEFIRST, WRITE_EXCL }
+  constants: {
+    COPY_EXCL,
+    COPY_RMNONEXISTENT,
+    WALK_FILEFIRST,
+    WRITE_EXCL
+  }
 } = require('@ndk/fs')
 const { normalize, relative } = require('path')
 const {
@@ -162,6 +167,22 @@ exports['@ndk/fs'] = class FsTest extends Test {
     await walk('test/example/fs/copy', path => files.push(path))
 
     assert.deepEqual(files, ['f1.txt'])
+  }
+
+  /** при копировании удаляем существующие файлы и папки в целевом каталоге,
+   *  которых нет в исходном каталоге */
+  async ['copy - удаление несуществующих']() {
+    await copy('test/example/fs/walk/p1', 'test/example/fs/copy/p1_new')
+    await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f_new.txt')
+    await copy('test/example/fs/walk', 'test/example/fs/copy')
+
+    assert(existsSync('test/example/fs/copy/p1_new'))
+    assert(existsSync('test/example/fs/copy/f_new.txt'))
+
+    await copy('test/example/fs/walk', 'test/example/fs/copy', COPY_RMNONEXISTENT)
+
+    assert(!existsSync('test/example/fs/copy/p1_new'))
+    assert(!existsSync('test/example/fs/copy/f_new.txt'))
   }
 
   /** удаление пустой папки */

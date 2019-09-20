@@ -16,9 +16,12 @@ const {
 } = require('fs')
 
 const constants = Object.create(null)
-const COPY_EXCL = constants.COPY_EXCL = 0b1
-const WALK_FILEFIRST = constants.WALK_FILEFIRST = 0b1
-const WRITE_EXCL = constants.WRITE_EXCL = 0b1
+const COPY_EXCL = constants.COPY_EXCL = 0b000001
+const COPY_RMNONEXISTENT = constants.COPY_RMNONEXISTENT = 0b000010
+const SYMLINK_EXCL = constants.SYMLINK_EXCL = 0b000100
+const SYMLINK_RMNONEXISTENT = constants.SYMLINK_RMNONEXISTENT = 0b001000
+const WALK_FILEFIRST = constants.WALK_FILEFIRST = 0b010000
+const WRITE_EXCL = constants.WRITE_EXCL = 0b100000
 
 
 /**
@@ -108,18 +111,38 @@ async function copy(src, dest, flags) {
  */
 async function __copy(src, dest, flags) {
   const mkdirOptions = { recursive: !(flags & COPY_EXCL) }
+  const existentPaths = flags & COPY_RMNONEXISTENT ? [] : false
 
   await mkdir(dest, mkdirOptions)
   await __walk('.', {
     root: src,
     walker: async (path, dirent) => {
+      const destPath = join(dest, path)
+
+      if (existentPaths) {
+        existentPaths.push(destPath)
+      }
       if (dirent.isDirectory()) {
-        await mkdir(join(dest, path), mkdirOptions)
+        await mkdir(destPath, mkdirOptions)
       } else {
-        await copyFile(join(src, path), join(dest, path))
+        await copyFile(join(src, path), destPath)
       }
     }
   })
+  if (existentPaths) {
+    await __walk('.', {
+      root: dest,
+      walker: async path => {
+        const destPath = join(dest, path)
+
+        if (!existentPaths.includes(destPath)) {
+          await remove(destPath)
+
+          return false
+        }
+      }
+    })
+  }
 }
 
 

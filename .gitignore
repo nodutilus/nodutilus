@@ -9,6 +9,7 @@ bin/node_modules
 # Промежуточные данные для тестов
 test/example/fs/copy
 test/example/fs/remove
+test/example/fs/symlink
 
 # Папка сборки модулей, хранения отчетов и пр.
 build

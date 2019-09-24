@@ -1,15 +1,19 @@
 /** @module @ndk/fs */
 'use strict'
 
-const { dirname, join } = require('path')
+const { dirname, join, resolve } = require('path')
 const {
+  existsSync,
   promises: {
     copyFile,
+    lstat,
     mkdir,
     readdir,
     readFile,
+    readlink,
     rmdir,
     stat,
+    symlink: symlinkFile,
     writeFile
   },
   constants: { COPYFILE_EXCL }
@@ -147,6 +151,96 @@ async function __copy(src, dest, flags) {
 
 
 /**
+ * @param {string} src
+ * @param {string} dest
+ * @param {number} flags
+ * @returns {Promise<void>}
+ */
+async function symlink(src, dest, flags) {
+  const srcStat = await stat(src)
+
+  if (srcStat.isDirectory()) {
+    await __symlink(src, dest, flags)
+  } else {
+    if (!(flags & SYMLINK_EXCL)) {
+      await mkdir(dirname(dest), { recursive: true })
+    }
+    await __symlinkFile(src, dest, flags)
+  }
+}
+
+
+/**
+ * @param {string} src
+ * @param {string} dest
+ * @param {number} flags
+ * @returns {Promise<void>}
+ */
+async function __symlink(src, dest, flags) {
+  const mkdirOptions = { recursive: !(flags & SYMLINK_EXCL) }
+  const existentPaths = flags & SYMLINK_RMNONEXISTENT ? [] : false
+
+  await mkdir(dest, mkdirOptions)
+  await __walk('.', {
+    root: src,
+    walker: async (path, dirent) => {
+      const destPath = join(dest, path)
+
+      if (existentPaths) {
+        existentPaths.push(destPath)
+      }
+      if (dirent.isDirectory()) {
+        await mkdir(destPath, mkdirOptions)
+      } else {
+        await __symlinkFile(join(src, path), destPath)
+      }
+    }
+  })
+  if (existentPaths) {
+    await __walk('.', {
+      root: dest,
+      walker: async path => {
+        const destPath = join(dest, path)
+
+        if (!existentPaths.includes(destPath)) {
+          await remove(destPath)
+
+          return false
+        }
+      }
+    })
+  }
+}
+
+
+/**
+ * @param {string} src
+ * @param {string} dest
+ * @param {number} flags
+ * @returns {Promise<void>}
+ */
+async function __symlinkFile(src, dest, flags) {
+  const resolvedSrc = resolve(src)
+
+  if (flags & SYMLINK_EXCL || !existsSync(dest)) {
+    await symlinkFile(resolvedSrc, dest)
+  } else {
+    const destStat = await lstat(dest)
+
+    if (destStat.isSymbolicLink()) {
+      const link = await readlink(dest)
+
+      if (resolvedSrc !== link) {
+        debugger
+      }
+    } else {
+      debugger
+    }
+  }
+}
+
+
+/**
  * @param {string} path
  * @returns {Promise<void>}
  */
@@ -223,6 +317,7 @@ exports.copy = copy
 exports.readJSON = readJSON
 exports.readText = readText
 exports.remove = remove
+exports.symlink = symlink
 exports.walk = walk
 exports.writeJSON = writeJSON
 exports.writeText = writeText

@@ -6,11 +6,14 @@ const {
   readJSON,
   readText,
   remove,
+  symlink,
   walk,
   writeJSON,
   constants: {
     COPY_EXCL,
     COPY_RMNONEXISTENT,
+    SYMLINK_EXCL,
+    SYMLINK_RMNONEXISTENT,
     WALK_FILEFIRST,
     WRITE_EXCL
   }
@@ -27,6 +30,7 @@ exports['@ndk/fs'] = class FsTest extends Test {
   /** Перед запуском очистим временные данные */
   async [Test.before]() {
     await rmdir('test/example/fs/copy', { recursive: true })
+    await rmdir('test/example/fs/symlink', { recursive: true })
     await rmdir('test/example/fs/remove', { recursive: true })
     await rmdir('test/example/fs/write', { recursive: true })
   }
@@ -34,6 +38,7 @@ exports['@ndk/fs'] = class FsTest extends Test {
   /** Удалим временные данные после тестов */
   async [Test.afterEach]() {
     await rmdir('test/example/fs/copy', { recursive: true })
+    await rmdir('test/example/fs/symlink', { recursive: true })
     await rmdir('test/example/fs/remove', { recursive: true })
     await rmdir('test/example/fs/write', { recursive: true })
   }
@@ -184,6 +189,101 @@ exports['@ndk/fs'] = class FsTest extends Test {
     assert(!existsSync('test/example/fs/copy/p1_new'))
     assert(!existsSync('test/example/fs/copy/f_new.txt'))
   }
+
+
+  /** создаем ссылки в несуществующую папку */
+  async ['symlink - базовый']() {
+    const filesA = []
+    const filesB = []
+
+    await symlink('test/example/fs/walk', 'test/example/fs/symlink')
+    await walk('test/example/fs/walk', path => filesA.push(path))
+    await walk('test/example/fs/symlink', path => filesB.push(path))
+
+    assert.deepEqual(filesB, filesA)
+
+    const textA = await readText('test/example/fs/walk/f1.txt')
+    const textB = await readText('test/example/fs/symlink/f1.txt')
+
+    assert.equal(textB, textA)
+  }
+
+  /** создаем ссылки в существующую папку, ссылки в конечной папке верные */
+  async ['symlink - базовый, с верными ссылками']() {
+    const filesA = []
+    const filesB = []
+
+    await symlink('test/example/fs/walk', 'test/example/fs/symlink')
+    await symlink('test/example/fs/walk', 'test/example/fs/symlink')
+    await walk('test/example/fs/walk', path => filesA.push(path))
+    await walk('test/example/fs/symlink', path => filesB.push(path))
+
+    assert.deepEqual(filesB, filesA)
+  }
+
+  /** создаем ссылки в существующую папку, ссылки в конечной папке ведут на другие файлы */
+
+  /** создаем ссылки в существующую папку, если конечная точка не ссылка, заменяем на ссылку */
+
+  // /** купируем в существующую папку с ошибкой на папке */
+  // async ['copy - базовый с ошибкой на папке']() {
+  //   await copy('test/example/fs/walk', 'test/example/fs/copy')
+
+  //   const error = await copy('test/example/fs/walk', 'test/example/fs/copy', COPY_EXCL)
+  //     .catch(error => error)
+
+  //   assert.equal(error.code, 'EEXIST')
+  //   assert.equal(relative('.', error.path), normalize('test/example/fs/copy'))
+  // }
+
+  // /** купируем в существующую папку с ошибкой на файле */
+  // async ['copy - базовый с ошибкой на файле']() {
+  //   await copy('test/example/fs/walk', 'test/example/fs/copy')
+
+  //   const error = await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt', COPY_EXCL)
+  //     .catch(error => error)
+
+  //   assert.equal(error.code, 'EEXIST')
+  //   assert.equal(relative('.', error.path), normalize('test/example/fs/walk/f1.txt'))
+  //   assert.equal(relative('.', error.dest), normalize('test/example/fs/copy/f1.txt'))
+  // }
+
+  // /** копируем файл */
+  // async ['copy - файл']() {
+  //   const files = []
+
+  //   await mkdir('test/example/fs/copy')
+  //   await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt')
+  //   await walk('test/example/fs/copy', path => files.push(path))
+
+  //   assert.deepEqual(files, ['f1.txt'])
+  // }
+
+  // /** копируем файл, если каталог назначения не создан */
+  // async ['copy - файл (без каталога)']() {
+  //   const files = []
+
+  //   await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt')
+  //   await walk('test/example/fs/copy', path => files.push(path))
+
+  //   assert.deepEqual(files, ['f1.txt'])
+  // }
+
+  // /** при копировании удаляем существующие файлы и папки в целевом каталоге,
+  //  *  которых нет в исходном каталоге */
+  // async ['copy - удаление несуществующих']() {
+  //   await copy('test/example/fs/walk/p1', 'test/example/fs/copy/p1_new')
+  //   await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f_new.txt')
+  //   await copy('test/example/fs/walk', 'test/example/fs/copy')
+
+  //   assert(existsSync('test/example/fs/copy/p1_new'))
+  //   assert(existsSync('test/example/fs/copy/f_new.txt'))
+
+  //   await copy('test/example/fs/walk', 'test/example/fs/copy', COPY_RMNONEXISTENT)
+
+  //   assert(!existsSync('test/example/fs/copy/p1_new'))
+  //   assert(!existsSync('test/example/fs/copy/f_new.txt'))
+  // }
 
   /** удаление пустой папки */
   async ['remove - пустая папка']() {

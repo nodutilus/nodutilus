@@ -231,10 +231,12 @@ async function __symlinkFile(src, dest, flags) {
       const link = await readlink(dest)
 
       if (resolvedSrc !== link) {
-        debugger
+        await remove(dest)
+        await symlinkFile(resolvedSrc, dest)
       }
     } else {
-      debugger
+      await remove(dest)
+      await symlinkFile(resolvedSrc, dest)
     }
   }
 }

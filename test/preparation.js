@@ -318,7 +318,7 @@ class allTests {
     doesNotThrow(mt.myTest)
     ok(mt.mySubTest instanceof Test)
     doesNotThrow(() => ok(new mt.notTest() instanceof Test))
-    doesNotThrow(mt.__proto__.notTest)
+    doesNotThrow(Reflect.getPrototypeOf(mt).notTest)
     equal(mt.sizeBeforeRedefined, 3)
     equal(tests.size, 2)
   }
@@ -472,7 +472,7 @@ class allTests {
     equal(include.success, true)
     equal(includeExt.success, true)
     equal(includeExt.tests.size, 1)
-    throws(mt.__proto__.includeExt, { message: 'Test Error' })
+    throws(Reflect.getPrototypeOf(mt).includeExt, { message: 'Test Error' })
   }
 
   async ['Test => return TestResult']() {
@@ -657,7 +657,7 @@ class allTests {
 
 async function preparation() {
   const tests = new allTests()
-  const testNames = Object.getOwnPropertyNames(tests.__proto__)
+  const testNames = Object.getOwnPropertyNames(Reflect.getPrototypeOf(tests))
     .filter(item => item !== 'constructor')
 
   for (const testName of testNames) {

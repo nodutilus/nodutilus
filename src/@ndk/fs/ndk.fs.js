@@ -257,12 +257,14 @@ async function remove(path) {
  * @returns {Promise<object>}
  */
 async function readJSON(path, defaultValue) {
-  return await readFile(path, 'utf8').then(JSON.parse).catch(error => {
+  const data = await readFile(path, 'utf8').then(JSON.parse).catch(error => {
     if (error.code === 'ENOENT' && typeof defaultValue !== 'undefined') {
       return defaultValue
     }
     throw error
   })
+
+  return data
 }
 
 
@@ -272,12 +274,14 @@ async function readJSON(path, defaultValue) {
  * @returns {Promise<string>}
  */
 async function readText(path, defaultValue) {
-  return await readFile(path, 'utf8').catch(error => {
+  const data = await readFile(path, 'utf8').catch(error => {
     if (error.code === 'ENOENT' && typeof defaultValue !== 'undefined') {
       return defaultValue
     }
     throw error
   })
+
+  return data
 }
 
 
@@ -290,7 +294,7 @@ async function readText(path, defaultValue) {
 async function writeJSON(path, data, flags) {
   const jsonData = JSON.stringify(data, null, 2)
 
-  return await writeText(path, jsonData, flags)
+  await writeText(path, jsonData, flags)
 }
 
 
@@ -307,7 +311,7 @@ async function writeText(path, data, flags) {
     await mkdir(dirname(path), { recursive })
   }
 
-  return await writeFile(path, data, {
+  await writeFile(path, data, {
     encoding: 'utf8',
     flag: recursive ? 'w' : 'wx'
   })

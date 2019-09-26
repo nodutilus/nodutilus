@@ -4,18 +4,17 @@
   "scripts": {
     "eslint": "eslint . --max-warnings 0",
     "eslintcc": "eslintcc . --greater-than C --show-rules",
-    "link-for-test": "ndk-ci-cd link-for-test src/@ndk test src/@ndk src",
+    "link-for-test": "node bin/link-node-module src/@ndk test src/@ndk src",
+    "link-for-test-real": "ndk-ci-cd link-for-test src/@ndk test src/@ndk src",
     "test": "node test",
     "coverage": "(nyc node test || node test) && (nyc check-coverage || nyc report -r=text && nyc check-coverage)",
     "coverage-html": "nyc -r=html node test",
-    "build": "ndk-ci-cd link-for-test src/@ndk bin && node bin/build-multi-package src/multi-package.json",
+    "build": "node bin/build-multi-package src/multi-package.json",
     "build-real": "ndk-ci-cd build-multi-package multi-package.json"
   },
   "dependencies": {
     "@nd-toolkit/eslint-config": "latest",
-    "@nd-toolkit/ci-cd": "latest",
     "eslint": "latest",
-    "eslint-plugin-jsdoc": "latest",
     "eslintcc": "latest",
     "nyc": "latest"
   },

@@ -168,7 +168,7 @@ function getInstanceTests(tests, instance) {
     const isTestClass = Object.isPrototypeOf.call(Test, value)
     const isTestInstance = value instanceof Test
 
-    if (isFunction && !isTestClass || isTestInstance) {
+    if ((isFunction && !isTestClass) || isTestInstance) {
       tests.add(name)
     } else {
       tests.delete(name)
@@ -273,8 +273,8 @@ class Test {
     const tests = getNestedStaticTestsClasses(this)
     const events = getClassEvents(new Map(), proto)
 
-    for (const [name, testClass] of tests) {
-      this[name] = new testClass()
+    for (const [name, TestClass] of tests) {
+      this[name] = new TestClass()
     }
     for (const [event, listener] of events) {
       this.event.on(event, listener.bind(this))
@@ -324,7 +324,11 @@ class Test {
         name,
         test,
         deepEvents: [Test.beforeEachDeep, Test.afterEachDeep]
-      }, async () => await this.run(test))
+      }, async () => {
+        const testResult = await this.run(test)
+
+        return testResult
+      })
       await __notify(testInstance, Test.afterEachNested, { name, result })
     } else {
       await __notify(testInstance, Test.beforeEach, { name })

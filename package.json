@@ -13,6 +13,7 @@
     "build-real": "ndk-ci-cd build-multi-package multi-package.json"
   },
   "dependencies": {
+    "@nd-toolkit/ci-cd": "latest",
     "@nd-toolkit/eslint-config": "latest",
     "eslint": "latest",
     "eslintcc": "latest",

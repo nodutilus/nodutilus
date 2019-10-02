@@ -19,6 +19,16 @@ const {
   constants: { COPYFILE_EXCL }
 } = require('fs')
 
+/**
+ * @typedef CONSTANTS
+ * @property {number} COPY_EXCL
+ * @property {number} COPY_RMNONEXISTENT
+ * @property {number} SYMLINK_EXCL
+ * @property {number} SYMLINK_RMNONEXISTENT
+ * @property {number} WALK_FILEFIRST
+ * @property {number} WRITE_EXCL
+ */
+/** @type {CONSTANTS} */
 const constants = Object.create(null)
 const COPY_EXCL = constants.COPY_EXCL = 0b000001
 const COPY_RMNONEXISTENT = constants.COPY_RMNONEXISTENT = 0b000010

@@ -1,6 +1,6 @@
 'use strict'
 
-const { symlink } = require('../src/@ndk/fs')
+const { symlink, constants: { SYMLINK_RMNONEXISTENT } } = require('../src/@ndk/fs')
 const { basename } = require('path')
 
 /**
@@ -10,7 +10,7 @@ const { basename } = require('path')
 async function linkNodeModule(src, dest = '.') {
   const destModulePath = `${dest}/node_modules/${basename(src)}`
 
-  await symlink(src, destModulePath)
+  await symlink(src, destModulePath, SYMLINK_RMNONEXISTENT)
 }
 
 

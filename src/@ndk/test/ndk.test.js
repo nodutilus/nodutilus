@@ -41,9 +41,11 @@ function getOwnClassMethods(tests, proto) {
  * @param {Test} proto
  */
 function getClassMethods(tests, proto) {
+  const nestedProto = Reflect.getPrototypeOf(proto)
+
   getOwnClassMethods(tests, proto)
-  if (proto.__proto__ instanceof Test) {
-    getClassMethods(tests, proto.__proto__)
+  if (nestedProto instanceof Test) {
+    getClassMethods(tests, nestedProto)
   }
 }
 
@@ -76,8 +78,10 @@ function getOwnClassEvents(events, proto) {
  * @returns {EventListeners}
  */
 function getClassEvents(events, proto) {
-  if (proto.__proto__ instanceof Test) {
-    getClassEvents(events, proto.__proto__)
+  const nestedProto = Reflect.getPrototypeOf(proto)
+
+  if (nestedProto instanceof Test) {
+    getClassEvents(events, nestedProto)
   }
   getOwnClassEvents(events, proto)
 
@@ -108,9 +112,11 @@ function getOwnNestedStaticTests(tests, constructor) {
  * @param {Function} constructor
  */
 function getNestedStaticTests(tests, constructor) {
+  const constructorProto = Reflect.getPrototypeOf(constructor)
+
   getOwnNestedStaticTests(tests, constructor)
-  if (Object.isPrototypeOf.call(Test, constructor.__proto__)) {
-    getNestedStaticTests(tests, constructor.__proto__)
+  if (Object.isPrototypeOf.call(Test, constructorProto)) {
+    getNestedStaticTests(tests, constructorProto)
   }
 }
 
@@ -162,7 +168,7 @@ function getInstanceTests(tests, instance) {
     const isTestClass = Object.isPrototypeOf.call(Test, value)
     const isTestInstance = value instanceof Test
 
-    if (isFunction && !isTestClass || isTestInstance) {
+    if ((isFunction && !isTestClass) || isTestInstance) {
       tests.add(name)
     } else {
       tests.delete(name)
@@ -263,11 +269,12 @@ class Test {
    * @returns {Test}
    */
   constructor() {
+    const proto = Reflect.getPrototypeOf(this)
     const tests = getNestedStaticTestsClasses(this)
-    const events = getClassEvents(new Map(), this.__proto__)
+    const events = getClassEvents(new Map(), proto)
 
-    for (const [name, testClass] of tests) {
-      this[name] = new testClass()
+    for (const [name, TestClass] of tests) {
+      this[name] = new TestClass()
     }
     for (const [event, listener] of events) {
       this.event.on(event, listener.bind(this))
@@ -317,7 +324,11 @@ class Test {
         name,
         test,
         deepEvents: [Test.beforeEachDeep, Test.afterEachDeep]
-      }, async () => await this.run(test))
+      }, async () => {
+        const testResult = await this.run(test)
+
+        return testResult
+      })
       await __notify(testInstance, Test.afterEachNested, { name, result })
     } else {
       await __notify(testInstance, Test.beforeEach, { name })

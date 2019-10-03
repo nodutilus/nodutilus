@@ -1,6 +1,7 @@
 'use strict'
 
-const { resolve } = require('path')
+const { readJSON, copy, constants: { COPY_RMNONEXISTENT } } = require('../src/@ndk/fs')
+const { readdir } = require('fs').promises
 
 
 /**
@@ -8,9 +9,18 @@ const { resolve } = require('path')
  * @param {string} optionsFile
  */
 async function buildMultiPackage(optionsFile) {
-  const options = require(resolve(optionsFile))
+  const options = await readJSON(optionsFile)
+  const packageNames = await readdir(options.packages)
+  const packages = await Promise.all(packageNames.map(async name => {
+    const packageJSON = await readJSON(`${options.packages}/${name}/package.json`)
 
-  await console.log('buildMultiPackage:', options)
+    return packageJSON
+  }))
+  const versions = await readJSON(options.versions, {})
+
+  await copy(options.packages, options.buildFolder, COPY_RMNONEXISTENT)
+
+  console.log('buildMultiPackage:', options, packages, versions)
 }
 
 

@@ -4,11 +4,12 @@ node_modules
 # Зависимости для тестирования и сборки
 src/node_modules
 test/node_modules
-bin/node_modules
 
 # Промежуточные данные для тестов
 test/example/fs/copy
+test/example/fs/symlink
 test/example/fs/remove
+test/example/fs/write
 
 # Папка сборки модулей, хранения отчетов и пр.
 build

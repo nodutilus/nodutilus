@@ -34,13 +34,13 @@ class MyTestConstructor extends Test {
   constructor() {
     super()
     this.myTest = () => {}
-    this.notTest = MyTestName
+    this.NotTest = MyTestName
     this.mySubTest = new MyTestName()
     this.sizeBeforeRedefined = this.tests.size
     this.muOpt = 123
   }
 
-  notTest() {}
+  NotTest() {}
 
 }
 
@@ -62,14 +62,14 @@ class MyTestConstructorFailure extends Test {
 class MyTestNameInclude extends Test {}
 
 
-MyTestNameInclude.include = MyTestName
+MyTestNameInclude.Include = MyTestName
 MyTestNameInclude.notTest = new MyTestName()
 
 
 class MyTestNameIncludeFailure extends MyTestNameInclude {}
 
 
-MyTestNameIncludeFailure.include = MyTestFailure
+MyTestNameIncludeFailure.Include = MyTestFailure
 
 
 class MyTestNameIncludeExtends extends MyTestNameIncludeFailure {}
@@ -128,13 +128,15 @@ class MyTestConstructorExt extends MyTestConstructor {
 class MyTestNameIncludeExt extends MyTestNameInclude {}
 
 
-MyTestNameIncludeExt.includeExt = MyTestName
+MyTestNameIncludeExt.IncludeExt = MyTestName
 
 
 class MyTestReturnTest extends Test {
 
   async myTest1() {
-    return await Test.run(new MyTestName())
+    const result = await Test.run(new MyTestName())
+
+    return result
   }
 
   myTest2() {
@@ -249,7 +251,7 @@ TestClassEvents.nestedEvents = TestClassEvents0
 
 class TestClassEventsNotFuction extends Test {
 
-  get[Test.beforeEach]() {
+  get [Test.beforeEach]() {
     return (() => {
       throw new Error('test')
     })()
@@ -289,7 +291,7 @@ class TestOrder2 extends TestOrder1 {
 TestOrder2.test3 = MyTestName
 
 
-class allTests {
+class AllTests {
 
   ['Test => getClassMethods']() {
     const mt = new MyTestName()
@@ -317,8 +319,8 @@ class allTests {
     deepEqual(Array.from(tests), ['myTest', 'mySubTest'])
     doesNotThrow(mt.myTest)
     ok(mt.mySubTest instanceof Test)
-    doesNotThrow(() => ok(new mt.notTest() instanceof Test))
-    doesNotThrow(mt.__proto__.notTest)
+    doesNotThrow(() => ok(new mt.NotTest() instanceof Test))
+    doesNotThrow(Reflect.getPrototypeOf(mt).NotTest)
     equal(mt.sizeBeforeRedefined, 3)
     equal(tests.size, 2)
   }
@@ -331,15 +333,15 @@ class allTests {
     doesNotThrow(mt.myTest)
     doesNotThrow(mt.myTest2)
     ok(mt.mySubTest instanceof Test)
-    doesNotThrow(() => ok(new mt.notTest() instanceof Test))
+    doesNotThrow(() => ok(new mt.NotTest() instanceof Test))
   }
 
   ['Test => getNestedStaticTests']() {
     const mt = new MyTestNameInclude()
     const { tests } = mt
 
-    deepEqual(Array.from(tests), ['include'])
-    doesNotThrow(() => ok(new MyTestNameInclude.include() instanceof Test))
+    deepEqual(Array.from(tests), ['Include'])
+    doesNotThrow(() => ok(new MyTestNameInclude.Include() instanceof Test))
     ok(MyTestNameInclude.notTest instanceof Test)
   }
 
@@ -347,9 +349,9 @@ class allTests {
     const mt = new MyTestNameIncludeExt()
     const { tests } = mt
 
-    deepEqual(Array.from(tests), ['includeExt', 'include'])
-    doesNotThrow(() => ok(new MyTestNameIncludeExt.includeExt() instanceof Test))
-    doesNotThrow(() => ok(new MyTestNameIncludeExt.include() instanceof Test))
+    deepEqual(Array.from(tests), ['IncludeExt', 'Include'])
+    doesNotThrow(() => ok(new MyTestNameIncludeExt.IncludeExt() instanceof Test))
+    doesNotThrow(() => ok(new MyTestNameIncludeExt.Include() instanceof Test))
     ok(MyTestNameIncludeExt.notTest instanceof Test)
   }
 
@@ -404,7 +406,7 @@ class allTests {
   async ['Test => run getNestedStaticTests']() {
     const mt = new MyTestNameInclude()
     const result = await Test.run(mt)
-    const include = result.tests.get('include')
+    const include = result.tests.get('Include')
     const baseTest = include.tests.get('baseTest')
 
     equal(result.success, true)
@@ -416,7 +418,7 @@ class allTests {
   async ['Test => run getNestedStaticTests failure']() {
     const mt = new MyTestNameIncludeFailure()
     const result = await Test.run(mt)
-    const include = result.tests.get('include')
+    const include = result.tests.get('Include')
     const baseTest = include.tests.get('baseTest')
 
     equal(result.success, false)
@@ -430,7 +432,7 @@ class allTests {
   async ['Test => run getNestedStaticTests extends']() {
     const mt = new MyTestNameIncludeExtends()
     const result = await Test.run(mt)
-    const include = result.tests.get('include')
+    const include = result.tests.get('Include')
     const baseTest = include.tests.get('baseTest')
     const includeExt = result.tests.get('includeExt')
     const baseTestExt = includeExt.tests.get('baseTest')
@@ -472,7 +474,7 @@ class allTests {
     equal(include.success, true)
     equal(includeExt.success, true)
     equal(includeExt.tests.size, 1)
-    throws(mt.__proto__.includeExt, { message: 'Test Error' })
+    throws(Reflect.getPrototypeOf(mt).includeExt, { message: 'Test Error' })
   }
 
   async ['Test => return TestResult']() {
@@ -562,18 +564,18 @@ class allTests {
     const testNamesDeep = []
     let result
 
-    mt.event.on(Test.after, (data => {
+    mt.event.on(Test.after, data => {
       ({ result } = data)
-    }))
+    })
     mt.event
-      .on(Test.afterEach, (data => {
+      .on(Test.afterEach, data => {
         testResult[data.name] = data.result
         testNames.push(data.name)
-      }))
-      .on(Test.afterEachNested, (data => {
+      })
+      .on(Test.afterEachNested, data => {
         testResult[data.name] = data.result
         testNames.push(data.name)
-      }))
+      })
       .on(Test.afterEachDeep, data => {
         if (!testNames.includes(data.name)) {
           testNamesDeep.push(data.name)
@@ -656,8 +658,8 @@ class allTests {
 
 
 async function preparation() {
-  const tests = new allTests()
-  const testNames = Object.getOwnPropertyNames(tests.__proto__)
+  const tests = new AllTests()
+  const testNames = Object.getOwnPropertyNames(Reflect.getPrototypeOf(tests))
     .filter(item => item !== 'constructor')
 
   for (const testName of testNames) {

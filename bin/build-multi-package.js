@@ -5,18 +5,82 @@ const { readdir } = require('fs').promises
 
 
 /**
- *
- * @param {string} optionsFile
+ * @class MultiPackageBuilder
  */
-async function buildMultiPackage(optionsFile) {
-  const options = await readJSON(optionsFile)
-  const packageDirs = await readdir(options.packages)
-  const packagesSrc = await Promise.all(packageDirs.map(async name => {
-    const packageJSON = await readJSON(`${options.packages}/${name}/package.json`)
+class MultiPackageBuilder {
 
-    return [name, packageJSON]
-  }))
-  const versions = await readJSON(options.versions)
+  /**
+   * @name MultiPackageBuilder~BuilderConfig
+   * @typedef BuilderConfig
+   * @property {string} packages
+   * @property {string} versions
+   * @property {PackageJSON} template
+   */
+  /**
+   * @name MultiPackageBuilder~PackageJSON
+   * @typedef PackageJSON
+   * @property {string} name
+   */
+  /**
+   * @name MultiPackageBuilder~Version
+   * @typedef Version
+   * @property {string} version
+   */
+
+  /**
+   * @name MultiPackageBuilder#loadMetadata
+   * @param {string} file
+   */
+  async loadMetadata(file) {
+    /**
+     * @name MultiPackageBuilder#config @type {BuilderConfig}
+     */
+    this.config = await readJSON(file)
+    /**
+     * @name MultiPackageBuilder#folders @type {Array<string>}
+     */
+    this.folders = await readdir(this.config.packages)
+    /**
+     * @name MultiPackageBuilder#packages @type {Map<string,PackageJSON>}
+     */
+    this.packages = new Map()
+    for (const name of this.folders) {
+      this.packages.set(name, await this.readPackageJSON(name))
+    }
+    /**
+     * @name MultiPackageBuilder#versions @type {Object<string,Version>}
+     */
+    this.versions = await readJSON(this.config.versions)
+  }
+
+  /**
+   * @name MultiPackageBuilder#readPackageJSON
+   * @param {string} name
+   * @returns {PackageJSON}
+   */
+  async readPackageJSON(name) {
+    /** @type {PackageJSON} */
+    const packageJSON = await readJSON(`${this.config.packages}/${name}/package.json`)
+
+    return Object.assign({}, this.config.template, packageJSON)
+  }
+
+}
+
+
+/**
+ *
+ * @param {string} configFile
+ */
+async function buildMultiPackage(configFile) {
+  const builder = new MultiPackageBuilder()
+
+  await builder.loadMetadata(configFile)
+
+
+  const options = builder.config
+  const packagesSrc = builder.packages
+  const versions = builder.versions
   const packageAliases = {}
   const packageNames = []
   const packages = {}

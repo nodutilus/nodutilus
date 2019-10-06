@@ -1,19 +1,12 @@
 {
   "packages": "src/@ndk",
   "versions": "src/versions.json",
+  "crossDependencies": "src/cross-dependencies.json",
+  "licenseFile": "LICENSE",
   "buildFolder": "build/@ndk",
-  "crossDependencies": {
-    "@ndk/test": ["@ndk/fn"]
-  },
   "template": {
-    "name": null,
-    "version": null,
     "homepage": "https://nd-toolkit.github.io",
-    "description": null,
-    "keywords": null,
     "repository": "github:nd-toolkit/ndk-source",
-    "license": "Unlicense",
-    "main": null,
-    "dependencies": null
+    "license": "Unlicense"
   }
 }

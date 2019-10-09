@@ -97,4 +97,38 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     assert.equal(error, 'error')
   }
 
+  /** executor не может вернуть значение, но может быть асинхронным,
+   * чтобы отпустить текущий поток выполнения */
+  async ['PromiseEventEmitter - асинхронный executor']() {
+    let value = 0
+    const pem = new PromiseEventEmitter(async resolve => {
+      await new Promise(resolve => setTimeout(resolve, 1))
+      resolve(++value + 1)
+    })
+
+    assert.equal(value, 0)
+
+    const result = await pem
+
+    assert.equal(result, 2)
+    assert.equal(value, 1)
+  }
+
+  /** Ошибки в асинхронном executor должны перехватываться через try/catch */
+  async ['PromiseEventEmitter - перехват асинхронной ошибки']() {
+    const pem = new PromiseEventEmitter(async (resolve, reject) => {
+      await new Promise(resolve => setTimeout(resolve, 1))
+      this.nonExistent()
+    })
+    let error = null
+
+    try {
+      await pem
+    } catch (err) {
+      error = err.message
+    }
+
+    assert.equal(error, 'this.nonExistent is not a function')
+  }
+
 }

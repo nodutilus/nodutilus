@@ -88,11 +88,12 @@ class PromiseEventEmitter extends Promise {
   /**
    * @callback PromiseExecutor
    * @param {function} resolve
-   * @param {function?} reject
-   * @param {EventEmitter?} emitter
+   * @param {?function} reject
+   * @param {?EventEmitter} emitter
+   * @returns {?Promise<void>}
    */
   /**
-   * @param {PromiseExecutor?} executor
+   * @param {?PromiseExecutor} executor
    */
   constructor(executor) {
     const emitter = new EventEmitter()
@@ -100,7 +101,11 @@ class PromiseEventEmitter extends Promise {
     super((resolve, reject) => {
       emitter.on(pemEvents.resolve, resolve).on(pemEvents.reject, reject)
       if (executor) {
-        executor(resolve, reject, emitter)
+        const promise = executor(resolve, reject, emitter)
+
+        if (promise instanceof Promise) {
+          promise.catch(reject)
+        }
       }
     })
 

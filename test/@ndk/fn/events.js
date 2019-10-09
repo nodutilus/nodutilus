@@ -30,6 +30,21 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     assert(em.has('test') === false)
   }
 
+  /** emit не должен ничего возвращать, ни чейнится */
+  async ['EventEmitter - emit не возвращает результат']() {
+    const em = new EventEmitter()
+    let value = 0
+
+    em.on('test', () => value++)
+
+    const p = em.emit('test')
+    const result = await p
+
+    assert(p instanceof Promise)
+    assert(result === undefined)
+    assert.equal(value, 1)
+  }
+
   /** PEE создается наследованием из Promise, с добавлением emitter
    * при этом последующие then/catch так же создают PEE */
   async ['PromiseEventEmitter - создание, чейнинг']() {
@@ -48,6 +63,22 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
 
     assert.equal(result, 'ok')
     assert.equal(tresult, 'ok+ok')
+  }
+
+  /** emit не должен ничего возвращать, ни чейнится */
+  async ['PromiseEventEmitter - emit не возвращает результат']() {
+    const em = new PromiseEventEmitter()
+    let value = 0
+
+    em.on('test', () => value++)
+
+    const p = em.emit('test')
+    const result = await p
+
+    assert(em instanceof PromiseEventEmitter)
+    assert(!(p instanceof PromiseEventEmitter))
+    assert(result === undefined)
+    assert.equal(value, 1)
   }
 
   /** Ошибки как и с Promise можно перехватывать через try/catch */

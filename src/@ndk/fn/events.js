@@ -80,6 +80,31 @@ class EventEmitter {
     return result
   }
 
+  /**
+   * @param {Event} event
+   * @returns {Promise<Array<any>>}
+   */
+  once(event) {
+    const events = privateEventsMap.get(this)
+
+    if (!events.has(event)) {
+      events.set(event, new Set())
+    }
+
+    return new Promise(resolve => {
+      const listeners = events.get(event)
+      const listener = (...args) => {
+        resolve(args)
+        listeners.delete(listener)
+        if (!listeners.size) {
+          events.delete(event)
+        }
+      }
+
+      listeners.add(listener)
+    })
+  }
+
 }
 
 

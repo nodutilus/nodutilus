@@ -45,6 +45,51 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     assert.equal(value, 1)
   }
 
+  /** once - аналогичен базовому во встроенном модуле events,
+   * но работает только с Promise */
+  async ['EventEmitter - once']() {
+    const em = new EventEmitter()
+    const p = new Promise(resolve => setTimeout(() => {
+      em.emit('test', 1, 12)
+      setTimeout(() => {
+        resolve(2)
+      }, 1)
+    }, 1))
+    const [result1, result12] = await em.once('test')
+    const result2 = await p
+
+    assert.equal(result1, 1)
+    assert.equal(result12, 12)
+    assert.equal(result2, 2)
+    assert(!(em.has('test')))
+  }
+
+  /** on и once можно использовать вместе, при этом события из on не очищаются */
+  async ['EventEmitter - on + once']() {
+    let result = 0
+    const em = new EventEmitter()
+    const p = new Promise(resolve => setTimeout(() => {
+      em.emit('test', 1)
+      setTimeout(() => {
+        resolve(2)
+      }, 1)
+    }, 1))
+
+    em.on('test', value => {
+      result += value
+    })
+
+    const [result1] = await em.once('test')
+    const result2 = await p
+
+    assert.equal(result1, 1)
+    assert.equal(result2, 2)
+    assert(em.has('test'))
+    assert.equal(result, 1)
+    em.emit('test', 1)
+    assert.equal(result, 2)
+  }
+
   /** PEE создается наследованием из Promise, с добавлением emitter
    * при этом последующие then/catch так же создают PEE */
   async ['PromiseEventEmitter - создание, чейнинг']() {

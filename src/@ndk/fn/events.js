@@ -3,10 +3,10 @@
 
 /** @typedef {any} Event */
 /** @typedef {function(...any)} Listener */
-/** @typedef {Map<Event,Set<Listener>>} ListenersMap */
-/** @type {WeakMap<EventEmitter,ListenersMap>} */
+/** @typedef {Map<Event, Set<Listener>>} ListenersMap */
+/** @type {WeakMap<EventEmitter, ListenersMap>} */
 const privateEventsMap = new WeakMap()
-/** @type {Object<string,Symbol>} */
+/** @type {Object<string, Symbol>} */
 const pemEvents = {
   resolve: Symbol('PromiseEventEmitter#event:resolve'),
   reject: Symbol('PromiseEventEmitter#event:reject')

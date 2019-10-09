@@ -9,11 +9,11 @@ const { readdir } = require('fs').promises
  * @property {string} version
  * @property {string} homepage
  * @property {string} description
- * @property {Array.<string>} keywords
+ * @property {Array<string>} keywords
  * @property {string} repository
  * @property {string} license
  * @property {string} main
- * @property {Object.<string, string>} dependencies
+ * @property {Object<string, string>} dependencies
  */
 /**
  * @class PackageJSON
@@ -32,7 +32,7 @@ class PackageJSON {
     this.homepage = null
     /** @name PackageJSON#description @type {string} */
     this.description = null
-    /** @name PackageJSON#keywords @type {Array.<string>} */
+    /** @name PackageJSON#keywords @type {Array<string>} */
     this.keywords = null
     /** @name PackageJSON#repository @type {string} */
     this.repository = null
@@ -40,7 +40,7 @@ class PackageJSON {
     this.license = null
     /** @name PackageJSON#main @type {string} */
     this.main = null
-    /** @name PackageJSON#dependencies @type {Object.<string, string>} */
+    /** @name PackageJSON#dependencies @type {Object<string, string>} */
     this.dependencies = {}
     Object.assign(this, source)
   }
@@ -103,23 +103,23 @@ class MultiPackageBuilder {
      */
     this.config = await readJSON(file)
     /**
-     * @name MultiPackageBuilder#folders @type {Array.<string>}
+     * @name MultiPackageBuilder#folders @type {Array<string>}
      */
     this.folders = await readdir(this.config.packages)
     /**
-     * @name MultiPackageBuilder#packages @type {Map.<string,PackageSource>}
+     * @name MultiPackageBuilder#packages @type {Map<string, PackageSource>}
      */
     this.packages = new Map()
     for (const folder of this.folders) {
       this.packages.set(folder, await this.readPackageJSON(folder))
     }
     /**
-     * @name MultiPackageBuilder#versions @type {Object.<string,Version>}
+     * @name MultiPackageBuilder#versions @type {Object<string, Version>}
      */
     this.versions = await readJSON(this.config.versions)
 
     /**
-     * @name MultiPackageBuilder#crossDependencies @type {Object.<string,Array<string>>}
+     * @name MultiPackageBuilder#crossDependencies @type {Object<string, Array<string>>}
      */
     this.crossDependencies = await readJSON(this.config.crossDependencies)
   }

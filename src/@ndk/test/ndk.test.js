@@ -196,7 +196,7 @@ class TestResult {
       this.success = false
     }
     if (hasNested) {
-      /** @type {Map.<string, TestResult>} */
+      /** @type {Map<string, TestResult>} */
       this.tests = new Map()
     }
   }

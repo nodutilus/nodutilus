@@ -1,7 +1,7 @@
 'use strict'
 
 const { Test, assert } = require('@ndk/test')
-const { EventEmitter } = require('@ndk/fn/events')
+const { EventEmitter, PromiseEventEmitter } = require('@ndk/fn/events')
 
 
 exports['@ndk/fn/events'] = class FnEventsTest extends Test {
@@ -28,6 +28,42 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     assert(em.has('test') === true)
     assert.doesNotThrow(fn2)
     assert(em.has('test') === false)
+  }
+
+  /** PEE создается наследованием из Promise, с добавлением emitter
+   * при этом последующие then/catch так же создают PEE */
+  async ['PromiseEventEmitter - создание, чейнинг']() {
+    const pem = new PromiseEventEmitter()
+    const tpem = pem.then(value => {
+      return value + '+' + value
+    })
+    const t2pem = tpem.then()
+
+    await t2pem.resolve('x')
+
+    await pem.resolve('ok')
+
+    const result = await pem
+    const tresult = await tpem
+
+    assert.equal(result, 'ok')
+    assert.equal(tresult, 'ok+ok')
+  }
+
+  /** Ошибки как и с Promise можно перехватывать через try/catch */
+  async ['PromiseEventEmitter - перехват ошибок']() {
+    const pem = new PromiseEventEmitter()
+    let error = null
+
+    await pem.reject('error')
+
+    try {
+      await pem
+    } catch (err) {
+      error = err
+    }
+
+    assert.equal(error, 'error')
   }
 
 }

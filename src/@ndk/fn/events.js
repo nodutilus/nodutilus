@@ -4,9 +4,13 @@
 /** @typedef {any} Event */
 /** @typedef {function(...any)} Listener */
 /** @typedef {Map<Event,Set<Listener>>} ListenersMap */
-
 /** @type {WeakMap<EventEmitter,ListenersMap>} */
 const privateEventsMap = new WeakMap()
+/** @type {Object<string,Symbol>} */
+const pemEvents = {
+  resolve: Symbol('PromiseEventEmitter#event:resolve'),
+  reject: Symbol('PromiseEventEmitter#event:reject')
+}
 
 
 class EventEmitter {
@@ -19,7 +23,7 @@ class EventEmitter {
   /**
    * @param {Event} event
    * @param  {...any} args
-   * @returns {Promise<EventEmitter>}
+   * @returns {Promise<void>}
    */
   async emit(event, ...args) {
     const listeners = privateEventsMap.get(this).get(event)
@@ -29,8 +33,6 @@ class EventEmitter {
         await listener(...args)
       }
     }
-
-    return this
   }
 
   /**
@@ -81,4 +83,68 @@ class EventEmitter {
 }
 
 
+class PromiseEventEmitter extends Promise {
+
+  /**
+   * @callback PromiseExecutor
+   * @param {function} resolve
+   * @param {function?} reject
+   * @param {EventEmitter?} emitter
+   */
+  /**
+   * @param {PromiseExecutor?} executor
+   */
+  constructor(executor) {
+    const emitter = new EventEmitter()
+
+    super((resolve, reject) => {
+      emitter.on(pemEvents.resolve, resolve).on(pemEvents.reject, reject)
+      if (executor) {
+        executor(resolve, reject, emitter)
+      }
+    })
+
+    this.emitter = emitter
+  }
+
+  /**
+   * @param {Event} event
+   * @param  {...any} args
+   * @returns {Promise<void>}
+   */
+  async emit(event, ...args) {
+    await this.emitter.emit(event, ...args)
+  }
+
+  /**
+   * @param {Event} event
+   * @param  {Listener} listener
+   * @returns {PromiseEventEmitter}
+   */
+  on(event, listener) {
+    this.emitter.on(event, listener)
+
+    return this
+  }
+
+  /**
+   * @param {any} value
+   * @returns {Promise<void>}
+   */
+  async resolve(value) {
+    await this.emit(pemEvents.resolve, value)
+  }
+
+  /**
+   * @param {any} reason
+   * @returns {Promise<void>}
+   */
+  async reject(reason) {
+    await this.emit(pemEvents.reject, reason)
+  }
+
+}
+
+
 exports.EventEmitter = EventEmitter
+exports.PromiseEventEmitter = PromiseEventEmitter

@@ -176,4 +176,34 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     assert.equal(error, 'this.nonExistent is not a function')
   }
 
+  /** once позволяет организовать обмен между executor'ом и внешним кодом,
+   * не создавая при этом лишних callback'ов */
+  async ['PromiseEventEmitter - once']() {
+    let result2 = 0
+    const pem = new PromiseEventEmitter(async (resolve, _, emitter) => {
+      await new Promise(resolve => setTimeout(resolve, 1))
+      emitter.emit('result1', 1)
+      result2 = await emitter.once('result2')
+      assert.deepEqual(result2, [2])
+      result2 = result2[0] + 1
+      resolve(4)
+    })
+    const [result1] = await pem.once('result1')
+
+    assert.equal(result1, 1)
+    assert.equal(result2, 0)
+    pem.emit('result2', 2)
+    assert.equal(result2, 0)
+
+    const result3 = await pem
+
+    assert.equal(result2, 3)
+    assert.equal(result3, 4)
+  }
+
+  /** emit может завершиться с ошибкой, но обработка её будет только
+   * при ожидании результата от Promise */
+
+  /** если до получения результата once в PEE возникнет ошибка,
+   * once завершится этой ошибкой, она же будет результатом финальном Promise */
 }

@@ -6,6 +6,8 @@
 /** @typedef {Map<Event, Set<Listener>>} ListenersMap */
 /** @type {WeakMap<EventEmitter, ListenersMap>} */
 const privateEventsMap = new WeakMap()
+/** @type {WeakMap<PromiseEventEmitter, EventEmitter>} */
+const privatePromiseEventEmittersMap = new WeakMap()
 /** @type {Object<string, Symbol>} */
 const pemEvents = {
   resolve: Symbol('PromiseEventEmitter#event:resolve'),
@@ -114,7 +116,7 @@ class PromiseEventEmitter extends Promise {
    * @callback PromiseExecutor
    * @param {function} resolve
    * @param {?function} reject
-   * @param {?EventEmitter} emitter
+   * @param {?PromiseEventEmitter} emitter
    * @returns {?Promise<void>}
    */
   /**
@@ -122,28 +124,35 @@ class PromiseEventEmitter extends Promise {
    */
   constructor(executor) {
     const emitter = new EventEmitter()
+    const promiseExecutor = (resolve, reject) => emitter
+      .on(pemEvents.resolve, value => { resolve(value) })
+      .on(pemEvents.reject, reason => { reject(reason) })
 
-    super((resolve, reject) => {
-      emitter.on(pemEvents.resolve, resolve).on(pemEvents.reject, reject)
-      if (executor) {
-        const promise = executor(resolve, reject, emitter)
+    super(promiseExecutor)
 
-        if (promise instanceof Promise) {
-          promise.catch(reject)
-        }
+    privatePromiseEventEmittersMap.set(this, emitter)
+
+    if (executor) {
+      const resolve = value => { emitter.emit(pemEvents.resolve, value) }
+      const reject = reason => { emitter.emit(pemEvents.reject, reason) }
+      const promise = executor(resolve, reject, this)
+
+      if (promise instanceof Promise) {
+        promise.catch(reason => { emitter.emit(pemEvents.reject, reason) })
       }
-    })
-
-    this.emitter = emitter
+    }
   }
 
   /**
    * @param {Event} event
    * @param  {...any} args
-   * @returns {Promise<void>}
    */
-  async emit(event, ...args) {
-    await this.emitter.emit(event, ...args)
+  emit(event, ...args) {
+    const emitter = privatePromiseEventEmittersMap.get(this)
+
+    emitter.emit(event, ...args).catch(reason => {
+      emitter.emit(pemEvents.reject, reason)
+    })
   }
 
   /**
@@ -152,25 +161,42 @@ class PromiseEventEmitter extends Promise {
    * @returns {PromiseEventEmitter}
    */
   on(event, listener) {
-    this.emitter.on(event, listener)
+    const emitter = privatePromiseEventEmittersMap.get(this)
+
+    emitter.on(event, listener)
 
     return this
   }
 
   /**
-   * @param {any} value
-   * @returns {Promise<void>}
+   * @param {Event} event
+   * @returns {Promise<Array<any>>}
    */
-  async resolve(value) {
-    await this.emit(pemEvents.resolve, value)
+  once(event) {
+    const emitter = privatePromiseEventEmittersMap.get(this)
+
+    return new Promise((resolve, reject) => {
+      emitter.once(pemEvents.reject).then(([reason]) => { reject(reason) })
+      emitter.once(event).then(value => { resolve(value) }, reason => { reject(reason) })
+    })
+  }
+
+  /**
+   * @param {any} value
+   */
+  resolve(value) {
+    const emitter = privatePromiseEventEmittersMap.get(this)
+
+    emitter.emit(pemEvents.resolve, value)
   }
 
   /**
    * @param {any} reason
-   * @returns {Promise<void>}
    */
-  async reject(reason) {
-    await this.emit(pemEvents.reject, reason)
+  reject(reason) {
+    const emitter = privatePromiseEventEmittersMap.get(this)
+
+    emitter.emit(pemEvents.reject, reason)
   }
 
 }

@@ -281,6 +281,29 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     assert.equal(error, 'this.nonExistent is not a function')
   }
 
+  /** Первая ошибка в обработчиках событий завершает Promise с ошибкой */
+  async ['PromiseEventEmitter - emit, ошибка в обработчике']() {
+    const pem = new PromiseEventEmitter(async (emitter) => {
+      await new Promise(resolve => setTimeout(resolve, 1))
+      pem.emit('test', 'test')
+    })
+    let error = null
+
+    pem.on('test', async (test) => {
+      await new Promise(resolve => setTimeout(resolve, 1))
+      assert.equal(test, 'test')
+      this.nonExistent()
+    })
+
+    try {
+      await pem
+    } catch (err) {
+      error = err.message
+    }
+
+    assert.equal(error, 'this.nonExistent is not a function')
+  }
+
   /** Проверяем, что можно обмениваться данными в асинхронном режиме
    * между основным и дочерним исполнением кода */
   async ['PromiseEventEmitter - once + emit, принял, обработал, отдал']() {
@@ -302,6 +325,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     assert.equal(result3, 3)
   }
 
-  /** если до получения результата once в PEE возникнет ошибка,
-   * once завершится этой ошибкой, она же будет результатом финальном Promise */
+  /** Если в событиях PEE возникает ошибка, то все последующие асинхронные действия завершаться этой ошибкой.
+   * emit - не отправит событие и упадет с ошибкой возникшей ранее
+   * once - не создаст новой подписки и упадет с ошибкой возникшей ранее */
 }

@@ -123,9 +123,15 @@ class PromiseEventEmitter extends Promise {
   constructor(asyncExecutor) {
     const AsyncFunction = Reflect.getPrototypeOf(EventEmitter.prototype.emit).constructor
     const emitter = new EventEmitter()
-    const executor = (resolve, reject) => emitter
-      .on(pemEvents.resolve, value => { resolve(value) })
-      .on(pemEvents.reject, reason => { reject(reason) })
+    const executor = (resolve, reject) => {
+      emitter
+        .on(pemEvents.resolve, value => {
+          resolve(value)
+        })
+        .on(pemEvents.reject, reason => {
+          reject(reason)
+        })
+    }
 
     super(executor)
 
@@ -134,12 +140,18 @@ class PromiseEventEmitter extends Promise {
 
     if (asyncExecutor) {
       if (asyncExecutor instanceof AsyncFunction) {
-        asyncExecutor(this).catch(reason => { emitter.emit(pemEvents.reject, reason) })
+        asyncExecutor(this).catch(reason => {
+          emitter.emit(pemEvents.reject, reason)
+        })
       } else {
         try {
           asyncExecutor(
-            value => { emitter.emit(pemEvents.resolve, value) },
-            reason => { emitter.emit(pemEvents.reject, reason) }
+            value => {
+              emitter.emit(pemEvents.resolve, value)
+            },
+            reason => {
+              emitter.emit(pemEvents.reject, reason)
+            }
           )
         } catch (error) {
           emitter.emit(pemEvents.reject, error)
@@ -181,8 +193,12 @@ class PromiseEventEmitter extends Promise {
     const emitter = privatePromiseEventEmittersMap.get(this)
 
     return new Promise((resolve, reject) => {
-      emitter.once(pemEvents.reject).then(([reason]) => { reject(reason) })
-      emitter.once(event).then(value => { resolve(value) }, reason => { reject(reason) })
+      emitter.once(pemEvents.reject).then(([reason]) => {
+        reject(reason)
+      })
+      emitter.once(event).then(value => {
+        resolve(value)
+      })
     })
   }
 

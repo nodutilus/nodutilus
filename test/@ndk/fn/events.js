@@ -251,8 +251,35 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     assert.equal(result3, 4)
   }
 
-  /** emit может завершиться с ошибкой, но обработка её будет только
-   * при ожидании результата от Promise */
+  /** Внутри PromiseEventEmitter после emit код синхронный, и если он падает,
+   * то следующий once завершиться данной ошибкой, а затем и await для PEE завершится данной ошибкой
+   */
+  async ['PromiseEventEmitter - once, ошибка после emit']() {
+    const pem = new PromiseEventEmitter(async (emitter) => {
+      await new Promise(resolve => setTimeout(resolve, 1))
+      setTimeout(() => {
+        emitter.emit('result1', 1)
+      }, 1)
+      this.nonExistent()
+    })
+    let error = null
+
+    try {
+      await pem.once('result1')
+    } catch (err) {
+      error = err.message
+    }
+
+    assert.equal(error, 'this.nonExistent is not a function')
+
+    try {
+      await pem
+    } catch (err) {
+      error = err.message
+    }
+
+    assert.equal(error, 'this.nonExistent is not a function')
+  }
 
   /** если до получения результата once в PEE возникнет ошибка,
    * once завершится этой ошибкой, она же будет результатом финальном Promise */

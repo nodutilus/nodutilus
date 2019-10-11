@@ -281,6 +281,27 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     assert.equal(error, 'this.nonExistent is not a function')
   }
 
+  /** Проверяем, что можно обмениваться данными в асинхронном режиме
+   * между основным и дочерним исполнением кода */
+  async ['PromiseEventEmitter - once + emit, принял, обработал, отдал']() {
+    let result2 = 0
+    const pem = new PromiseEventEmitter(async (emitter) => {
+      await new Promise(resolve => setTimeout(resolve, 1))
+      emitter.emit('result1', 1, 'test')
+      result2 = await emitter.once('result2')
+      emitter.resolve(result2[0] + 1)
+    })
+    const result1 = await pem.once('result1')
+
+    pem.emit('result2', result1[0] + 1)
+
+    const result3 = await pem
+
+    assert.deepEqual(result1, [1, 'test'])
+    assert.deepEqual(result2, [2])
+    assert.equal(result3, 3)
+  }
+
   /** если до получения результата once в PEE возникнет ошибка,
    * once завершится этой ошибкой, она же будет результатом финальном Promise */
 }

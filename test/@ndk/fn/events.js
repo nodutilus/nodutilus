@@ -255,7 +255,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
    * то следующий once завершиться данной ошибкой, а затем и await для PEE завершится данной ошибкой
    */
   async ['PromiseEventEmitter - once, ошибка после emit']() {
-    const pem = new PromiseEventEmitter(async (emitter) => {
+    const pem = new PromiseEventEmitter(async emitter => {
       await new Promise(resolve => setTimeout(resolve, 1))
       setTimeout(() => {
         emitter.emit('result1', 1)
@@ -283,13 +283,13 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
 
   /** Первая ошибка в обработчиках событий завершает Promise с ошибкой */
   async ['PromiseEventEmitter - emit, ошибка в обработчике']() {
-    const pem = new PromiseEventEmitter(async (emitter) => {
+    const pem = new PromiseEventEmitter(async emitter => {
       await new Promise(resolve => setTimeout(resolve, 1))
       pem.emit('test', 'test')
     })
     let error = null
 
-    pem.on('test', async (test) => {
+    pem.on('test', async test => {
       await new Promise(resolve => setTimeout(resolve, 1))
       assert.equal(test, 'test')
       this.nonExistent()
@@ -308,7 +308,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
    * между основным и дочерним исполнением кода */
   async ['PromiseEventEmitter - once + emit, принял, обработал, отдал']() {
     let result2 = 0
-    const pem = new PromiseEventEmitter(async (emitter) => {
+    const pem = new PromiseEventEmitter(async emitter => {
       await new Promise(resolve => setTimeout(resolve, 1))
       emitter.emit('result1', 1, 'test')
       result2 = await emitter.once('result2')

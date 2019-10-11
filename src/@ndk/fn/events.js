@@ -113,32 +113,37 @@ class EventEmitter {
 class PromiseEventEmitter extends Promise {
 
   /**
-   * @callback PromiseExecutor
-   * @param {function} resolve
-   * @param {?function} reject
-   * @param {?PromiseEventEmitter} emitter
-   * @returns {?Promise<void>}
+   * @callback AsyncExecutor
+   * @param {PromiseEventEmitter} emitter
+   * @returns {Promise<void>}
    */
   /**
-   * @param {?PromiseExecutor} executor
+   * @param {AsyncExecutor} [asyncExecutor]
    */
-  constructor(executor) {
+  constructor(asyncExecutor) {
+    const AsyncFunction = Reflect.getPrototypeOf(EventEmitter.prototype.emit).constructor
     const emitter = new EventEmitter()
-    const promiseExecutor = (resolve, reject) => emitter
+    const executor = (resolve, reject) => emitter
       .on(pemEvents.resolve, value => { resolve(value) })
       .on(pemEvents.reject, reason => { reject(reason) })
 
-    super(promiseExecutor)
+    super(executor)
 
     privatePromiseEventEmittersMap.set(this, emitter)
 
-    if (executor) {
-      const resolve = value => { emitter.emit(pemEvents.resolve, value) }
-      const reject = reason => { emitter.emit(pemEvents.reject, reason) }
-      const promise = executor(resolve, reject, this)
 
-      if (promise instanceof Promise) {
-        promise.catch(reason => { emitter.emit(pemEvents.reject, reason) })
+    if (asyncExecutor) {
+      if (asyncExecutor instanceof AsyncFunction) {
+        asyncExecutor(this).catch(reason => { emitter.emit(pemEvents.reject, reason) })
+      } else {
+        try {
+          asyncExecutor(
+            value => { emitter.emit(pemEvents.resolve, value) },
+            reason => { emitter.emit(pemEvents.reject, reason) }
+          )
+        } catch (error) {
+          emitter.emit(pemEvents.reject, error)
+        }
       }
     }
   }

@@ -146,9 +146,9 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
    * чтобы отпустить текущий поток выполнения */
   async ['PromiseEventEmitter - асинхронный executor']() {
     let value = 0
-    const pem = new PromiseEventEmitter(async resolve => {
+    const pem = new PromiseEventEmitter(async emmiter => {
       await new Promise(resolve => setTimeout(resolve, 1))
-      resolve(++value + 1)
+      emmiter.resolve(++value + 1)
     })
 
     assert.equal(value, 0)
@@ -161,8 +161,56 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
 
   /** Ошибки в асинхронном executor должны перехватываться через try/catch */
   async ['PromiseEventEmitter - перехват асинхронной ошибки']() {
-    const pem = new PromiseEventEmitter(async (resolve, reject) => {
+    const pem = new PromiseEventEmitter(async () => {
       await new Promise(resolve => setTimeout(resolve, 1))
+      this.nonExistent()
+    })
+    let error = null
+
+    try {
+      await pem
+    } catch (err) {
+      error = err.message
+    }
+
+    assert.equal(error, 'this.nonExistent is not a function')
+  }
+
+  /** Если executor асинхронный, то у него всего 1 аргумент emitter,
+   *    а синхронный executor получает методы resolve, reject.
+   * Это необходимо для поддержания правильного чейнинга,
+   *    т.к. он должен создавать новые экземпляры Promise */
+  async ['PromiseEventEmitter - синхронный executor']() {
+    const pem = new PromiseEventEmitter((resolve, reject) => {
+      assert(typeof resolve === 'function')
+      assert(typeof reject === 'function')
+      resolve(1)
+    })
+    const result = await pem
+
+    assert.equal(result, 1)
+  }
+
+  /** Ошибки в асинхронном executor должны перехватываться через try/catch */
+  async ['PromiseEventEmitter - перехват синхронной ошибки']() {
+    const pem = new PromiseEventEmitter((resolve, reject) => {
+      reject('test')
+    })
+    let error = null
+
+    try {
+      await pem
+    } catch (err) {
+      error = err
+    }
+
+    assert.equal(error, 'test')
+  }
+
+  /** Ошибки в коде синхронного executor должны перехватываться через
+   * try/catch на блоке с await для PEE, а не на конструкторе PEE */
+  async ['PromiseEventEmitter - перехват синхронной ошибки в коде']() {
+    const pem = new PromiseEventEmitter(() => {
       this.nonExistent()
     })
     let error = null
@@ -180,13 +228,15 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
    * не создавая при этом лишних callback'ов */
   async ['PromiseEventEmitter - once']() {
     let result2 = 0
-    const pem = new PromiseEventEmitter(async (resolve, _, emitter) => {
+    const pem = new PromiseEventEmitter(async emitter => {
+      // Код до первого await синхронный, что бы выполнять в этом блоке инициализацию и подписки на события
       await new Promise(resolve => setTimeout(resolve, 1))
+      // Отсылать события можно только в асинхронных блоках
       emitter.emit('result1', 1)
       result2 = await emitter.once('result2')
       assert.deepEqual(result2, [2])
       result2 = result2[0] + 1
-      resolve(4)
+      emitter.resolve(4)
     })
     const [result1] = await pem.once('result1')
 

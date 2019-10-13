@@ -8,6 +8,8 @@
 const privateEventsMap = new WeakMap()
 /** @type {WeakMap<PromiseEventEmitter, EventEmitter>} */
 const privatePromiseEventEmittersMap = new WeakMap()
+/** @type {WeakMap<EventEmitter, any>} */
+const privatePromiseEventEmittersReason = new WeakMap()
 /** @type {Object<string, Symbol>} */
 const pemEvents = {
   resolve: Symbol('PromiseEventEmitter#event:resolve'),
@@ -129,6 +131,7 @@ class PromiseEventEmitter extends Promise {
           resolve(value)
         })
         .on(pemEvents.reject, reason => {
+          privatePromiseEventEmittersReason.set(emitter, reason)
           reject(reason)
         })
     }
@@ -167,9 +170,13 @@ class PromiseEventEmitter extends Promise {
   emit(event, ...args) {
     const emitter = privatePromiseEventEmittersMap.get(this)
 
-    emitter.emit(event, ...args).catch(reason => {
-      emitter.emit(pemEvents.reject, reason)
-    })
+    if (privatePromiseEventEmittersReason.has(emitter)) {
+      throw privatePromiseEventEmittersReason.get(emitter)
+    } else {
+      emitter.emit(event, ...args).catch(reason => {
+        emitter.emit(pemEvents.reject, reason)
+      })
+    }
   }
 
   /**
@@ -193,12 +200,16 @@ class PromiseEventEmitter extends Promise {
     const emitter = privatePromiseEventEmittersMap.get(this)
 
     return new Promise((resolve, reject) => {
-      emitter.once(pemEvents.reject).then(([reason]) => {
-        reject(reason)
-      })
-      emitter.once(event).then(value => {
-        resolve(value)
-      })
+      if (privatePromiseEventEmittersReason.has(emitter)) {
+        reject(privatePromiseEventEmittersReason.get(emitter))
+      } else {
+        emitter.once(pemEvents.reject).then(([reason]) => {
+          reject(reason)
+        })
+        emitter.once(event).then(value => {
+          resolve(value)
+        })
+      }
     })
   }
 

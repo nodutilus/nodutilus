@@ -90,6 +90,81 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     assert.equal(result, 2)
   }
 
+  /** PEE должен соответствовать поведению Promise */
+  async ['PromiseEventEmitter - equal Promise']() {
+    let result1 = null
+    let result2 = null
+    let result3 = null
+    let result4 = null
+
+    result1 = await new Promise(resolve => resolve('test1'))
+    result2 = await new PromiseEventEmitter(resolve => resolve('test1'))
+    assert(result1 === result2 && result2 === 'test1')
+
+    try {
+      await new Promise((resolve, reject) => reject(new Error('test2')))
+    } catch (error) {
+      result1 = error.message
+    }
+    try {
+      await new PromiseEventEmitter((resolve, reject) => reject(new Error('test2')))
+    } catch (error) {
+      result2 = error.message
+    }
+    assert(result1 === result2 && result2 === 'test2')
+
+    try {
+      await new Promise(() => this.test3())
+    } catch (error) {
+      result1 = error.message
+    }
+    try {
+      await new PromiseEventEmitter(() => this.test3())
+    } catch (error) {
+      result2 = error.message
+    }
+    assert(result1 === result2 && result2 === 'this.test3 is not a function')
+
+    result1 = await (new Promise(() => this.test4())).catch(reason => reason.message)
+    result2 = await (new PromiseEventEmitter(() => this.test4())).catch(reason => reason.message)
+    assert(result1 === result2 && result2 === 'this.test4 is not a function')
+
+    result1 = await (new Promise(() => this.test5()))
+      .catch(reason => new Error(reason.message))
+    result2 = await (new PromiseEventEmitter(() => this.test5()))
+      .catch(reason => new Error(reason.message))
+    assert(result1.message === result2.message && result2.message === 'this.test5 is not a function')
+
+    result1 = await (new Promise(resolve => resolve('test6'))).finally(value => { result3 = value })
+    result2 = await (new PromiseEventEmitter(resolve => resolve('test6'))).finally(value => { result4 = value })
+    assert(result1 === result2 && result2 === 'test6')
+    assert(result3 === result4 && result4 === undefined)
+
+    try {
+      await (new Promise((resolve, reject) => reject(new Error('test7')))).finally(() => {})
+    } catch (error) {
+      result1 = error.message
+    }
+    try {
+      await (new PromiseEventEmitter((resolve, reject) => reject(new Error('test7')))).finally(() => {})
+    } catch (error) {
+      result2 = error.message
+    }
+    assert(result1 === result2 && result2 === 'test7')
+
+    try {
+      await (new Promise((resolve, reject) => reject(new Error('test7')))).finally(() => { this.test8() })
+    } catch (error) {
+      result1 = error.message
+    }
+    try {
+      await (new PromiseEventEmitter((resolve, reject) => reject(new Error('test7')))).finally(() => { this.test8() })
+    } catch (error) {
+      result2 = error.message
+    }
+    assert(result1 === result2 && result2 === 'this.test8 is not a function')
+  }
+
   /** PEE создается наследованием из Promise, с добавлением emitter
    * при этом последующие then/catch так же создают PEE */
   async ['PromiseEventEmitter - создание, чейнинг']() {

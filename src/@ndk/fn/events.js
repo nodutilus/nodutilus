@@ -169,9 +169,10 @@ class PromiseEventEmitter extends Promise {
    * @returns {Promise<any>}
    */
   ['then'](onFulfilled, onRejected) {
-    return new Promise((resolve, reject) => {
-      debugger
-    })
+    return super.then(onFulfilled, onRejected)
+    // return new Promise((resolve, reject) => {
+    //   debugger
+    // })
   }
 
   /**
@@ -189,7 +190,8 @@ class PromiseEventEmitter extends Promise {
   ['finally'](onFinally) {
     const finallyHandler = () => onFinally()
 
-    return this.then(finallyHandler, finallyHandler)
+    return super.finally(finallyHandler)
+    // return this.then(finallyHandler, finallyHandler)
   }
 
   /**

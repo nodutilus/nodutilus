@@ -164,6 +164,35 @@ class PromiseEventEmitter extends Promise {
   }
 
   /**
+   * @param {*} onFulfilled
+   * @param {*} onRejected
+   * @returns {Promise<any>}
+   */
+  ['then'](onFulfilled, onRejected) {
+    return new Promise((resolve, reject) => {
+      debugger
+    })
+  }
+
+  /**
+   * @param {*} onRejected
+   * @returns {Promise<any>}
+   */
+  ['catch'](onRejected) {
+    return this.then(undefined, onRejected)
+  }
+
+  /**
+   * @param {*} onFinally
+   * @returns {Promise<any>}
+   */
+  ['finally'](onFinally) {
+    const finallyHandler = () => onFinally()
+
+    return this.then(finallyHandler, finallyHandler)
+  }
+
+  /**
    * @param {Event} event
    * @param  {...any} args
    */

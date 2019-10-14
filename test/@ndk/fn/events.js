@@ -347,15 +347,22 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
   async ['PromiseEventEmitter - once + emit, принял, обработал, отдал']() {
     let result2 = 0
     const pem = new PromiseEventEmitter(async emitter => {
+      // Выполняем некоторые асинхронные операции
       await new Promise(resolve => setTimeout(resolve, 1))
+      // Отправляем результат основной задаче
       emitter.emit('result1', 1, 'test')
+      // Ожидаем ответ от основной задачи
       result2 = await emitter.once('result2')
+      // Обрабатываем ответ, отдаем результат и завершаем Promise через resolve
       emitter.resolve(result2[0] + 1)
     })
+    // Ожидаем ответ от подзадачи
     const result1 = await pem.once('result1')
 
+    // Отправляем доп. данные подзадаче
     pem.emit('result2', result1[0] + 1)
 
+    // Ожидаем завершения подзадачи
     const result3 = await pem
 
     assert.deepEqual(result1, [1, 'test'])

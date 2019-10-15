@@ -163,6 +163,38 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
       result2 = error.message
     }
     assert(result1 === result2 && result2 === 'this.test8 is not a function')
+
+    result1 = await (new Promise(resolve => resolve('test9')).then(value => {
+      return value + '_9'
+    }))
+    result2 = await (new PromiseEventEmitter(resolve => resolve('test9')).then(value => {
+      return value + '_9'
+    }))
+    assert(result1 === result2 && result2 === 'test9_9')
+
+    result1 = await (new Promise(resolve => resolve('test10')).then(async value => {
+      await new Promise(resolve => { setTimeout(resolve, 1) })
+
+      return value + '_10'
+    }))
+    result2 = await (new PromiseEventEmitter(resolve => resolve('test10')).then(async value => {
+      await new Promise(resolve => { setTimeout(resolve, 1) })
+
+      return value + '_10'
+    }))
+    assert(result1 === result2 && result2 === 'test10_10')
+
+    result1 = await (new Promise(resolve => this.test11()).catch(async reason => {
+      await new Promise(resolve => { setTimeout(resolve, 1) })
+
+      return reason.message + '_11'
+    }))
+    result2 = await (new PromiseEventEmitter(resolve => this.test11()).catch(async reason => {
+      await new Promise(resolve => { setTimeout(resolve, 1) })
+
+      return reason.message + '_11'
+    }))
+    assert(result1 === result2 && result2 === 'this.test11 is not a function_11')
   }
 
   /** PEE создается наследованием из Promise, с добавлением emitter

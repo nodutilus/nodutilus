@@ -123,42 +123,33 @@ class PromiseEventEmitter extends Promise {
    * @param {AsyncExecutor} [asyncExecutor]
    */
   constructor(asyncExecutor) {
-    const AsyncFunction = Reflect.getPrototypeOf(EventEmitter.prototype.emit).constructor
-    const emitter = new EventEmitter()
-    const executor = (resolve, reject) => {
-      emitter
-        .on(pemEvents.resolve, value => {
-          resolve(value)
-        })
-        .on(pemEvents.reject, reason => {
-          privatePromiseEventEmittersReason.set(emitter, reason)
-          reject(reason)
-        })
-    }
+    const executorIsFunction = typeof asyncExecutor === 'function'
 
-    super(executor)
+    if (executorIsFunction && asyncExecutor.length === 2) {
+      super(asyncExecutor)
+    } else {
+      const emitter = new EventEmitter()
+      const promiseExecutor = (resolve, reject) => {
+        emitter
+          .on(pemEvents.resolve, value => {
+            resolve(value)
+          })
+          .on(pemEvents.reject, reason => {
+            privatePromiseEventEmittersReason.set(emitter, reason)
+            reject(reason)
+          })
+      }
 
-    privatePromiseEventEmittersMap.set(this, emitter)
+      super(promiseExecutor)
 
+      privatePromiseEventEmittersMap.set(this, emitter)
 
-    if (asyncExecutor) {
-      if (asyncExecutor instanceof AsyncFunction) {
-        asyncExecutor(this).catch(reason => {
+      if (executorIsFunction) {
+        (async () => {
+          await asyncExecutor(this)
+        })().catch(reason => {
           emitter.emit(pemEvents.reject, reason)
         })
-      } else {
-        try {
-          asyncExecutor(
-            value => {
-              emitter.emit(pemEvents.resolve, value)
-            },
-            reason => {
-              emitter.emit(pemEvents.reject, reason)
-            }
-          )
-        } catch (error) {
-          emitter.emit(pemEvents.reject, error)
-        }
       }
     }
   }
@@ -170,9 +161,6 @@ class PromiseEventEmitter extends Promise {
    */
   ['then'](onFulfilled, onRejected) {
     return super.then(onFulfilled, onRejected)
-    // return new Promise((resolve, reject) => {
-    //   debugger
-    // })
   }
 
   /**
@@ -180,7 +168,7 @@ class PromiseEventEmitter extends Promise {
    * @returns {Promise<any>}
    */
   ['catch'](onRejected) {
-    return this.then(undefined, onRejected)
+    return super.catch(onRejected)
   }
 
   /**
@@ -188,10 +176,7 @@ class PromiseEventEmitter extends Promise {
    * @returns {Promise<any>}
    */
   ['finally'](onFinally) {
-    const finallyHandler = () => onFinally()
-
-    return super.finally(finallyHandler)
-    // return this.then(finallyHandler, finallyHandler)
+    return super.finally(onFinally)
   }
 
   /**

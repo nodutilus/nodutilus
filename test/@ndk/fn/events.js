@@ -98,7 +98,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     let result4 = null
 
     result1 = await new Promise(resolve => resolve('test1'))
-    result2 = await new PromiseEventEmitter(resolve => resolve('test1'))
+    result2 = await new PromiseEventEmitter(emitter => emitter.resolve('test1'))
     assert(result1 === result2 && result2 === 'test1')
 
     try {
@@ -107,7 +107,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
       result1 = error.message
     }
     try {
-      await new PromiseEventEmitter((resolve, reject) => reject(new Error('test2')))
+      await new PromiseEventEmitter(emitter => emitter.reject(new Error('test2')))
     } catch (error) {
       result2 = error.message
     }
@@ -136,7 +136,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     assert(result1.message === result2.message && result2.message === 'this.test5 is not a function')
 
     result1 = await (new Promise(resolve => resolve('test6'))).finally(value => { result3 = value })
-    result2 = await (new PromiseEventEmitter(resolve => resolve('test6'))).finally(value => { result4 = value })
+    result2 = await (new PromiseEventEmitter(emitter => emitter.resolve('test6'))).finally(value => { result4 = value })
     assert(result1 === result2 && result2 === 'test6')
     assert(result3 === result4 && result4 === undefined)
 
@@ -146,7 +146,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
       result1 = error.message
     }
     try {
-      await (new PromiseEventEmitter((resolve, reject) => reject(new Error('test7')))).finally(() => {})
+      await (new PromiseEventEmitter(emitter => emitter.reject(new Error('test7')))).finally(() => {})
     } catch (error) {
       result2 = error.message
     }
@@ -158,7 +158,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
       result1 = error.message
     }
     try {
-      await (new PromiseEventEmitter((resolve, reject) => reject(new Error('test7')))).finally(() => { this.test8() })
+      await (new PromiseEventEmitter(emitter => emitter.reject(new Error('test7')))).finally(() => { this.test8() })
     } catch (error) {
       result2 = error.message
     }
@@ -167,7 +167,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     result1 = await (new Promise(resolve => resolve('test9')).then(value => {
       return value + '_9'
     }))
-    result2 = await (new PromiseEventEmitter(resolve => resolve('test9')).then(value => {
+    result2 = await (new PromiseEventEmitter(emitter => emitter.resolve('test9')).then(value => {
       return value + '_9'
     }))
     assert(result1 === result2 && result2 === 'test9_9')
@@ -177,7 +177,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
 
       return value + '_10'
     }))
-    result2 = await (new PromiseEventEmitter(resolve => resolve('test10')).then(async value => {
+    result2 = await (new PromiseEventEmitter(emitter => emitter.resolve('test10')).then(async value => {
       await new Promise(resolve => { setTimeout(resolve, 1) })
 
       return value + '_10'
@@ -189,7 +189,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
 
       return reason.message + '_11'
     }))
-    result2 = await (new PromiseEventEmitter(resolve => this.test11()).catch(async reason => {
+    result2 = await (new PromiseEventEmitter(() => this.test11()).catch(async reason => {
       await new Promise(resolve => { setTimeout(resolve, 1) })
 
       return reason.message + '_11'
@@ -283,10 +283,12 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     assert.equal(error, 'this.nonExistent is not a function')
   }
 
-  /** Если executor асинхронный, то у него всего 1 аргумент emitter,
-   *    а синхронный executor получает методы resolve, reject.
+  /** Если у executor всего 1 аргумент emitter, то создается полноценный PEE,
+   *  а внутри создается синхронный executor, который получает методы resolve, reject.
+   * Если в конструктор PEE передается 2 аргумента, методы resolve, reject,
+   *  то экземпляр создается как обычный Promise.
    * Это необходимо для поддержания правильного чейнинга,
-   *    т.к. он должен создавать новые экземпляры Promise */
+   *    т.к. он должен создавать новые экземпляры Promise. */
   async ['PromiseEventEmitter - синхронный executor']() {
     const pem = new PromiseEventEmitter((resolve, reject) => {
       assert(typeof resolve === 'function')

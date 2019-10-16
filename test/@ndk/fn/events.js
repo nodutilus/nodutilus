@@ -195,26 +195,64 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
       return reason.message + '_11'
     }))
     assert(result1 === result2 && result2 === 'this.test11 is not a function_11')
+
+    result1 = await new Promise(resolve => { resolve('test12') }).then().catch().then()
+    result2 = await new PromiseEventEmitter(emitter => { emitter.resolve('test12') }).then().catch().then()
+    assert(result1 === result2 && result2 === 'test12')
+
+    result1 = await new Promise((resolve, reject) => { reject(new Error('test13')) })
+      .then().catch(reason => reason.message)
+    result2 = await new PromiseEventEmitter((resolve, reject) => { reject(new Error('test13')) })
+      .then().catch(reason => reason.message)
+    assert(result1 === result2 && result2 === 'test13')
+
+    result1 = await new Promise((resolve, reject) => { reject(new Error('test14')) })
+      .catch().catch(reason => reason.message)
+    result2 = await new PromiseEventEmitter((resolve, reject) => { reject(new Error('test14')) })
+      .catch().catch(reason => reason.message)
+    assert(result1 === result2 && result2 === 'test14')
+
+    result1 = await new Promise((resolve, reject) => { reject(new Error('test15')) })
+      .catch(reason => { throw reason }).catch(reason => reason.message)
+    result2 = await new PromiseEventEmitter((resolve, reject) => { reject(new Error('test15')) })
+      .catch(reason => { throw reason }).catch(reason => reason.message)
+    assert(result1 === result2 && result2 === 'test15')
   }
 
-  /** PEE создается наследованием из Promise, с добавлением emitter
-   * при этом последующие then/catch так же создают PEE */
+  /** PEE создается наследованием из Promise, с добавлением emitter,
+   * при этом последующие then/catch/finally создают обычный Promise */
   async ['PromiseEventEmitter - создание, чейнинг']() {
     const pem = new PromiseEventEmitter()
     const tpem = pem.then(value => {
       return value + '+' + value
     })
     const t2pem = tpem.then()
+    const cpem = pem.catch()
+    const fpem = pem.finally()
 
-    await t2pem.resolve('x')
+    assert(pem instanceof PromiseEventEmitter)
+    assert(!(tpem instanceof PromiseEventEmitter))
+    assert(tpem instanceof Promise)
+    assert(!(t2pem instanceof PromiseEventEmitter))
+    assert(t2pem instanceof Promise)
+    assert(!(cpem instanceof PromiseEventEmitter))
+    assert(cpem instanceof Promise)
+    assert(!(fpem instanceof PromiseEventEmitter))
+    assert(fpem instanceof Promise)
 
     await pem.resolve('ok')
 
     const result = await pem
     const tresult = await tpem
+    const t2result = await t2pem
+    const cresult = await cpem
+    const fresult = await fpem
 
     assert.equal(result, 'ok')
     assert.equal(tresult, 'ok+ok')
+    assert.equal(t2result, 'ok+ok')
+    assert.equal(cresult, 'ok')
+    assert.equal(fresult, 'ok')
   }
 
   /** emit не должен ничего возвращать, ни чейнится */

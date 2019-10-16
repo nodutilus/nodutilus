@@ -155,28 +155,46 @@ class PromiseEventEmitter extends Promise {
   }
 
   /**
-   * @param {*} onFulfilled
-   * @param {*} onRejected
+   * @callback onFulfilledFunction
+   * @param {any} value
+   * @returns {Promise<any>}
+   */
+  /**
+   * @callback onRejectedFunction
+   * @param {any} reason
+   * @returns {Promise<any>}
+   */
+  /**
+   * @param {onFulfilledFunction} [onFulfilled]
+   * @param {onRejectedFunction} [onRejected]
    * @returns {Promise<any>}
    */
   ['then'](onFulfilled, onRejected) {
-    return super.then(onFulfilled, onRejected)
-  }
-
-  /**
-   * @param {*} onRejected
-   * @returns {Promise<any>}
-   */
-  ['catch'](onRejected) {
-    return super.catch(onRejected)
-  }
-
-  /**
-   * @param {*} onFinally
-   * @returns {Promise<any>}
-   */
-  ['finally'](onFinally) {
-    return super.finally(onFinally)
+    return new Promise((resolve, reject) => {
+      super.then(
+        value => {
+          if (typeof onFulfilled === 'function') {
+            try {
+              resolve(onFulfilled(value))
+            } catch (error) {
+              reject(error)
+            }
+          } else {
+            resolve(value)
+          }
+        },
+        reason => {
+          if (typeof onRejected === 'function') {
+            try {
+              resolve(onRejected(reason))
+            } catch (error) {
+              reject(error)
+            }
+          } else {
+            reject(reason)
+          }
+        })
+    })
   }
 
   /**

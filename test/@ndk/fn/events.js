@@ -202,21 +202,41 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
 
     result1 = await new Promise((resolve, reject) => { reject(new Error('test13')) })
       .then().catch(reason => reason.message)
-    result2 = await new PromiseEventEmitter((resolve, reject) => { reject(new Error('test13')) })
+    result2 = await new PromiseEventEmitter(emitter => { emitter.reject(new Error('test13')) })
       .then().catch(reason => reason.message)
     assert(result1 === result2 && result2 === 'test13')
 
     result1 = await new Promise((resolve, reject) => { reject(new Error('test14')) })
       .catch().catch(reason => reason.message)
-    result2 = await new PromiseEventEmitter((resolve, reject) => { reject(new Error('test14')) })
+    result2 = await new PromiseEventEmitter(emitter => { emitter.reject(new Error('test14')) })
       .catch().catch(reason => reason.message)
     assert(result1 === result2 && result2 === 'test14')
 
     result1 = await new Promise((resolve, reject) => { reject(new Error('test15')) })
       .catch(reason => { throw reason }).catch(reason => reason.message)
-    result2 = await new PromiseEventEmitter((resolve, reject) => { reject(new Error('test15')) })
+    result2 = await new PromiseEventEmitter(emitter => { emitter.reject(new Error('test15')) })
       .catch(reason => { throw reason }).catch(reason => reason.message)
     assert(result1 === result2 && result2 === 'test15')
+
+    result1 = await new Promise((resolve, reject) => {
+      reject(new Error('test16'))
+      reject(new Error('test16_16'))
+    }).catch(reason => { throw reason }).catch(reason => reason.message)
+    result2 = await new PromiseEventEmitter(emitter => {
+      emitter.reject(new Error('test16'))
+      emitter.reject(new Error('test16_16'))
+    }).catch(reason => { throw reason }).catch(reason => reason.message)
+    assert(result1 === result2 && result2 === 'test16')
+
+    result1 = await new Promise((resolve, reject) => {
+      resolve('test17')
+      resolve('test17_17')
+    })
+    result2 = await new PromiseEventEmitter(emitter => {
+      emitter.resolve('test17')
+      emitter.resolve('test17_17')
+    })
+    assert(result1 === result2 && result2 === 'test17')
   }
 
   /** PEE создается наследованием из Promise, с добавлением emitter,

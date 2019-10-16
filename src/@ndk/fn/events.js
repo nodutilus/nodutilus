@@ -135,8 +135,10 @@ class PromiseEventEmitter extends Promise {
             resolve(value)
           })
           .on(pemEvents.reject, reason => {
-            privatePromiseEventEmittersReason.set(emitter, reason)
-            reject(reason)
+            if (!privatePromiseEventEmittersReason.has(emitter)) {
+              privatePromiseEventEmittersReason.set(emitter, reason)
+              reject(reason)
+            }
           })
       }
 

@@ -509,6 +509,52 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     assert.equal(error, 'this.nonExistent is not a function')
   }
 
+  /** Повторный emitter.reject не должен перетирать ошибку,
+   * которую будут получать последующие асинхронные вызовы событий провалившегося обещания */
+  async ['PromiseEventEmitter - emitter.reject - только 1 раз']() {
+    const pem = new PromiseEventEmitter(async emitter => {
+      await new Promise(resolve => setTimeout(resolve, 1))
+      emitter.reject('test 1')
+      emitter.reject('test 2')
+    })
+    let error = null
+
+    try {
+      await pem.once('result1')
+    } catch (err) {
+      error = err
+    }
+
+    assert.equal(error, 'test 1')
+    error = null
+
+    try {
+      pem.emit('result2')
+    } catch (err) {
+      error = err
+    }
+
+    assert.equal(error, 'test 1')
+    error = null
+
+    try {
+      await pem.once('result2')
+    } catch (err) {
+      error = err
+    }
+
+    assert.equal(error, 'test 1')
+    error = null
+
+    try {
+      await pem
+    } catch (err) {
+      error = err
+    }
+
+    assert.equal(error, 'test 1')
+  }
+
   /** Проверяем, что можно обмениваться данными в асинхронном режиме
    * между основным и дочерним исполнением кода */
   async ['PromiseEventEmitter - once + emit, принял, обработал, отдал']() {

@@ -555,6 +555,21 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     assert.equal(error, 'test 1')
   }
 
+  /** В синхронном блоке executor'а недоступен emit,
+   * т.к. на отправку данного события никто не может подписаться */
+  async ['PromiseEventEmitter - запрет синхронного emit']() {
+    const pem = new PromiseEventEmitter(myEmitter => myEmitter.emit('test'))
+    let error = null
+
+    try {
+      await pem
+    } catch (err) {
+      error = err.message
+    }
+
+    assert.equal(error, 'myEmitter.emit is not a function')
+  }
+
   /** Проверяем, что можно обмениваться данными в асинхронном режиме
    * между основным и дочерним исполнением кода */
   async ['PromiseEventEmitter - once + emit, принял, обработал, отдал']() {

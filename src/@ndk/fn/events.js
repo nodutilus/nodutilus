@@ -147,11 +147,15 @@ class PromiseEventEmitter extends Promise {
       privatePromiseEventEmittersMap.set(this, emitter)
 
       if (executorIsFunction) {
-        (async () => {
+        const execute = async () => {
           await asyncExecutor(this)
-        })().catch(reason => {
+        }
+
+        this.emit = undefined
+        execute().catch(reason => {
           emitter.emit(pemEvents.reject, reason)
         })
+        this.emit = Reflect.getPrototypeOf(this).emit
       }
     }
   }

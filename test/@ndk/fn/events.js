@@ -9,25 +9,33 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
   /** Попытка удаление события до подписки не должна падать */
   ['EventEmitter - удаление события до подписки']() {
     const em = new EventEmitter()
-    const fn = () => em.delete('test', fn)
+    const fn = () => em.off('test', fn)
 
     assert.doesNotThrow(fn)
+    assert.equal(em.count, 0)
+    assert.equal(em.listenerCount('test'), 0)
   }
 
   /** После отписки от последнего события сет со слушателями удаляется.
    * На данное поведение опирается метод "has" */
   ['EventEmitter - удаление события после удаления последнего слушателя']() {
     const em = new EventEmitter()
-    const fn1 = () => em.delete('test', fn1)
-    const fn2 = () => em.delete('test', fn2)
+    const fn1 = () => em.off('test', fn1)
+    const fn2 = () => em.off('test', fn2)
 
     em.on('test', fn1)
       .on('test', fn2)
 
+    assert.equal(em.count, 1)
+    assert.equal(em.listenerCount('test'), 2)
     assert.doesNotThrow(fn1)
     assert(em.has('test') === true)
+    assert.equal(em.count, 1)
+    assert.equal(em.listenerCount('test'), 1)
     assert.doesNotThrow(fn2)
     assert(em.has('test') === false)
+    assert.equal(em.count, 0)
+    assert.equal(em.listenerCount('test'), 0)
   }
 
   /** emit не должен ничего возвращать, ни чейнится */
@@ -58,6 +66,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     const [result1, result12] = await em.once('test')
     const result2 = await p
 
+    assert.equal(em.count, 0)
     assert.equal(result1, 1)
     assert.equal(result12, 12)
     assert.equal(result2, 2)
@@ -75,13 +84,22 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
       }, 1)
     }, 1))
 
+    assert.equal(em.count, 0)
     em.on('test', value => {
       result += value
     })
+    assert.equal(em.count, 1)
+    assert.equal(em.listenerCount('test'), 1)
 
-    const [result1] = await em.once('test')
+    const result1P = em.once('test')
+
+    assert.equal(em.count, 1)
+    assert.equal(em.listenerCount('test'), 2)
+
+    const [result1] = await result1P
     const result2 = await p
 
+    assert.equal(em.listenerCount('test'), 1)
     assert.equal(result1, 1)
     assert.equal(result2, 2)
     assert(em.has('test'))
@@ -273,6 +291,33 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     assert.equal(t2result, 'ok+ok')
     assert.equal(cresult, 'ok')
     assert.equal(fresult, 'ok')
+  }
+
+  /** PEE имеет такие же методы работы с событиями как и EventEmitter */
+  async ['PromiseEventEmitter - count,listenerCount,has,on,off']() {
+    const pem = new PromiseEventEmitter()
+    const testFN = () => {}
+
+    pem.on('test', testFN)
+    await pem.emit('test')
+
+    // pem имеет 2 служебных события resolve/reject
+    assert.equal(pem.count, 3)
+    assert.equal(pem.listenerCount('test'), 1)
+    assert(pem.has('test'))
+
+    pem.off('test', testFN)
+
+    assert.equal(pem.count, 2)
+    assert.equal(pem.listenerCount('test'), 0)
+    assert(!(pem.has('test')))
+
+    const propsEE = Object.getOwnPropertyNames(EventEmitter.prototype)
+    const propsPEE = Object.getOwnPropertyNames(PromiseEventEmitter.prototype)
+
+    for (const name of propsEE) {
+      assert(propsPEE.includes(name), `PromiseEventEmitter#${name}`)
+    }
   }
 
   /** emit не должен ничего возвращать, ни чейнится */

@@ -229,7 +229,7 @@ async function __deepEventsWrapper({ testInstance, name, test, deepEvents }, fn)
     result = await fn()
 
     deepEventsWrapper.forEach(([event, wrapper]) => {
-      test.event.delete(event, wrapper)
+      test.event.off(event, wrapper)
     })
   } else {
     result = await fn()

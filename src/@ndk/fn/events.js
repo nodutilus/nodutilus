@@ -25,6 +25,29 @@ class EventEmitter {
   }
 
   /**
+   * @returns {number}
+   */
+  get count() {
+    const events = privateEventsMap.get(this)
+
+    return events.size
+  }
+
+  /**
+   * @param {Event} event
+   * @returns {number}
+   */
+  listenerCount(event) {
+    const listeners = privateEventsMap.get(this).get(event)
+
+    if (listeners) {
+      return listeners.size
+    } else {
+      return 0
+    }
+  }
+
+  /**
    * @param {Event} event
    * @param  {...any} args
    * @returns {Promise<void>}
@@ -67,21 +90,20 @@ class EventEmitter {
   /**
    * @param {Event} event
    * @param  {Listener} listener
-   * @returns {boolean}
+   * @returns {EventEmitter}
    */
-  delete(event, listener) {
+  off(event, listener) {
     const events = privateEventsMap.get(this)
     const listeners = events.get(event)
-    let result = false
 
     if (listeners) {
-      result = listeners.delete(listener)
+      listeners.delete(listener)
       if (!listeners.size) {
         events.delete(event)
       }
     }
 
-    return result
+    return this
   }
 
   /**
@@ -200,6 +222,25 @@ class PromiseEventEmitter extends Promise {
   }
 
   /**
+   * @returns {number}
+   */
+  get count() {
+    const emitter = privatePromiseEventEmittersMap.get(this)
+
+    return emitter.count
+  }
+
+  /**
+   * @param {Event} event
+   * @returns {number}
+   */
+  listenerCount(event) {
+    const emitter = privatePromiseEventEmittersMap.get(this)
+
+    return emitter.listenerCount(event)
+  }
+
+  /**
    * @param {Event} event
    * @param  {...any} args
    * @returns {Promise<void>}
@@ -220,6 +261,16 @@ class PromiseEventEmitter extends Promise {
 
   /**
    * @param {Event} event
+   * @returns {boolean}
+   */
+  has(event) {
+    const emitter = privatePromiseEventEmittersMap.get(this)
+
+    return emitter.has(event)
+  }
+
+  /**
+   * @param {Event} event
    * @param  {Listener} listener
    * @returns {PromiseEventEmitter}
    */
@@ -227,6 +278,19 @@ class PromiseEventEmitter extends Promise {
     const emitter = privatePromiseEventEmittersMap.get(this)
 
     emitter.on(event, listener)
+
+    return this
+  }
+
+  /**
+   * @param {Event} event
+   * @param  {Listener} listener
+   * @returns {PromiseEventEmitter}
+   */
+  off(event, listener) {
+    const emitter = privatePromiseEventEmittersMap.get(this)
+
+    emitter.off(event, listener)
 
     return this
   }

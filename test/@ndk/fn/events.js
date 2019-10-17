@@ -287,6 +287,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
 
     assert(em instanceof PromiseEventEmitter)
     assert(!(p instanceof PromiseEventEmitter))
+    assert(p instanceof Promise)
     assert(result === undefined)
     assert.equal(value, 1)
   }
@@ -396,40 +397,49 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
   async ['PromiseEventEmitter - once']() {
     let result2 = 0
     const pem = new PromiseEventEmitter(async emitter => {
-      // Код до первого await синхронный, что бы выполнять в этом блоке инициализацию и подписки на события
-      await new Promise(resolve => setTimeout(resolve, 1))
-      // Отсылать события можно только в асинхронных блоках
-      emitter.emit('result1', 1)
+      await emitter.emit('result1', 1)
       result2 = await emitter.once('result2')
       assert.deepEqual(result2, [2])
       result2 = result2[0] + 1
+      await new Promise(resolve => { setTimeout(resolve, 1) }).then(() => {
+        result2 = 0
+      })
       emitter.resolve(4)
     })
     const [result1] = await pem.once('result1')
 
     assert.equal(result1, 1)
     assert.equal(result2, 0)
-    pem.emit('result2', 2)
+
+    const emitP = pem.emit('result2', 2)
+
     assert.equal(result2, 0)
+    await emitP
+    assert.equal(result2, 3)
 
     const result3 = await pem
 
-    assert.equal(result2, 3)
+    assert.equal(result2, 0)
     assert.equal(result3, 4)
   }
 
-  /** В связке emit+once код синхронный, если специально не вкладывать его в асинхронные вызовы.
-   * Если после emit будет ошибка, она попадет уже в await для PEE */
+  /** В PromiseEventEmitter emit без await выполняется асинхронно, а код после него синхронно,
+   * и если после emit есть ошибка, то once его ожидающий завершиться ошибкой */
   async ['PromiseEventEmitter - once, ошибка после emit']() {
-    const pem = new PromiseEventEmitter(async emitter => {
-      await new Promise(resolve => setTimeout(resolve, 1))
-      emitter.emit('result1', 1)
+    const pem = new PromiseEventEmitter(emitter => {
+      emitter.emit('result1', 1).catch(reason => {})
       this.nonExistent()
     })
     let error = null
-    const [result] = await pem.once('result1')
 
-    assert.equal(result, 1)
+    try {
+      await pem.once('result1')
+    } catch (err) {
+      error = err.message
+    }
+
+    assert.equal(error, 'this.nonExistent is not a function')
+    error = null
 
     try {
       await pem
@@ -443,8 +453,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
   /** Первая ошибка в обработчиках событий завершает Promise с ошибкой */
   async ['PromiseEventEmitter - emit, ошибка в обработчике']() {
     const pem = new PromiseEventEmitter(async emitter => {
-      await new Promise(resolve => setTimeout(resolve, 1))
-      pem.emit('test', 'test')
+      await emitter.emit('test', 'test')
     })
     let error = null
 
@@ -483,7 +492,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     error = null
 
     try {
-      pem.emit('result2')
+      await pem.emit('result2')
     } catch (err) {
       error = err.message
     }
@@ -529,7 +538,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     error = null
 
     try {
-      pem.emit('result2')
+      await pem.emit('result2')
     } catch (err) {
       error = err
     }
@@ -555,21 +564,6 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     assert.equal(error, 'test 1')
   }
 
-  /** В синхронном блоке executor'а недоступен emit,
-   * т.к. на отправку данного события никто не может подписаться */
-  async ['PromiseEventEmitter - запрет синхронного emit']() {
-    const pem = new PromiseEventEmitter(myEmitter => myEmitter.emit('test'))
-    let error = null
-
-    try {
-      await pem
-    } catch (err) {
-      error = err.message
-    }
-
-    assert.equal(error, 'myEmitter.emit is not a function')
-  }
-
   /** Проверяем, что можно обмениваться данными в асинхронном режиме
    * между основным и дочерним исполнением кода */
   async ['PromiseEventEmitter - once + emit, принял, обработал, отдал']() {
@@ -578,7 +572,7 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
       // Выполняем некоторые асинхронные операции
       await new Promise(resolve => setTimeout(resolve, 1))
       // Отправляем результат основной задаче
-      emitter.emit('result1', 1, 'test')
+      await emitter.emit('result1', 1, 'test')
       // Ожидаем ответ от основной задачи
       result2 = await emitter.once('result2')
       // Обрабатываем ответ, отдаем результат и завершаем Promise через resolve
@@ -596,6 +590,30 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     assert.deepEqual(result1, [1, 'test'])
     assert.deepEqual(result2, [2])
     assert.equal(result3, 3)
+  }
+
+  /** Ошибки внутри событий не должны влиять на результат PEE */
+  async ['PromiseEventEmitter - errors in events']() {
+    const pem = new PromiseEventEmitter()
+    let error = null
+
+    pem.on('test', () => {
+      this.nonExistentInEvent()
+    })
+
+    try {
+      await pem.emit('test')
+    } catch (err) {
+      error = err.message
+    }
+
+    assert.equal(error, 'this.nonExistentInEvent is not a function')
+
+    pem.resolve('redy')
+
+    const result = await pem
+
+    assert.deepEqual(result, 'redy')
   }
 
 }

@@ -147,15 +147,11 @@ class PromiseEventEmitter extends Promise {
       privatePromiseEventEmittersMap.set(this, emitter)
 
       if (executorIsFunction) {
-        const execute = async () => {
+        (async () => {
           await asyncExecutor(this)
-        }
-
-        this.emit = undefined
-        execute().catch(reason => {
+        })().catch(reason => {
           emitter.emit(pemEvents.reject, reason)
         })
-        this.emit = Reflect.getPrototypeOf(this).emit
       }
     }
   }
@@ -206,17 +202,20 @@ class PromiseEventEmitter extends Promise {
   /**
    * @param {Event} event
    * @param  {...any} args
+   * @returns {Promise<void>}
    */
   emit(event, ...args) {
-    const emitter = privatePromiseEventEmittersMap.get(this)
+    return new Promise((resolve, reject) => {
+      process.nextTick(() => {
+        const emitter = privatePromiseEventEmittersMap.get(this)
 
-    if (privatePromiseEventEmittersReason.has(emitter)) {
-      throw privatePromiseEventEmittersReason.get(emitter)
-    } else {
-      emitter.emit(event, ...args).catch(reason => {
-        emitter.emit(pemEvents.reject, reason)
+        if (privatePromiseEventEmittersReason.has(emitter)) {
+          reject(privatePromiseEventEmittersReason.get(emitter))
+        } else {
+          emitter.emit(event, ...args).then(resolve, reject)
+        }
       })
-    }
+    })
   }
 
   /**

@@ -98,6 +98,10 @@ async function testAllTests() {
     class AllTests extends Test {}
 
     Object.assign(AllTests, require('./all-tests'))
+
+    // Не будем жечь диск для тестов на память
+    AllTests['@ndk/fs'] = null
+
     await Test.run(new AllTests())
   }
 }

@@ -31,6 +31,8 @@ function getOwnClassMethods(tests, proto) {
 
     if (isFunction && !isTestClass) {
       tests.add(name)
+    } else if (tests.has(name)) {
+      tests.delete(name)
     }
   })
 }
@@ -43,10 +45,10 @@ function getOwnClassMethods(tests, proto) {
 function getClassMethods(tests, proto) {
   const nestedProto = Reflect.getPrototypeOf(proto)
 
-  getOwnClassMethods(tests, proto)
   if (nestedProto instanceof Test) {
     getClassMethods(tests, nestedProto)
   }
+  getOwnClassMethods(tests, proto)
 }
 
 
@@ -67,6 +69,8 @@ function getOwnClassEvents(events, proto) {
 
     if (isEvent && isFunction) {
       events.set(event, value)
+    } else if (events.has(event)) {
+      events.delete(event)
     }
   })
 }
@@ -102,6 +106,8 @@ function getOwnNestedStaticTests(tests, constructor) {
 
     if (isTestClass) {
       tests.add(name)
+    } else if (tests.has(name)) {
+      tests.delete(name)
     }
   })
 }
@@ -114,10 +120,10 @@ function getOwnNestedStaticTests(tests, constructor) {
 function getNestedStaticTests(tests, constructor) {
   const constructorProto = Reflect.getPrototypeOf(constructor)
 
-  getOwnNestedStaticTests(tests, constructor)
   if (Object.isPrototypeOf.call(Test, constructorProto)) {
     getNestedStaticTests(tests, constructorProto)
   }
+  getOwnNestedStaticTests(tests, constructor)
 }
 
 
@@ -389,3 +395,4 @@ Test.afterEachNested = baseEvents.afterEachNested
 
 exports.assert = assert
 exports.Test = Test
+exports.TestResult = TestResult

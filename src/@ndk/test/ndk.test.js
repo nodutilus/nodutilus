@@ -132,7 +132,7 @@ function getNestedStaticTests(tests, constructor) {
  * @param {Test} proto
  * @returns {Set<string>}
  */
-function getOwnNestedStaticTestsClasses(tests, proto) {
+function getOwnResolvedNestedStaticTests(tests, proto) {
   getOwnNestedStaticTests(tests, proto.constructor)
 
   if (tests.size > 0) {
@@ -153,13 +153,13 @@ function getOwnNestedStaticTestsClasses(tests, proto) {
  * @param {Test} proto
  * @returns {Set<string>}
  */
-function getNestedStaticTestsClasses(tests, proto) {
+function getResolvedNestedStaticTests(tests, proto) {
   const nestedProto = Reflect.getPrototypeOf(proto)
 
   if (nestedProto instanceof Test) {
-    getNestedStaticTestsClasses(tests, nestedProto)
+    getResolvedNestedStaticTests(tests, nestedProto)
   }
-  getOwnNestedStaticTestsClasses(tests, proto)
+  getOwnResolvedNestedStaticTests(tests, proto)
 
   return tests
 }
@@ -280,7 +280,7 @@ class Test {
    */
   constructor() {
     const proto = Reflect.getPrototypeOf(this)
-    const tests = getNestedStaticTestsClasses(new Set(), proto)
+    const tests = getResolvedNestedStaticTests(new Set(), proto)
     const events = getClassEvents(new Map(), proto)
     const { constructor } = this
 

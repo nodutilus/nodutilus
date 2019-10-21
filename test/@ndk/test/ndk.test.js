@@ -177,7 +177,7 @@ exports['@ndk/test'] = class TestTest extends Test {
     assert.equal(resultE.tests.get('TestA').tests.get('testB').success, true)
     assert.equal(resultE.tests.get('TestD').tests.get('testB').success, true)
     assert.equal(resultE.tests.get('TestB'), undefined)
-    // assert.equal(resultE.tests.get('TestF'), undefined)
+    assert.equal(resultE.tests.get('TestF'), undefined)
     assert.equal(resultE.tests.get('TestG'), undefined)
     assert.equal(resultE.tests.get('testH').tests.get('testA').success, true)
   }

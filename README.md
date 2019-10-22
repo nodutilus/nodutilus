@@ -1,7 +1,7 @@
-# NDK Source Code [![Build][badge]][actions]
+# ND Toolkit Source Code [![Build][badge]][actions]
 
-Исходники модулей [npmjs.com/org/ndk](https://www.npmjs.com/org/ndk)
+Исходники модулей [npmjs.com/org/nd-toolkit](https://www.npmjs.com/org/nd-toolkit)
 
-[badge]: https://github.com/nd-toolkit/ndk-source/workflows/Checks%20%26%20Tests/badge.svg
+[badge]: https://github.com/nd-toolkit/nd-toolkit/workflows/Checks%20%26%20Tests/badge.svg
 
-[actions]: https://github.com/nd-toolkit/ndk-source/actions
+[actions]: https://github.com/nd-toolkit/nd-toolkit/actions

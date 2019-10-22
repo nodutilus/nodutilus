@@ -1,5 +1,5 @@
 {
-  "name": "@ndk/fs",
+  "name": "@nd-toolkit/fs",
   "description": "Методы для работы с файлами, которых нет в стандартной библиотеке fs",
   "keywords": [
     "fs",
@@ -7,5 +7,5 @@
     "directories",
     "filesystem"
   ],
-  "main": "ndk.fs.js"
+  "main": "nd-toolkit.fs.js"
 }

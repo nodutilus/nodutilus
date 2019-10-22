@@ -1,9 +1,9 @@
 {
-  "packages": "src/@ndk",
+  "packages": "src/@nd-toolkit",
   "versions": "src/versions.json",
   "crossDependencies": "src/cross-dependencies.json",
   "licenseFile": "LICENSE",
-  "buildFolder": "build/@ndk",
+  "buildFolder": "build/@nd-toolkit",
   "template": {
     "homepage": "https://nd-toolkit.github.io",
     "repository": "github:nd-toolkit/nd-toolkit",

@@ -1,6 +1,6 @@
 'use strict'
 
-const { Test, assert } = require('@ndk/test')
+const { Test, assert } = require('@nd-toolkit/test')
 const {
   copy,
   readJSON,
@@ -17,7 +17,7 @@ const {
     WALK_FILEFIRST,
     WRITE_EXCL
   }
-} = require('@ndk/fs')
+} = require('@nd-toolkit/fs')
 const { normalize, relative } = require('path')
 const {
   existsSync,
@@ -25,7 +25,7 @@ const {
 } = require('fs')
 
 
-exports['@ndk/fs'] = class FsTest extends Test {
+exports['@nd-toolkit/fs'] = class FsTest extends Test {
 
   /** Перед запуском очистим временные данные */
   async [Test.before]() {

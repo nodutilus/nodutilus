@@ -1,4 +1,4 @@
-/** @module @ndk/fs */
+/** @module @nd-toolkit/fs */
 'use strict'
 
 const { dirname, join, resolve } = require('path')

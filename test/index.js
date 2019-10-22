@@ -18,10 +18,7 @@ class AllTests extends Test {
 }
 
 
-Object.assign(AllTests,
-  require('./@ndk/fn'),
-  require('./@ndk/fs')
-)
+Object.assign(AllTests, require('./all-tests'))
 
 
 async function runTests() {

@@ -267,12 +267,12 @@ class TestOrder1 extends Test {
     this.test5 = new Test()
   }
 
-  test2() {}
+  test1() {}
 
 }
 
 
-TestOrder1.test4 = MyTestName
+TestOrder1.test3 = MyTestName
 
 
 class TestOrder2 extends TestOrder1 {
@@ -283,12 +283,12 @@ class TestOrder2 extends TestOrder1 {
     this.test7 = () => {}
   }
 
-  test1() {}
+  test2() {}
 
 }
 
 
-TestOrder2.test3 = MyTestName
+TestOrder2.test4 = MyTestName
 
 
 class AllTests {
@@ -308,7 +308,7 @@ class AllTests {
     const mt = new MyTestNameExt()
     const { tests } = mt
 
-    deepEqual(Array.from(tests), ['baseTestExt', 'baseTest'])
+    deepEqual(Array.from(tests), ['baseTest', 'baseTestExt'])
     doesNotThrow(mt.baseTestExt)
   }
 
@@ -349,7 +349,7 @@ class AllTests {
     const mt = new MyTestNameIncludeExt()
     const { tests } = mt
 
-    deepEqual(Array.from(tests), ['IncludeExt', 'Include'])
+    deepEqual(Array.from(tests), ['Include', 'IncludeExt'])
     doesNotThrow(() => ok(new MyTestNameIncludeExt.IncludeExt() instanceof Test))
     doesNotThrow(() => ok(new MyTestNameIncludeExt.Include() instanceof Test))
     ok(MyTestNameIncludeExt.notTest instanceof Test)
@@ -641,7 +641,7 @@ class AllTests {
     const { tests } = mt
     const result = await Test.run(mt)
 
-    deepEqual(Array.from(tests), ['test2', 'test4', 'test5'])
+    deepEqual(Array.from(tests), ['test1', 'test3', 'test5'])
     equal(result.success, true)
   }
 

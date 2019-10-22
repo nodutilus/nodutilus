@@ -33,7 +33,8 @@
     "exclude": [
       "bin",
       "build",
-      "test/index.js"
+      "test/index.js",
+      "test/mem.js"
     ],
     "reporter": [
       "lcovonly"

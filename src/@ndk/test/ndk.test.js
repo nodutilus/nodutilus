@@ -31,6 +31,8 @@ function getOwnClassMethods(tests, proto) {
 
     if (isFunction && !isTestClass) {
       tests.add(name)
+    } else if (tests.has(name)) {
+      tests.delete(name)
     }
   })
 }
@@ -43,10 +45,10 @@ function getOwnClassMethods(tests, proto) {
 function getClassMethods(tests, proto) {
   const nestedProto = Reflect.getPrototypeOf(proto)
 
-  getOwnClassMethods(tests, proto)
   if (nestedProto instanceof Test) {
     getClassMethods(tests, nestedProto)
   }
+  getOwnClassMethods(tests, proto)
 }
 
 
@@ -67,6 +69,8 @@ function getOwnClassEvents(events, proto) {
 
     if (isEvent && isFunction) {
       events.set(event, value)
+    } else if (events.has(event)) {
+      events.delete(event)
     }
   })
 }
@@ -102,6 +106,8 @@ function getOwnNestedStaticTests(tests, constructor) {
 
     if (isTestClass) {
       tests.add(name)
+    } else if (tests.has(name)) {
+      tests.delete(name)
     }
   })
 }
@@ -114,42 +120,46 @@ function getOwnNestedStaticTests(tests, constructor) {
 function getNestedStaticTests(tests, constructor) {
   const constructorProto = Reflect.getPrototypeOf(constructor)
 
-  getOwnNestedStaticTests(tests, constructor)
   if (Object.isPrototypeOf.call(Test, constructorProto)) {
     getNestedStaticTests(tests, constructorProto)
   }
+  getOwnNestedStaticTests(tests, constructor)
 }
 
 
 /**
- * @param {Test} instance
- * @returns {Map<string, typeof Test>}
+ * @param {Set<string>} tests
+ * @param {Test} proto
+ * @returns {Set<string>}
  */
-function getNestedStaticTestsClasses(instance) {
-  /** @type {Map<string, typeof Test>} */
-  const tests = new Map()
-  /** @type {Set<string>} */
-  const classMethods = new Set()
-  let { __proto__, constructor } = instance
+function getOwnResolvedNestedStaticTests(tests, proto) {
+  getOwnNestedStaticTests(tests, proto.constructor)
 
-  while (__proto__ instanceof Test) {
-    /** @type {Set<string>} */
-    const curentStaticTests = new Set()
+  if (tests.size > 0) {
+    const ownPropertyNames = Object.getOwnPropertyNames(proto)
 
-    getOwnNestedStaticTests(curentStaticTests, constructor)
-    getOwnClassMethods(classMethods, __proto__)
-    if (curentStaticTests.size > 0) {
-      for (const staticTest of curentStaticTests) {
-        const notClassMethods = !classMethods.has(staticTest)
-        const notExists = !tests.has(staticTest)
-
-        if (notClassMethods && notExists) {
-          tests.set(staticTest, constructor[staticTest])
-        }
+    for (const ownPropertyName of ownPropertyNames) {
+      if (tests.has(ownPropertyName)) {
+        tests.delete(ownPropertyName)
       }
     }
-    ({ __proto__: { constructor } } = { __proto__ } = __proto__)
   }
+
+  return tests
+}
+
+/**
+ * @param {Set<string>} tests
+ * @param {Test} proto
+ * @returns {Set<string>}
+ */
+function getResolvedNestedStaticTests(tests, proto) {
+  const nestedProto = Reflect.getPrototypeOf(proto)
+
+  if (nestedProto instanceof Test) {
+    getResolvedNestedStaticTests(tests, nestedProto)
+  }
+  getOwnResolvedNestedStaticTests(tests, proto)
 
   return tests
 }
@@ -196,7 +206,7 @@ class TestResult {
       this.success = false
     }
     if (hasNested) {
-      /** @type {Map.<string, TestResult>} */
+      /** @type {Map<string, TestResult>} */
       this.tests = new Map()
     }
   }
@@ -229,7 +239,7 @@ async function __deepEventsWrapper({ testInstance, name, test, deepEvents }, fn)
     result = await fn()
 
     deepEventsWrapper.forEach(([event, wrapper]) => {
-      test.event.delete(event, wrapper)
+      test.event.off(event, wrapper)
     })
   } else {
     result = await fn()
@@ -270,11 +280,12 @@ class Test {
    */
   constructor() {
     const proto = Reflect.getPrototypeOf(this)
-    const tests = getNestedStaticTestsClasses(this)
+    const tests = getResolvedNestedStaticTests(new Set(), proto)
     const events = getClassEvents(new Map(), proto)
+    const { constructor } = this
 
-    for (const [name, TestClass] of tests) {
-      this[name] = new TestClass()
+    for (const name of tests) {
+      this[name] = new constructor[name]()
     }
     for (const [event, listener] of events) {
       this.event.on(event, listener.bind(this))
@@ -286,10 +297,11 @@ class Test {
    */
   get tests() {
     const tests = new Set()
-    const { __proto__, constructor } = this
+    const proto = Reflect.getPrototypeOf(this)
+    const { constructor } = this
 
-    if (__proto__ instanceof Test) {
-      getClassMethods(tests, __proto__)
+    if (proto instanceof Test) {
+      getClassMethods(tests, proto)
       getNestedStaticTests(tests, constructor)
     }
     getInstanceTests(tests, this)
@@ -389,3 +401,4 @@ Test.afterEachNested = baseEvents.afterEachNested
 
 exports.assert = assert
 exports.Test = Test
+exports.TestResult = TestResult

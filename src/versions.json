@@ -1,0 +1,14 @@
+{
+  "@ndk/fn": {
+    "version": "0.1.0",
+    "publish": true
+  },
+  "@ndk/fs": {
+    "version": "0.1.0",
+    "publish": true
+  },
+  "@ndk/test": {
+    "version": "0.1.0",
+    "publish": true
+  }
+}

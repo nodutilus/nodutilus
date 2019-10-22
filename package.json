@@ -1,5 +1,5 @@
 {
-  "repository": "github:nd-toolkit/ndk-source",
+  "repository": "github:nd-toolkit/nd-toolkit",
   "license": "Unlicense",
   "scripts": {
     "eslint": "eslint . --max-warnings 0",

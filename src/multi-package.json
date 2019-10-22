@@ -6,7 +6,7 @@
   "buildFolder": "build/@ndk",
   "template": {
     "homepage": "https://nd-toolkit.github.io",
-    "repository": "github:nd-toolkit/ndk-source",
+    "repository": "github:nd-toolkit/nd-toolkit",
     "license": "Unlicense"
   }
 }

@@ -130,8 +130,8 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     } catch (error) {
       result2 = error.message
     }
-    assert(result1, 'test2')
-    assert(result2, 'test2')
+    assert.equal(result1, 'test2')
+    assert.equal(result2, 'test2')
 
     try {
       await new Promise(() => this.test3())
@@ -143,27 +143,27 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     } catch (error) {
       result2 = error.message
     }
-    assert(result1, 'this.test3 is not a function')
-    assert(result2, 'this.test3 is not a function')
+    assert.equal(result1, 'this.test3 is not a function')
+    assert.equal(result2, 'this.test3 is not a function')
 
     result1 = await (new Promise(() => this.test4())).catch(reason => reason.message)
     result2 = await (new PromiseEventEmitter(() => this.test4())).catch(reason => reason.message)
-    assert(result1, 'this.test4 is not a function')
-    assert(result2, 'this.test4 is not a function')
+    assert.equal(result1, 'this.test4 is not a function')
+    assert.equal(result2, 'this.test4 is not a function')
 
     result1 = await (new Promise(() => this.test5()))
       .catch(reason => new Error(reason.message))
     result2 = await (new PromiseEventEmitter(() => this.test5()))
       .catch(reason => new Error(reason.message))
-    assert(result1.message, 'this.test5 is not a function')
-    assert(result2.message, 'this.test5 is not a function')
+    assert.equal(result1.message, 'this.test5 is not a function')
+    assert.equal(result2.message, 'this.test5 is not a function')
 
     result1 = await (new Promise(resolve => resolve('test6'))).finally(value => { result3 = value })
     result2 = await (new PromiseEventEmitter(emitter => emitter.resolve('test6'))).finally(value => { result4 = value })
-    assert(result1, 'test6')
-    assert(result2, 'test6')
-    assert(result3, undefined)
-    assert(result4, undefined)
+    assert.equal(result1, 'test6')
+    assert.equal(result2, 'test6')
+    assert.equal(result3, undefined)
+    assert.equal(result4, undefined)
 
     try {
       await (new Promise((resolve, reject) => reject(new Error('test7')))).finally(() => {})
@@ -175,8 +175,8 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     } catch (error) {
       result2 = error.message
     }
-    assert(result1, 'test7')
-    assert(result2, 'test7')
+    assert.equal(result1, 'test7')
+    assert.equal(result2, 'test7')
 
     try {
       await (new Promise((resolve, reject) => reject(new Error('test7')))).finally(() => { this.test8() })
@@ -188,8 +188,8 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     } catch (error) {
       result2 = error.message
     }
-    assert(result1, 'this.test8 is not a function')
-    assert(result2, 'this.test8 is not a function')
+    assert.equal(result1, 'this.test8 is not a function')
+    assert.equal(result2, 'this.test8 is not a function')
 
     result1 = await (new Promise(resolve => resolve('test9')).then(value => {
       return value + '_9'
@@ -197,8 +197,8 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
     result2 = await (new PromiseEventEmitter(emitter => emitter.resolve('test9')).then(value => {
       return value + '_9'
     }))
-    assert(result1, 'test9_9')
-    assert(result2, 'test9_9')
+    assert.equal(result1, 'test9_9')
+    assert.equal(result2, 'test9_9')
 
     result1 = await (new Promise(resolve => resolve('test10')).then(async value => {
       await new Promise(resolve => { setTimeout(resolve, 1) })
@@ -210,8 +210,8 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
 
       return value + '_10'
     }))
-    assert(result1, 'test10_10')
-    assert(result2, 'test10_10')
+    assert.equal(result1, 'test10_10')
+    assert.equal(result2, 'test10_10')
 
     result1 = await (new Promise(resolve => this.test11()).catch(async reason => {
       await new Promise(resolve => { setTimeout(resolve, 1) })
@@ -223,34 +223,34 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
 
       return reason.message + '_11'
     }))
-    assert(result1, 'this.test11 is not a function_11')
-    assert(result2, 'this.test11 is not a function_11')
+    assert.equal(result1, 'this.test11 is not a function_11')
+    assert.equal(result2, 'this.test11 is not a function_11')
 
     result1 = await new Promise(resolve => { resolve('test12') }).then().catch().then()
     result2 = await new PromiseEventEmitter(emitter => { emitter.resolve('test12') }).then().catch().then()
-    assert(result1, 'test12')
-    assert(result2, 'test12')
+    assert.equal(result1, 'test12')
+    assert.equal(result2, 'test12')
 
     result1 = await new Promise((resolve, reject) => { reject(new Error('test13')) })
       .then().catch(reason => reason.message)
     result2 = await new PromiseEventEmitter(emitter => { emitter.reject(new Error('test13')) })
       .then().catch(reason => reason.message)
-    assert(result1, 'test13')
-    assert(result2, 'test13')
+    assert.equal(result1, 'test13')
+    assert.equal(result2, 'test13')
 
     result1 = await new Promise((resolve, reject) => { reject(new Error('test14')) })
       .catch().catch(reason => reason.message)
     result2 = await new PromiseEventEmitter(emitter => { emitter.reject(new Error('test14')) })
       .catch().catch(reason => reason.message)
-    assert(result1, 'test14')
-    assert(result2, 'test14')
+    assert.equal(result1, 'test14')
+    assert.equal(result2, 'test14')
 
     result1 = await new Promise((resolve, reject) => { reject(new Error('test15')) })
       .catch(reason => { throw reason }).catch(reason => reason.message)
     result2 = await new PromiseEventEmitter(emitter => { emitter.reject(new Error('test15')) })
       .catch(reason => { throw reason }).catch(reason => reason.message)
-    assert(result1, 'test15')
-    assert(result2, 'test15')
+    assert.equal(result1, 'test15')
+    assert.equal(result2, 'test15')
 
     result1 = await new Promise((resolve, reject) => {
       reject(new Error('test16'))
@@ -260,8 +260,8 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
       emitter.reject(new Error('test16'))
       emitter.reject(new Error('test16_16'))
     }).catch(reason => { throw reason }).catch(reason => reason.message)
-    assert(result1, 'test16')
-    assert(result2, 'test16')
+    assert.equal(result1, 'test16')
+    assert.equal(result2, 'test16')
 
     result1 = await new Promise((resolve, reject) => {
       resolve('test17')
@@ -271,8 +271,8 @@ exports['@ndk/fn/events'] = class FnEventsTest extends Test {
       emitter.resolve('test17')
       emitter.resolve('test17_17')
     })
-    assert(result1, 'test17')
-    assert(result2, 'test17')
+    assert.equal(result1, 'test17')
+    assert.equal(result2, 'test17')
   }
 
   /** PEE создается наследованием из Promise, с добавлением emitter,

@@ -1,4 +1,4 @@
-# ND Toolkit Source Code [![Build][badge]][actions]
+# ND Toolkit - Source Code [![Build][badge]][actions]
 
 Исходники модулей [npmjs.com/org/nd-toolkit](https://www.npmjs.com/org/nd-toolkit)
 

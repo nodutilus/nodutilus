@@ -1,8 +1,8 @@
-/** @module @ndk/test */
+/** @module @nd-toolkit/test */
 'use strict'
 
 const { strict: assert } = require('assert')
-const { EventEmitter } = require('@ndk/fn/events')
+const { EventEmitter } = require('@nd-toolkit/fn/events')
 
 const baseEvents = {
   before: Symbol('Test#event:before'),

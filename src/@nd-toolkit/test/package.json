@@ -1,5 +1,5 @@
 {
-  "name": "@ndk/test",
+  "name": "@nd-toolkit/test",
   "description": "Тесты на классах. Агрегация, наследование, события",
   "keywords": [
     "test",
@@ -9,5 +9,5 @@
     "async-test",
     "test utils"
   ],
-  "main": "ndk.test.js"
+  "main": "nd-toolkit.test.js"
 }

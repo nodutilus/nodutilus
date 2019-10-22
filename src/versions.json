@@ -1,13 +1,13 @@
 {
-  "@ndk/fn": {
+  "@nd-toolkit/fn": {
     "version": "0.1.0",
     "publish": true
   },
-  "@ndk/fs": {
+  "@nd-toolkit/fs": {
     "version": "0.1.0",
     "publish": true
   },
-  "@ndk/test": {
+  "@nd-toolkit/test": {
     "version": "0.1.0",
     "publish": true
   }

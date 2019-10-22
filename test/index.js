@@ -1,7 +1,7 @@
 'use strict'
 
 const { preparation } = require('./preparation.js')
-const { Test } = require('@ndk/test')
+const { Test } = require('@nd-toolkit/test')
 
 
 class AllTests extends Test {

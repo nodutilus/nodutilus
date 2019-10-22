@@ -1,16 +1,16 @@
 {
-  "repository": "github:nd-toolkit/ndk-source",
+  "repository": "github:nd-toolkit/nd-toolkit",
   "license": "Unlicense",
   "scripts": {
     "eslint": "eslint . --max-warnings 0",
     "eslintcc": "eslintcc . --greater-than C --show-rules",
-    "link-for-test": "node bin/link-node-module src/@ndk test src/@ndk src",
-    "link-for-test-real": "ndk-ci-cd link-for-test src/@ndk test src/@ndk src",
+    "link-for-test": "node bin/link-node-module src/@nd-toolkit test src/@nd-toolkit src",
+    "link-for-test-real": "nd-toolkit-ci-cd link-for-test src/@nd-toolkit test src/@nd-toolkit src",
     "test": "node test",
     "coverage": "(nyc node test || node test) && (nyc check-coverage || nyc report -r=text && nyc check-coverage)",
     "coverage-html": "nyc -r=html node test",
     "build": "node bin/build-multi-package src/multi-package.json",
-    "build-real": "ndk-ci-cd build-multi-package multi-package.json"
+    "build-real": "nd-toolkit-ci-cd build-multi-package multi-package.json"
   },
   "dependencies": {
     "@nd-toolkit/ci-cd": "latest",

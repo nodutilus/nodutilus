@@ -1,4 +1,4 @@
-/** @module  @ndk/fn/events */
+/** @module  @nd-toolkit/fn/events */
 'use strict'
 
 /** @typedef {any} Event */

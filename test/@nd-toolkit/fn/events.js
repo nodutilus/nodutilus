@@ -1,10 +1,10 @@
 'use strict'
 
-const { Test, assert } = require('@ndk/test')
-const { EventEmitter, PromiseEventEmitter } = require('@ndk/fn/events')
+const { Test, assert } = require('@nd-toolkit/test')
+const { EventEmitter, PromiseEventEmitter } = require('@nd-toolkit/fn/events')
 
 
-exports['@ndk/fn/events'] = class FnEventsTest extends Test {
+exports['@nd-toolkit/fn/events'] = class FnEventsTest extends Test {
 
   /** Попытка удаление события до подписки не должна падать */
   ['EventEmitter - удаление события до подписки']() {

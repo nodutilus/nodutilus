@@ -1,5 +1,5 @@
 {
-  "name": "@ndk/fn",
+  "name": "@nd-toolkit/fn",
   "description": "Вспомогательные функции, обобщенные алгоритмы и методики",
   "keywords": [
     "helpers",
@@ -9,5 +9,5 @@
     "promises",
     "events"
   ],
-  "main": "ndk.fn.js"
+  "main": "nd-toolkit.fn.js"
 }

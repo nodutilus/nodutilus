@@ -1,4 +1,4 @@
-# nodutilus - Source Code [![Build][badge]][actions]
+# nodutilus [![Build][badge]][actions]
 
 Исходники модулей:
 - [npmjs.com/org/nodutilus](https://www.npmjs.com/org/nodutilus)

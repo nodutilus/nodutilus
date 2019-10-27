@@ -1,8 +1,8 @@
 'use strict'
 
-const { Test, TestResult, assert } = require('@nd-toolkit/test')
+const { Test, TestResult, assert } = require('@nodutilus/test')
 
-exports['@nd-toolkit/test'] = class TestTest extends Test {
+exports['@nodutilus/test'] = class TestTest extends Test {
 
   /** Тесты можно расширять через наследование классов */
   async ['Test - наследование тестов']() {

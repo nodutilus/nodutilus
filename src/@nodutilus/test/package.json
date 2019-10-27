@@ -1,5 +1,5 @@
 {
-  "name": "@nd-toolkit/test",
+  "name": "@nodutilus/test",
   "description": "Тесты на классах. Агрегация, наследование, события",
   "keywords": [
     "test",
@@ -9,5 +9,5 @@
     "async-test",
     "test utils"
   ],
-  "main": "nd-toolkit.test.js"
+  "main": "nodutilus.test.js"
 }

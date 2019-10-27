@@ -1,12 +1,12 @@
 {
-  "packages": "src/@nd-toolkit",
+  "packages": "src/@nodutilus",
   "versions": "src/versions.json",
   "crossDependencies": "src/cross-dependencies.json",
   "licenseFile": "LICENSE",
-  "buildFolder": "build/@nd-toolkit",
+  "buildFolder": "build/@nodutilus",
   "template": {
-    "homepage": "https://nd-toolkit.github.io",
-    "repository": "github:nd-toolkit/nd-toolkit",
+    "homepage": "https://nodutilus.github.io",
+    "repository": "github:nodutilus/nodutilus",
     "license": "Unlicense"
   }
 }

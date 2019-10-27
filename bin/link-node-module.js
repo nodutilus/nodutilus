@@ -1,6 +1,6 @@
 'use strict'
 
-const { symlink, constants: { SYMLINK_RMNONEXISTENT } } = require('../src/@nd-toolkit/fs')
+const { symlink, constants: { SYMLINK_RMNONEXISTENT } } = require('../src/@nodutilus/fs')
 const { basename } = require('path')
 
 /**

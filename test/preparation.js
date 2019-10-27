@@ -1,6 +1,6 @@
 'use strict'
 
-const { Test, assert } = require('@nd-toolkit/test')
+const { Test, assert } = require('@nodutilus/test')
 
 const { ok, equal, deepEqual, throws, doesNotThrow } = assert
 

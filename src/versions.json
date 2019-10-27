@@ -1,13 +1,13 @@
 {
-  "@nd-toolkit/fn": {
+  "@nodutilus/fn": {
     "version": "0.1.0",
     "publish": true
   },
-  "@nd-toolkit/fs": {
+  "@nodutilus/fs": {
     "version": "0.1.0",
     "publish": true
   },
-  "@nd-toolkit/test": {
+  "@nodutilus/test": {
     "version": "0.1.0",
     "publish": true
   }

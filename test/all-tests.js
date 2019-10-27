@@ -1,7 +1,7 @@
 'use strict'
 
 Object.assign(exports,
-  require('./@nd-toolkit/fn'),
-  require('./@nd-toolkit/fs'),
-  require('./@nd-toolkit/test')
+  require('./@nodutilus/fn'),
+  require('./@nodutilus/fs'),
+  require('./@nodutilus/test')
 )

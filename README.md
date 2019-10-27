@@ -1,9 +1,9 @@
-# ND Toolkit - Source Code [![Build][badge]][actions]
+# nodutilus - Source Code [![Build][badge]][actions]
 
 Исходники модулей:
-- [npmjs.com/org/nd-toolkit](https://www.npmjs.com/org/nd-toolkit)
-- [github.com/orgs/nd-toolkit/packages](https://github.com/orgs/nd-toolkit/packages)
+- [npmjs.com/org/nodutilus](https://www.npmjs.com/org/nodutilus)
+- [github.com/orgs/nodutilus/packages](https://github.com/orgs/nodutilus/packages)
 
-[badge]: https://github.com/nd-toolkit/nd-toolkit/workflows/Checks%20%26%20Tests/badge.svg
+[badge]: https://github.com/nodutilus/nodutilus/workflows/Checks%20%26%20Tests/badge.svg
 
-[actions]: https://github.com/nd-toolkit/nd-toolkit/actions
+[actions]: https://github.com/nodutilus/nodutilus/actions

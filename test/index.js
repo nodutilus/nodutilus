@@ -1,7 +1,7 @@
 'use strict'
 
 const { preparation } = require('./preparation.js')
-const { Test } = require('@nd-toolkit/test')
+const { Test } = require('@nodutilus/test')
 
 
 class AllTests extends Test {

@@ -1,20 +1,18 @@
 {
-  "repository": "github:nd-toolkit/nd-toolkit",
+  "repository": "github:nodutilus/nodutilus",
   "license": "Unlicense",
   "scripts": {
-    "eslint": "eslint . --max-warnings 0",
-    "eslintcc": "eslintcc . --greater-than C --show-rules",
-    "link-for-test": "node bin/link-node-module src/@nd-toolkit test src/@nd-toolkit src",
-    "link-for-test-real": "nd-toolkit-ci-cd link-for-test src/@nd-toolkit test src/@nd-toolkit src",
+    "link-for-test": "node bin/link-node-module src/@nodutilus test src/@nodutilus src",
+    "link-for-test-real": "nodutilus-ci-cd link-for-test src/@nodutilus test src/@nodutilus src",
     "test": "node test",
     "coverage": "(nyc node test || node test) && (nyc check-coverage || nyc report -r=text && nyc check-coverage)",
     "coverage-html": "nyc -r=html node test",
     "build": "node bin/build-multi-package src/multi-package.json",
-    "build-real": "nd-toolkit-ci-cd build-multi-package multi-package.json"
+    "build-real": "nodutilus-ci-cd build-multi-package multi-package.json"
   },
   "dependencies": {
-    "@nd-toolkit/ci-cd": "latest",
-    "@nd-toolkit/eslint-config": "latest",
+    "@nodutilus/ci-cd": "latest",
+    "@nodutilus/eslint-config": "latest",
     "eslint": "latest",
     "eslintcc": "latest",
     "nyc": "latest"

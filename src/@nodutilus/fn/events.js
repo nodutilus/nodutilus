@@ -1,4 +1,4 @@
-/** @module  @nd-toolkit/fn/events */
+/** @module  @nodutilus/fn/events */
 'use strict'
 
 /** @typedef {any} Event */

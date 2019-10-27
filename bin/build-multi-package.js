@@ -1,6 +1,6 @@
 'use strict'
 
-const { readJSON, writeJSON, copy, constants: { COPY_RMNONEXISTENT } } = require('../src/@nd-toolkit/fs')
+const { readJSON, writeJSON, copy, constants: { COPY_RMNONEXISTENT } } = require('../src/@nodutilus/fs')
 const { readdir } = require('fs').promises
 
 /**

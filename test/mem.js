@@ -58,7 +58,7 @@ async function simulationActivity() {
 
 
 async function testEventEmitter() {
-  const { EventEmitter } = require('@nd-toolkit/fn/events')
+  const { EventEmitter } = require('@nodutilus/fn/events')
 
   for (let i = 0; i < 1000; i++) {
     const em = new EventEmitter()
@@ -72,7 +72,7 @@ async function testEventEmitter() {
 
 
 async function testPromiseEventEmitter() {
-  const { PromiseEventEmitter } = require('@nd-toolkit/fn/events')
+  const { PromiseEventEmitter } = require('@nodutilus/fn/events')
 
 
   for (let i = 0; i < 1000; i++) {
@@ -92,7 +92,7 @@ async function testPromiseEventEmitter() {
 
 
 async function testAllTests() {
-  const { Test } = require('@nd-toolkit/test')
+  const { Test } = require('@nodutilus/test')
 
   for (let i = 0; i < 10; i++) {
     class AllTests extends Test {}
@@ -100,7 +100,7 @@ async function testAllTests() {
     Object.assign(AllTests, require('./all-tests'))
 
     // Не будем жечь диск для тестов на память
-    AllTests['@nd-toolkit/fs'] = null
+    AllTests['@nodutilus/fs'] = null
 
     await Test.run(new AllTests())
   }

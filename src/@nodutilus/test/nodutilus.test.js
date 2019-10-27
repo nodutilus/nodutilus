@@ -1,8 +1,8 @@
-/** @module @nd-toolkit/test */
+/** @module @nodutilus/test */
 'use strict'
 
 const { strict: assert } = require('assert')
-const { EventEmitter } = require('@nd-toolkit/fn/events')
+const { EventEmitter } = require('@nodutilus/fn/events')
 
 const baseEvents = {
   before: Symbol('Test#event:before'),

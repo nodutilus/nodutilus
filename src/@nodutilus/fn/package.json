@@ -1,5 +1,5 @@
 {
-  "name": "@nd-toolkit/fn",
+  "name": "@nodutilus/fn",
   "description": "Вспомогательные функции, обобщенные алгоритмы и методики",
   "keywords": [
     "helpers",
@@ -9,5 +9,5 @@
     "promises",
     "events"
   ],
-  "main": "nd-toolkit.fn.js"
+  "main": "nodutilus.fn.js"
 }

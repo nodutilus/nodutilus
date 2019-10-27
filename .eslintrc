@@ -1,5 +1,5 @@
 {
-  "extends": "@nd-toolkit",
+  "extends": "@nodutilus",
   "overrides": [{
     "files": ["test/*"],
     "rules": {

@@ -1,8 +1,8 @@
-/** @module @nd-toolkit/fn */
+/** @module @nodutilus/fn */
 'use strict'
 
 /**
  * @name events
- * @module @nd-toolkit/fn/events
+ * @module @nodutilus/fn/events
  */
 exports.events = require('./events')

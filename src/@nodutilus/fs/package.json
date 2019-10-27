@@ -1,5 +1,5 @@
 {
-  "name": "@nd-toolkit/fs",
+  "name": "@nodutilus/fs",
   "description": "Методы для работы с файлами, которых нет в стандартной библиотеке fs",
   "keywords": [
     "fs",
@@ -7,5 +7,5 @@
     "directories",
     "filesystem"
   ],
-  "main": "nd-toolkit.fs.js"
+  "main": "nodutilus.fs.js"
 }

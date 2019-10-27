@@ -26,8 +26,10 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-      - run: npx eslint . --max-warnings 0
-      - run: npx eslintcc . --greater-than C --show-rules
+      - name: ESLint checks
+        run: npx eslint . --max-warnings 0
+      - name: ESLintCC checks
+        run: npx eslintcc . --greater-than C --show-rules
 
   tests:
     name: Test, node ${{ matrix.node }}, ${{ matrix.os }}

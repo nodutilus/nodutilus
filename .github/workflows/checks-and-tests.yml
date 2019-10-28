@@ -82,9 +82,34 @@ jobs:
       - name: Run Coverage
         run: npm run coverage
 
+  # Для PR только собираем модули
   build:
+    name: Build
+    needs: [checks, tests, coverage]
+    if: github.event_name != 'push'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+        with:
+          node-version: "12"
+          registry-url: "https://npm.pkg.github.com"
+
+      - name: Install dependencies
+        run: npm install
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Build packages
+        run: npm run build-multi-package
+
+  # Для изменений в мастере - публикуем
+  build-and-publish:
     name: Build & Publish
     needs: [checks, tests, coverage]
+    if: github.event_name == 'push'
 
     runs-on: ubuntu-latest
 

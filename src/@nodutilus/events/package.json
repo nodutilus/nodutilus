@@ -1,0 +1,12 @@
+{
+  "name": "@nodutilus/events",
+  "description": "EventEmitter с поддержкой асинхронных событий и Promise",
+  "keywords": [
+    "events",
+    "async",
+    "promise",
+    "EventEmitter",
+    "PromiseEventEmitter"
+  ],
+  "main": "nodutilus.events.js"
+}

@@ -1,3 +1,3 @@
 {
-  "@nodutilus/test": ["@nodutilus/fn"]
+  "@nodutilus/test": ["@nodutilus/events"]
 }

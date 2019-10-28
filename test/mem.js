@@ -58,7 +58,7 @@ async function simulationActivity() {
 
 
 async function testEventEmitter() {
-  const { EventEmitter } = require('@nodutilus/fn/events')
+  const { EventEmitter } = require('@nodutilus/events')
 
   for (let i = 0; i < 1000; i++) {
     const em = new EventEmitter()
@@ -72,7 +72,7 @@ async function testEventEmitter() {
 
 
 async function testPromiseEventEmitter() {
-  const { PromiseEventEmitter } = require('@nodutilus/fn/events')
+  const { PromiseEventEmitter } = require('@nodutilus/events')
 
 
   for (let i = 0; i < 1000; i++) {

@@ -1,4 +1,4 @@
-/** @module  @nodutilus/fn/events */
+/** @module  @nodutilus/events */
 'use strict'
 
 /** @typedef {any} Event */

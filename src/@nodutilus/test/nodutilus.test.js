@@ -2,7 +2,7 @@
 'use strict'
 
 const { strict: assert } = require('assert')
-const { EventEmitter } = require('@nodutilus/fn/events')
+const { EventEmitter } = require('@nodutilus/events')
 
 const baseEvents = {
   before: Symbol('Test#event:before'),

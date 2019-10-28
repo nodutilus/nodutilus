@@ -42,7 +42,7 @@ class MultiPackageBuilder {
         curVersion = execSync(`npm view ${packageJSON.name} version`, {
           encoding: 'utf-8',
           stdio: ['ignore', 'pipe', 'pipe']
-        })
+        }).trim()
       } catch (error) {
         if (!(/npm ERR! code E404/).test(error.stderr)) {
           throw error
@@ -54,6 +54,8 @@ class MultiPackageBuilder {
           encoding: 'utf-8',
           stdio: ['inherit', 'inherit', 'inherit']
         })
+      } else {
+        console.log(`📦  ${packageJSON.name}@${curVersion}`)
       }
     }
   }

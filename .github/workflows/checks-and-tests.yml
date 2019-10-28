@@ -83,7 +83,7 @@ jobs:
         run: npm run coverage
 
   build:
-    name: Build
+    name: Build & Publish
     needs: [checks, tests, coverage]
 
     runs-on: ubuntu-latest
@@ -105,3 +105,5 @@ jobs:
 
       - name: Publish packages
         run: npm run publish-multi-package
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

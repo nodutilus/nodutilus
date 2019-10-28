@@ -62,7 +62,7 @@ jobs:
 
   coverage:
     name: Check Coverage
-    needs: tests
+    needs: checks
 
     runs-on: ubuntu-latest
 

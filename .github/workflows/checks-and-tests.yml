@@ -100,4 +100,8 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-      - run: npm run build
+      - name: Build packages
+        run: npm run build-multi-package
+
+      - name: Publish packages
+        run: npm run publish-multi-package

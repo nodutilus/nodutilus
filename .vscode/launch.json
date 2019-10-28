@@ -18,5 +18,13 @@
     "args": [
       "src/multi-package.json"
     ]
+  }, {
+    "type": "node",
+    "request": "launch",
+    "name": "Publish",
+    "program": "${workspaceFolder}/bin/publish-multi-package.js",
+    "args": [
+      "src/multi-package.json"
+    ]
   }]
 }

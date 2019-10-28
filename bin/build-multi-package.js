@@ -182,8 +182,6 @@ async function buildMultiPackage(configFile) {
 
   await builder.loadMetadata(configFile)
   await builder.build()
-
-  console.log('buildMultiPackage:', builder)
 }
 
 

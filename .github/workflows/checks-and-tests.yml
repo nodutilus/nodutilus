@@ -128,7 +128,15 @@ jobs:
       - name: Build packages
         run: npm run build-multi-package
 
-      - name: Publish packages
+      - name: Publish packages (GPR)
         run: npm run publish-multi-package
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - uses: actions/setup-node@master
+        with:
+          registry-url: "https://registry.npmjs.org"
+      - name: Publish packages (NPM)
+        run: npm run publish-multi-package
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPMJS_TOKEN}}

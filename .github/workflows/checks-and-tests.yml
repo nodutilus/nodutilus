@@ -136,6 +136,7 @@ jobs:
       - uses: actions/setup-node@master
         with:
           registry-url: "https://registry.npmjs.org"
+          scope: "@nodutilus"
       - name: Publish packages (NPM)
         run: npm run publish-multi-package
         env:

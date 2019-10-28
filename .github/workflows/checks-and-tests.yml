@@ -33,7 +33,6 @@ jobs:
 
   tests:
     name: Test, node ${{ matrix.node }}, ${{ matrix.os }}
-    needs: checks
 
     strategy:
       matrix:
@@ -62,7 +61,6 @@ jobs:
 
   coverage:
     name: Check Coverage
-    needs: checks
 
     runs-on: ubuntu-latest
 
@@ -86,7 +84,7 @@ jobs:
 
   build:
     name: Build
-    needs: coverage
+    needs: [checks, tests, coverage]
 
     runs-on: ubuntu-latest
 

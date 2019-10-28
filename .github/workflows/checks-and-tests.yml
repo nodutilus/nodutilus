@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
-          node-version: ">=12.10"
+          node-version: "12"
           registry-url: "https://npm.pkg.github.com"
 
       - name: Install dependencies
@@ -37,7 +37,7 @@ jobs:
 
     strategy:
       matrix:
-        node: [">=12.10"]
+        node: ["12"]
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
     runs-on: ${{ matrix.os }}
@@ -70,7 +70,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
-          node-version: ">=12.10"
+          node-version: "12"
           registry-url: "https://npm.pkg.github.com"
 
       - name: Install dependencies
@@ -94,7 +94,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
-          node-version: ">=12.10"
+          node-version: "12"
           registry-url: "https://npm.pkg.github.com"
 
       - name: Install dependencies

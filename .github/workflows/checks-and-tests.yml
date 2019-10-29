@@ -79,7 +79,7 @@ jobs:
       - name: Prepare Tests
         run: npm run link-for-test
 
-      - name: Run Coverage
+      - name: Check Coverage
         run: npm run coverage
 
   # Для PR только собираем модули

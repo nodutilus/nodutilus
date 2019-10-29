@@ -14,6 +14,7 @@ const { readdir } = require('fs').promises
  * @property {string} license
  * @property {string} main
  * @property {Object<string, string>} dependencies
+ * @property {Object<string, string>} publishConfig
  */
 /**
  * @class PackageJSON
@@ -42,6 +43,8 @@ class PackageJSON {
     this.main = null
     /** @name PackageJSON#dependencies @type {Object<string, string>} */
     this.dependencies = {}
+    /** @name PackageJSON#publishConfig @type {Object<string, string>} */
+    this.publishConfig = {}
     Object.assign(this, source)
   }
 

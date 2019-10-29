@@ -7,6 +7,9 @@
   "template": {
     "homepage": "https://nodutilus.github.io",
     "repository": "github:nodutilus/nodutilus",
-    "license": "Unlicense"
+    "license": "Unlicense",
+    "publishConfig": {
+      "access": "public"
+    }
   }
 }

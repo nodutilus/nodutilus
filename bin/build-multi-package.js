@@ -162,7 +162,9 @@ class MultiPackageBuilder {
     const { name, dependencies } = packageJSON
     const crossDependencies = this.crossDependencies[name]
 
-    packageJSON.version = this.versions[name].version
+    if (name in this.versions) {
+      packageJSON.version = this.versions[name].version
+    }
 
     if (crossDependencies) {
       for (const crossDependencie of crossDependencies) {

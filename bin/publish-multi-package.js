@@ -49,13 +49,13 @@ class MultiPackageBuilder {
         }
       }
 
-      if (newVersion !== curVersion) {
+      if (newVersion && newVersion !== curVersion) {
         execSync(`npm publish ${path}`, {
           encoding: 'utf-8',
           stdio: ['inherit', 'inherit', 'inherit']
         })
       } else {
-        console.log(`📦  ${packageJSON.name}@${curVersion}`)
+        console.log(`📦  ${packageJSON.name}@${curVersion}${newVersion ? '' : ' (ignore)'}`)
       }
     }
   }

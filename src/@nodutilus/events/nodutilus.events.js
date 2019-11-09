@@ -55,6 +55,15 @@ class EventEmitter {
   async emit(event, ...args) {
     const listeners = privateEventsMap.get(this).get(event)
 
+    if (Object.isPrototypeOf.call(EventEmitter, this.constructor)) {
+      const isMethod = typeof this[event] === 'function'
+      const isNotOwn = !Reflect.has(EventEmitter.prototype, event)
+
+      if (isMethod && isNotOwn) {
+        await this[event](...args)
+      }
+    }
+
     if (listeners) {
       for (const listener of listeners) {
         await listener(...args)
@@ -246,6 +255,8 @@ class PromiseEventEmitter extends Promise {
    * @returns {Promise<void>}
    */
   emit(event, ...args) {
+    const self = this
+
     return new Promise((resolve, reject) => {
       process.nextTick(() => {
         const emitter = privatePromiseEventEmittersMap.get(this)
@@ -253,7 +264,17 @@ class PromiseEventEmitter extends Promise {
         if (privatePromiseEventEmittersReason.has(emitter)) {
           reject(privatePromiseEventEmittersReason.get(emitter))
         } else {
-          emitter.emit(event, ...args).then(resolve, reject)
+          (async () => {
+            if (Object.isPrototypeOf.call(PromiseEventEmitter, this.constructor)) {
+              const isMethod = typeof self[event] === 'function'
+              const isNotOwn = !Reflect.has(PromiseEventEmitter.prototype, event)
+
+              if (isMethod && isNotOwn) {
+                await self[event](...args)
+              }
+            }
+            await emitter.emit(event, ...args)
+          })().then(resolve, reject)
         }
       })
     })

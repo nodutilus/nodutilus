@@ -48,27 +48,44 @@ class EventEmitter {
   }
 
   /**
+   * @param {EventEmitter} instance
    * @param {Event} event
    * @param  {...any} args
    * @returns {Promise<void>}
    */
-  async emit(event, ...args) {
-    const listeners = privateEventsMap.get(this).get(event)
+  static async emitForClassMethod(instance, event, ...args) {
+    const isMethod = typeof instance[event] === 'function'
+    const isNotOwn = !Reflect.has(this.prototype, event)
 
-    if (Object.isPrototypeOf.call(EventEmitter, this.constructor)) {
-      const isMethod = typeof this[event] === 'function'
-      const isNotOwn = !Reflect.has(EventEmitter.prototype, event)
-
-      if (isMethod && isNotOwn) {
-        await this[event](...args)
-      }
+    if (isMethod && isNotOwn) {
+      await instance[event](...args)
     }
+  }
+
+  /**
+   * @param {EventEmitter} instance
+   * @param {Event} event
+   * @param  {...any} args
+   * @returns {Promise<void>}
+   */
+  static async emitForBasicListeners(instance, event, ...args) {
+    const listeners = privateEventsMap.get(instance).get(event)
 
     if (listeners) {
       for (const listener of listeners) {
         await listener(...args)
       }
     }
+  }
+
+  /**
+   * @param {Event} event
+   * @param  {...any} args
+   * @returns {Promise<void>|void}
+   */
+  async emit(event, ...args) {
+    await EventEmitter.emitForClassMethod(this, event, ...args)
+    await EventEmitter.emitForBasicListeners(this, event, ...args)
   }
 
   /**
@@ -250,6 +267,14 @@ class PromiseEventEmitter extends Promise {
   }
 
   /**
+   * @param  {...any} args
+   * @returns {Promise<void>}
+   */
+  static async emitForClassMethod(...args) {
+    await EventEmitter.emitForClassMethod.apply(PromiseEventEmitter, args)
+  }
+
+  /**
    * @param {Event} event
    * @param  {...any} args
    * @returns {Promise<void>}
@@ -265,15 +290,8 @@ class PromiseEventEmitter extends Promise {
           reject(privatePromiseEventEmittersReason.get(emitter))
         } else {
           (async () => {
-            if (Object.isPrototypeOf.call(PromiseEventEmitter, this.constructor)) {
-              const isMethod = typeof self[event] === 'function'
-              const isNotOwn = !Reflect.has(PromiseEventEmitter.prototype, event)
-
-              if (isMethod && isNotOwn) {
-                await self[event](...args)
-              }
-            }
-            await emitter.emit(event, ...args)
+            await PromiseEventEmitter.emitForClassMethod(self, event, ...args)
+            await EventEmitter.emitForBasicListeners(emitter, event, ...args)
           })().then(resolve, reject)
         }
       })

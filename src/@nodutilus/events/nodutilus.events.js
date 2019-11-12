@@ -81,7 +81,7 @@ class EventEmitter {
   /**
    * @param {Event} event
    * @param  {...any} args
-   * @returns {Promise<void>|void}
+   * @returns {Promise<void>}
    */
   async emit(event, ...args) {
     await EventEmitter.emitForClassMethod(this, event, ...args)

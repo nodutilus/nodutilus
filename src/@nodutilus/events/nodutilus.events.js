@@ -48,18 +48,44 @@ class EventEmitter {
   }
 
   /**
+   * @param {EventEmitter} instance
    * @param {Event} event
    * @param  {...any} args
    * @returns {Promise<void>}
    */
-  async emit(event, ...args) {
-    const listeners = privateEventsMap.get(this).get(event)
+  static async emitForClassMethod(instance, event, ...args) {
+    const isMethod = typeof instance[event] === 'function'
+    const isNotOwn = !Reflect.has(this.prototype, event)
+
+    if (isMethod && isNotOwn) {
+      await instance[event](...args)
+    }
+  }
+
+  /**
+   * @param {EventEmitter} instance
+   * @param {Event} event
+   * @param  {...any} args
+   * @returns {Promise<void>}
+   */
+  static async emitForBasicListeners(instance, event, ...args) {
+    const listeners = privateEventsMap.get(instance).get(event)
 
     if (listeners) {
       for (const listener of listeners) {
         await listener(...args)
       }
     }
+  }
+
+  /**
+   * @param {Event} event
+   * @param  {...any} args
+   * @returns {Promise<void>}
+   */
+  async emit(event, ...args) {
+    await EventEmitter.emitForClassMethod(this, event, ...args)
+    await EventEmitter.emitForBasicListeners(this, event, ...args)
   }
 
   /**
@@ -241,11 +267,21 @@ class PromiseEventEmitter extends Promise {
   }
 
   /**
+   * @param  {...any} args
+   * @returns {Promise<void>}
+   */
+  static async emitForClassMethod(...args) {
+    await EventEmitter.emitForClassMethod.apply(PromiseEventEmitter, args)
+  }
+
+  /**
    * @param {Event} event
    * @param  {...any} args
    * @returns {Promise<void>}
    */
   emit(event, ...args) {
+    const self = this
+
     return new Promise((resolve, reject) => {
       process.nextTick(() => {
         const emitter = privatePromiseEventEmittersMap.get(this)
@@ -253,7 +289,10 @@ class PromiseEventEmitter extends Promise {
         if (privatePromiseEventEmittersReason.has(emitter)) {
           reject(privatePromiseEventEmittersReason.get(emitter))
         } else {
-          emitter.emit(event, ...args).then(resolve, reject)
+          (async () => {
+            await PromiseEventEmitter.emitForClassMethod(self, event, ...args)
+            await EventEmitter.emitForBasicListeners(emitter, event, ...args)
+          })().then(resolve, reject)
         }
       })
     })

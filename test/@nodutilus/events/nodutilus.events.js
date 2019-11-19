@@ -3,6 +3,8 @@
 const { Test, assert } = require('@nodutilus/test')
 const { EventEmitter, PromiseEventEmitter } = require('@nodutilus/events')
 
+const testClassMethodAsEvents = Symbol('testClassMethodAsEvents')
+
 
 exports['@nodutilus/events'] = class EventsTest extends Test {
 
@@ -58,7 +60,11 @@ exports['@nodutilus/events'] = class EventsTest extends Test {
   async ['EventEmitter - once']() {
     const em = new EventEmitter()
     const p = new Promise(resolve => setTimeout(() => {
-      em.emit('test', 1, 12)
+      em.emit('test', 1, 12).then(() => {
+        setTimeout(() => {
+          resolve(2)
+        }, 1)
+      })
       setTimeout(() => {
         resolve(2)
       }, 1)
@@ -78,34 +84,121 @@ exports['@nodutilus/events'] = class EventsTest extends Test {
     let result = 0
     const em = new EventEmitter()
     const p = new Promise(resolve => setTimeout(() => {
-      em.emit('test', 1)
-      setTimeout(() => {
-        resolve(2)
-      }, 1)
+      em.emit('test', 1).then(() => {
+        assert.equal(result, 2)
+        setTimeout(() => {
+          resolve(2)
+        }, 1)
+      })
     }, 1))
 
     assert.equal(em.count, 0)
     em.on('test', value => {
       result += value
     })
+    em.on('test', value => {
+      result += value
+    })
     assert.equal(em.count, 1)
-    assert.equal(em.listenerCount('test'), 1)
+    assert.equal(em.listenerCount('test'), 2)
 
     const result1P = em.once('test')
 
     assert.equal(em.count, 1)
-    assert.equal(em.listenerCount('test'), 2)
+    assert.equal(em.listenerCount('test'), 3)
 
     const [result1] = await result1P
     const result2 = await p
 
-    assert.equal(em.listenerCount('test'), 1)
+    assert.equal(em.listenerCount('test'), 2)
     assert.equal(result1, 1)
     assert.equal(result2, 2)
     assert(em.has('test'))
-    assert.equal(result, 1)
-    em.emit('test', 1)
     assert.equal(result, 2)
+    await em.emit('test', 1)
+    assert.equal(result, 4)
+  }
+
+  /**
+   * Методы класса наследника можно использовать как события
+   *
+   * @param {typeof EventEmitter} cls Класс, для которого проверяем: EventEmitter, PromiseEventEmitter
+   */
+  async [testClassMethodAsEvents](cls) {
+    const event = Symbol('test:event')
+    let result = 0
+    let secondResult = 0
+    let counter = 0
+    let checkThis = null
+
+    class MyEM extends cls {
+
+      /**
+       * Используется как обработчик события
+       *
+       * @param {number} val
+       */
+      async testEvent(val) {
+        await new Promise(resolve => {
+          result = val
+          resolve()
+        })
+        checkThis = this
+      }
+
+      /**
+       * Событие может быть задано символом
+       *
+       * @param {number} val
+       */
+      [event](val) {
+        result = val
+      }
+
+      /**
+       * Для проверки запрета вызова служебных методов как событий переопределим emit
+       *
+       * @param {...any} args
+       * @returns {Promise<void>}
+       */
+      async emit(...args) {
+        await super.emit(...args)
+        counter++
+      }
+
+    }
+
+    const myEM = new MyEM()
+
+    // Событие можно объявить в классе, и повторно подписаться на него позже
+    myEM.on(event, val => {
+      secondResult = val + 1
+    })
+
+    await myEM.emit('testEvent', 1)
+    await myEM.emit('emit')
+
+    assert.equal(result, 1)
+    assert.equal(counter, 2)
+    assert.equal(checkThis, myEM)
+
+    await myEM.emit(event, 3)
+
+    assert.equal(result, 3)
+    assert.equal(secondResult, 4)
+
+    const myEMBase = new EventEmitter()
+    let result2 = 0
+
+    myEMBase.test = () => { result2 = 1 }
+    await myEMBase.emit('test')
+
+    assert.equal(result2, 1)
+  }
+
+  /** Методы как события для EventEmitter */
+  async ['EventEmitter - methods as events']() {
+    await this[testClassMethodAsEvents](EventEmitter)
   }
 
   /** PEE должен соответствовать поведению Promise */
@@ -645,7 +738,7 @@ exports['@nodutilus/events'] = class EventsTest extends Test {
     const result1 = await pem.once('result1')
 
     // Отправляем доп. данные подзадаче
-    pem.emit('result2', result1[0] + 1)
+    await pem.emit('result2', result1[0] + 1)
 
     // Ожидаем завершения подзадачи
     const result3 = await pem
@@ -677,6 +770,11 @@ exports['@nodutilus/events'] = class EventsTest extends Test {
     const result = await pem
 
     assert.deepEqual(result, 'redy')
+  }
+
+  /** Методы как события для PromiseEventEmitter */
+  async ['PromiseEventEmitter - methods as events']() {
+    await this[testClassMethodAsEvents](PromiseEventEmitter)
   }
 
 }

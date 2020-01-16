@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
-          node-version: "12"
+          node-version: ">=13"
           registry-url: "https://npm.pkg.github.com"
 
       - name: Install dependencies
@@ -27,16 +27,15 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: ESLint checks
-        run: npx eslint . --max-warnings 0
+        run: npx nodutilus-eslint
       - name: ESLintCC checks
         run: npx eslintcc . --greater-than C --show-rules
 
   tests:
-    name: Test, node ${{ matrix.node }}, ${{ matrix.os }}
+    name: Test, ${{ matrix.os }}
 
     strategy:
       matrix:
-        node: ["12"]
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
     runs-on: ${{ matrix.os }}
@@ -45,7 +44,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
-          node-version: ${{ matrix.node }}
+          node-version: ">=13"
           registry-url: "https://npm.pkg.github.com"
 
       - name: Install dependencies
@@ -68,7 +67,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
-          node-version: "12"
+          node-version: ">=13"
           registry-url: "https://npm.pkg.github.com"
 
       - name: Install dependencies
@@ -94,7 +93,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
-          node-version: "12"
+          node-version: ">=13"
           registry-url: "https://npm.pkg.github.com"
 
       - name: Install dependencies
@@ -117,7 +116,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
-          node-version: "12"
+          node-version: ">=13"
           registry-url: "https://npm.pkg.github.com"
 
       - name: Install dependencies
@@ -135,8 +134,9 @@ jobs:
 
       - uses: actions/setup-node@master
         with:
-          registry-url: "https://registry.npmjs.org"
+          node-version: ">=13"
           scope: "@nodutilus"
+          registry-url: "https://registry.npmjs.org"
       - name: Publish packages (NPM)
         run: npm run publish-multi-package
         env:

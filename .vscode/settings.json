@@ -1,6 +1,8 @@
 {
   "editor.tabSize": 2,
-  "editor.rulers": [110],
+  "editor.rulers": [
+    110
+  ],
   "editor.detectIndentation": false,
   "files.autoSave": "afterDelay",
   "files.autoSaveDelay": 3000,
@@ -8,10 +10,10 @@
   "files.eol": "\n",
   "[javascript]": {
     "files.insertFinalNewline": true,
-    "editor.defaultFormatter": "HookyQR.beautify"
+    "editor.defaultFormatter": "vscode.typescript-language-features"
   },
   "[json]": {
-    "editor.defaultFormatter": "HookyQR.beautify"
+    "editor.defaultFormatter": "vscode.json-language-features"
   },
   "javascript.validate.enable": false,
   "eslint.enable": true,

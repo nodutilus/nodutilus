@@ -14,31 +14,12 @@
   "dependencies": {
     "@nodutilus/ci-cd": "latest",
     "@nodutilus/eslint-config": "latest",
-    "eslint": "latest",
-    "eslintcc": "latest",
-    "nyc": "latest"
+    "@nodutilus/nyc-config": "latest",
+    "eslintcc": "latest"
   },
   "eslintIgnore": [
     "bin/node_modules",
     "src/node_modules",
     "test/node_modules"
-  ],
-  "nyc": {
-    "all": true,
-    "branches": 100,
-    "lines": 100,
-    "functions": 100,
-    "statements": 100,
-    "exclude": [
-      "bin",
-      "build",
-      "test/index.js",
-      "test/mem.js"
-    ],
-    "reporter": [
-      "lcovonly"
-    ],
-    "temp-dir": "./build/nyc_output",
-    "report-dir": "./build/coverage"
-  }
+  ]
 }

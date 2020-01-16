@@ -1,0 +1,3 @@
+{
+  "extends": "@nodutilus/eslint-config"
+}

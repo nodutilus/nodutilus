@@ -16,7 +16,9 @@ const pemEvents = {
   reject: Symbol('PromiseEventEmitter#event:reject')
 }
 
-
+/**
+ * Управление событиями и подписками, в т.ч. асинхронными
+ */
 class EventEmitter {
 
   /** @returns {EventEmitter} */
@@ -159,7 +161,9 @@ class EventEmitter {
 
 }
 
-
+/**
+ * Управление событиями в режиме <Promise>
+ */
 class PromiseEventEmitter extends Promise {
 
   /**

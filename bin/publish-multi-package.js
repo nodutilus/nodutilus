@@ -4,7 +4,9 @@ const { readJSON } = require('../src/@nodutilus/fs')
 const { readdir } = require('fs').promises
 const { execSync } = require('child_process')
 
-
+/**
+ * Сборка нескольких NPM пакетов из 1-го хранилища
+ */
 class MultiPackageBuilder {
 
   /**

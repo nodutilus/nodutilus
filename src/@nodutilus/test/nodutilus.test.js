@@ -186,7 +186,9 @@ function getInstanceTests(tests, instance) {
   })
 }
 
-
+/**
+ * Отчет о результатах тестирования
+ */
 class TestResult {
 
   /**
@@ -272,7 +274,9 @@ async function __notify(testInstance, event, data = {}) {
   }
 }
 
-
+/**
+ * Написание тестов в парадигме классов
+ */
 class Test {
 
   /**

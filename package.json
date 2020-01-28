@@ -1,25 +1,11 @@
 {
   "repository": "github:nodutilus/nodutilus",
   "license": "Unlicense",
-  "scripts": {
-    "link-for-test": "node bin/link-node-module src/@nodutilus test src/@nodutilus src",
-    "link-for-test-real": "nodutilus-ci-cd link-for-test src/@nodutilus test src/@nodutilus src",
-    "test": "node test",
-    "coverage": "(nyc node test || node test) && (nyc check-coverage || nyc report -r=text && nyc check-coverage)",
-    "coverage-html": "nyc -r=html node test",
-    "build-multi-package": "node bin/build-multi-package src/multi-package.json",
-    "build-real": "nodutilus-ci-cd build-multi-package multi-package.json",
-    "publish-multi-package": "node bin/publish-multi-package src/multi-package.json"
-  },
+  "type": "module",
   "dependencies": {
     "@nodutilus/ci-cd": "latest",
     "@nodutilus/eslint-config": "latest",
     "@nodutilus/nyc-config": "latest",
     "eslintcc": "latest"
-  },
-  "eslintIgnore": [
-    "bin/node_modules",
-    "src/node_modules",
-    "test/node_modules"
-  ]
+  }
 }

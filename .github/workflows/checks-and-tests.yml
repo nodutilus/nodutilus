@@ -52,11 +52,8 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-      - name: Prepare Tests
-        run: npm run link-for-test
-
       - name: Run Tests
-        run: npm test
+        run: node test
 
   coverage:
     name: Check Coverage
@@ -75,34 +72,8 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-      - name: Prepare Tests
-        run: npm run link-for-test
-
       - name: Check Coverage
-        run: npm run coverage
-
-  # Для PR только собираем модули
-  build:
-    name: Build
-    needs: [checks, tests, coverage]
-    if: github.event_name != 'push'
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@master
-        with:
-          node-version: ">=13"
-          registry-url: "https://npm.pkg.github.com"
-
-      - name: Install dependencies
-        run: npm install
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-      - name: Build packages
-        run: npm run build-multi-package
+        run: npx nodutilus-nyc
 
   # Для изменений в мастере - публикуем
   build-and-publish:
@@ -124,11 +95,8 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-      - name: Build packages
-        run: npm run build-multi-package
-
       - name: Publish packages (GPR)
-        run: npm run publish-multi-package
+        run: npx nodutilus-ci-cd publish-package src/@nodutilus
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
@@ -138,6 +106,6 @@ jobs:
           scope: "@nodutilus"
           registry-url: "https://registry.npmjs.org"
       - name: Publish packages (NPM)
-        run: npm run publish-multi-package
+        run: npx nodutilus-ci-cd publish-package src/@nodutilus
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPMJS_TOKEN}}

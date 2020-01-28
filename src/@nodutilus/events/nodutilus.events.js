@@ -19,7 +19,7 @@ const pemEvents = {
 /**
  * Управление событиями и подписками, в т.ч. асинхронными
  */
-class EventEmitter {
+export class EventEmitter {
 
   /** @returns {EventEmitter} */
   constructor() {

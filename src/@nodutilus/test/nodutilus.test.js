@@ -1,8 +1,10 @@
 /** @module @nodutilus/test */
 'use strict'
 
+import { EventEmitter } from '@nodutilus/events'
+
 const { strict: assert } = require('assert')
-const { EventEmitter } = require('@nodutilus/events')
+
 
 const baseEvents = {
   before: Symbol('Test#event:before'),

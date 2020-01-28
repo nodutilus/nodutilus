@@ -1,0 +1,22 @@
+{
+  "name": "@nodutilus/events",
+  "version": "0.1.0",
+  "repository": "github:nodutilus/nodutilus",
+  "homepage": "https://nodutilus.github.io",
+  "license": "Unlicense",
+  "type": "module",
+  "exports": {
+    ".": "./nodutilus.events.js"
+  },
+  "description": "EventEmitter с поддержкой асинхронных событий и Promise",
+  "keywords": [
+    "events",
+    "async",
+    "promise",
+    "EventEmitter",
+    "PromiseEventEmitter"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

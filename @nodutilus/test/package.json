@@ -1,0 +1,26 @@
+{
+  "name": "@nodutilus/test",
+  "version": "0.1.0",
+  "repository": "github:nodutilus/nodutilus",
+  "homepage": "https://nodutilus.github.io",
+  "license": "Unlicense",
+  "type": "module",
+  "exports": {
+    ".": "nodutilus.test.js"
+  },
+  "dependencies": {
+    "@nodutilus/events": "^0.1"
+  },
+  "description": "Тесты на классах. Агрегация, наследование, события",
+  "keywords": [
+    "test",
+    "tests",
+    "testing",
+    "test-class",
+    "async-test",
+    "test utils"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

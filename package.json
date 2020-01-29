@@ -5,7 +5,6 @@
   "dependencies": {
     "@nodutilus/ci-cd": "latest",
     "@nodutilus/eslint-config": "latest",
-    "@nodutilus/nyc-config": "latest",
-    "eslintcc": "latest"
+    "@nodutilus/nyc-config": "latest"
   }
 }

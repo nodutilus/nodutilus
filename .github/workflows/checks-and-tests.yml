@@ -28,8 +28,6 @@ jobs:
 
       - name: ESLint checks
         run: npx nodutilus-eslint
-      - name: ESLintCC checks
-        run: npx eslintcc . --greater-than C --show-rules
 
   tests:
     name: Test, ${{ matrix.os }}

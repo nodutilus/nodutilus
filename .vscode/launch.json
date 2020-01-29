@@ -10,7 +10,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "All Tests",
+      "name": "Tests",
       "program": "${workspaceFolder}/test/index.js"
     }
   ]

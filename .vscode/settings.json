@@ -15,6 +15,9 @@
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
+  "[jsonс]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
   "javascript.validate.enable": false,
   "eslint.enable": true,
   "npm.enableScriptExplorer": true

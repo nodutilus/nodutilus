@@ -257,12 +257,12 @@ exports['@nodutilus/events'] = class EventsTest extends Test {
     assert.equal(result4, undefined)
 
     try {
-      await (new Promise((resolve, reject) => reject(new Error('test7')))).finally(() => {})
+      await (new Promise((resolve, reject) => reject(new Error('test7')))).finally(() => { })
     } catch (error) {
       result1 = error.message
     }
     try {
-      await (new PromiseEventEmitter(emitter => emitter.reject(new Error('test7')))).finally(() => {})
+      await (new PromiseEventEmitter(emitter => emitter.reject(new Error('test7')))).finally(() => { })
     } catch (error) {
       result2 = error.message
     }
@@ -405,7 +405,7 @@ exports['@nodutilus/events'] = class EventsTest extends Test {
   /** PEE имеет такие же методы работы с событиями как и EventEmitter */
   async ['PromiseEventEmitter - count,listenerCount,has,on,off']() {
     const pem = new PromiseEventEmitter()
-    const testFN = () => {}
+    const testFN = () => { }
 
     pem.on('test', testFN)
     await pem.emit('test')
@@ -581,7 +581,7 @@ exports['@nodutilus/events'] = class EventsTest extends Test {
    * и если после emit есть ошибка, то once его ожидающий завершиться ошибкой */
   async ['PromiseEventEmitter - once, ошибка после emit']() {
     const pem = new PromiseEventEmitter(emitter => {
-      emitter.emit('result1', 1).catch(reason => {})
+      emitter.emit('result1', 1).catch(reason => { })
       this.nonExistent()
     })
     let error = null

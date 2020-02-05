@@ -1,3 +1,6 @@
 {
-  "main": "nodutilus.events.js"
+  "type": "module",
+  "exports": {
+    ".": "./events.js"
+  }
 }

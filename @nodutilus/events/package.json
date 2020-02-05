@@ -6,7 +6,7 @@
   "license": "Unlicense",
   "type": "module",
   "exports": {
-    ".": "./nodutilus.events.js"
+    ".": "./events.js"
   },
   "description": "EventEmitter с поддержкой асинхронных событий и Promise",
   "keywords": [

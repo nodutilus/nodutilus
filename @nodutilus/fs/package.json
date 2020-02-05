@@ -6,7 +6,7 @@
   "license": "Unlicense",
   "type": "module",
   "exports": {
-    ".": "nodutilus.fs.js"
+    ".": "./fs.js"
   },
   "description": "Методы для работы с файлами, которых нет в стандартной библиотеке fs",
   "keywords": [

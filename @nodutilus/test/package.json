@@ -6,7 +6,7 @@
   "license": "Unlicense",
   "type": "module",
   "exports": {
-    ".": "nodutilus.test.js"
+    ".": "./test.js"
   },
   "dependencies": {
     "@nodutilus/events": "^0.1"

@@ -1,8 +1,7 @@
 /** @module @nodutilus/test */
 
+import { strict as assert } from 'assert'
 import { EventEmitter } from '@nodutilus/events'
-
-const { strict: assert } = require('assert')
 
 
 const baseEvents = {
@@ -404,6 +403,8 @@ Test.beforeEachNested = baseEvents.beforeEachNested
 Test.afterEachNested = baseEvents.afterEachNested
 
 
-exports.assert = assert
-exports.Test = Test
-exports.TestResult = TestResult
+export {
+  assert,
+  Test,
+  TestResult
+}

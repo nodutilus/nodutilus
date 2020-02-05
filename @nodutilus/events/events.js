@@ -18,7 +18,7 @@ const pemEvents = {
 /**
  * Управление событиями и подписками, в т.ч. асинхронными
  */
-export class EventEmitter {
+class EventEmitter {
 
   /** @returns {EventEmitter} */
   constructor() {
@@ -379,5 +379,7 @@ class PromiseEventEmitter extends Promise {
 }
 
 
-exports.EventEmitter = EventEmitter
-exports.PromiseEventEmitter = PromiseEventEmitter
+export {
+  EventEmitter,
+  PromiseEventEmitter
+}

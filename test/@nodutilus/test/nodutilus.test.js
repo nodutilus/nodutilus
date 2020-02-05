@@ -1,5 +1,3 @@
-'use strict'
-
 const { Test, TestResult, assert } = require('@nodutilus/test')
 
 exports['@nodutilus/test'] = class TestTest extends Test {

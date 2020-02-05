@@ -1,5 +1,4 @@
 /** @module @nodutilus/fs */
-'use strict'
 
 const { dirname, join, resolve } = require('path')
 const {

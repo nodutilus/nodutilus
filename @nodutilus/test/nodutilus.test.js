@@ -1,5 +1,4 @@
 /** @module @nodutilus/test */
-'use strict'
 
 import { EventEmitter } from '@nodutilus/events'
 

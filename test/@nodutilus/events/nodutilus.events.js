@@ -1,5 +1,3 @@
-'use strict'
-
 const { Test, assert } = require('@nodutilus/test')
 const { EventEmitter, PromiseEventEmitter } = require('@nodutilus/events')
 

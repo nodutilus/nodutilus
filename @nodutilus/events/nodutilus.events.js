@@ -1,5 +1,4 @@
 /** @module  @nodutilus/events */
-'use strict'
 
 /** @typedef {any} Event */
 /** @typedef {function(...any)} Listener */

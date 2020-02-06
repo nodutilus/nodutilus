@@ -4,6 +4,7 @@
   "report-dir": "./build/coverage",
   "include": [
     "@nodutilus",
-    "test/@nodutilus-test"
+    "test/@nodutilus-test",
+    "test/preparation.js"
   ]
 }

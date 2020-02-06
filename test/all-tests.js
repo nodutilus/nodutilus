@@ -1,4 +1,5 @@
 import { Test } from '@nodutilus/test'
+import { preparation } from './preparation.js'
 import events from '@nodutilus-test/events'
 import fs from '@nodutilus-test/fs'
 import test from '@nodutilus-test/test'
@@ -22,6 +23,8 @@ class AllTests extends Test {
 }
 
 
-export function runTests() {
+export async function runTests() {
+  await preparation()
+
   return Test.run(new AllTests())
 }

@@ -1,29 +1,13 @@
-const { Test, assert } = require('@nodutilus/test')
-const {
-  copy,
-  readJSON,
-  readText,
-  remove,
-  symlink,
-  walk,
-  writeJSON,
-  constants: {
-    COPY_EXCL,
-    COPY_RMNONEXISTENT,
-    SYMLINK_EXCL,
-    SYMLINK_RMNONEXISTENT,
-    WALK_FILEFIRST,
-    WRITE_EXCL
-  }
-} = require('@nodutilus/fs')
-const { normalize, relative } = require('path')
-const {
-  existsSync,
-  promises: { mkdir, rmdir }
-} = require('fs')
+import { Test, assert } from '@nodutilus/test'
+import { copy, readJSON, readText, remove, walk, writeJSON, constants as fsConstants } from '@nodutilus/fs'
+import { normalize, relative } from 'path'
+import { existsSync, promises as fsPromises } from 'fs'
+
+const { COPY_EXCL, COPY_RMNONEXISTENT, WALK_FILEFIRST, WRITE_EXCL } = fsConstants
+const { mkdir, rmdir } = fsPromises
 
 
-exports['@nodutilus/fs'] = class FsTest extends Test {
+export default class FsTest extends Test {
 
   /** Перед запуском очистим временные данные */
   async [Test.before]() {
@@ -188,127 +172,6 @@ exports['@nodutilus/fs'] = class FsTest extends Test {
 
     assert(!existsSync('test/example/fs/copy/p1_new'))
     assert(!existsSync('test/example/fs/copy/f_new.txt'))
-  }
-
-
-  /** создаем ссылки в несуществующую папку */
-  async ['symlink - базовый']() {
-    const filesA = []
-    const filesB = []
-
-    await symlink('test/example/fs/walk', 'test/example/fs/symlink')
-    await walk('test/example/fs/walk', path => filesA.push(path))
-    await walk('test/example/fs/symlink', path => filesB.push(path))
-
-    assert.deepEqual(filesB, filesA)
-
-    const textA = await readText('test/example/fs/walk/f1.txt')
-    const textB = await readText('test/example/fs/symlink/f1.txt')
-
-    assert.equal(textB, textA)
-  }
-
-  /** создаем ссылки в существующую папку, ссылки в конечной папке верные */
-  async ['symlink - перезапись, с верными ссылками']() {
-    const filesA = []
-    const filesB = []
-
-    await symlink('test/example/fs/walk', 'test/example/fs/symlink')
-    await symlink('test/example/fs/walk', 'test/example/fs/symlink')
-    await walk('test/example/fs/walk', path => filesA.push(path))
-    await walk('test/example/fs/symlink', path => filesB.push(path))
-
-    assert.deepEqual(filesB, filesA)
-  }
-
-  /** создаем ссылки в существующую папку, ссылки в конечной папке ведут на другие файлы */
-  async ['symlink - перезапись, кривые ссылки']() {
-    await symlink('test/example/fs/walk/p1/p1f1.txt', 'test/example/fs/symlink/f1.txt')
-
-    const text1 = await readText('test/example/fs/symlink/f1.txt')
-
-    await symlink('test/example/fs/walk/f1.txt', 'test/example/fs/symlink/f1.txt')
-
-    const text2 = await readText('test/example/fs/symlink/f1.txt')
-
-    assert.deepEqual(text1, 'p1f1.txt')
-    assert.deepEqual(text2, '')
-  }
-
-  /** создаем ссылки в существующую папку, если конечная точка не ссылка, заменяем на ссылку */
-  async ['symlink - перезапись, файл вместо ссылки']() {
-    await copy('test/example/fs/walk/p1/p1f1.txt', 'test/example/fs/symlink/f1.txt')
-
-    const text1 = await readText('test/example/fs/symlink/f1.txt')
-
-    await symlink('test/example/fs/walk/f1.txt', 'test/example/fs/symlink/f1.txt')
-
-    const text2 = await readText('test/example/fs/symlink/f1.txt')
-
-    assert.deepEqual(text1, 'p1f1.txt')
-    assert.deepEqual(text2, '')
-  }
-
-  /** создаем ссылки в существующую папку с ошибкой на папке */
-  async ['symlink - с ошибкой на папке']() {
-    await symlink('test/example/fs/walk/p2', 'test/example/fs/symlink/p2')
-
-    const error = await symlink('test/example/fs/walk', 'test/example/fs/symlink', SYMLINK_EXCL)
-      .catch(error => error)
-
-    assert.equal(error.syscall, 'mkdir')
-    assert.equal(error.code, 'EEXIST')
-    assert.equal(relative('.', error.path), normalize('test/example/fs/symlink'))
-  }
-
-  /** создаем ссылки в существующую папку с ошибкой на файле */
-  async ['symlink - с ошибкой на файле']() {
-    await symlink('test/example/fs/walk/f1.txt', 'test/example/fs/symlink/f1.txt')
-
-    const error = await symlink('test/example/fs/walk/f1.txt', 'test/example/fs/symlink/f1.txt', SYMLINK_EXCL)
-      .catch(error => error)
-
-    assert.equal(error.syscall, 'symlink')
-    assert.equal(error.code, 'EEXIST')
-    assert.equal(relative('.', error.path), normalize('test/example/fs/walk/f1.txt'))
-    assert.equal(relative('.', error.dest), normalize('test/example/fs/symlink/f1.txt'))
-  }
-
-  /** создаем ссылку на файл */
-  async ['symlink - файл']() {
-    const files = []
-
-    await mkdir('test/example/fs/symlink')
-    await symlink('test/example/fs/walk/f1.txt', 'test/example/fs/symlink/f1.txt')
-    await walk('test/example/fs/symlink', path => files.push(path))
-
-    assert.deepEqual(files, ['f1.txt'])
-  }
-
-  /** создаем ссылку на файл, если каталог назначения не создан */
-  async ['symlink - файл (без каталога)']() {
-    const files = []
-
-    await symlink('test/example/fs/walk/f1.txt', 'test/example/fs/symlink/f1.txt')
-    await walk('test/example/fs/symlink', path => files.push(path))
-
-    assert.deepEqual(files, ['f1.txt'])
-  }
-
-  /** при создании ссылок удаляем существующие файлы и папки в целевом каталоге,
-   *  которых нет в исходном каталоге */
-  async ['symlink - удаление несуществующих']() {
-    await symlink('test/example/fs/walk/p1', 'test/example/fs/symlink/p1_new')
-    await symlink('test/example/fs/walk/f1.txt', 'test/example/fs/symlink/f_new.txt')
-    await symlink('test/example/fs/walk', 'test/example/fs/symlink')
-
-    assert(existsSync('test/example/fs/symlink/p1_new'))
-    assert(existsSync('test/example/fs/symlink/f_new.txt'))
-
-    await symlink('test/example/fs/walk', 'test/example/fs/symlink', SYMLINK_RMNONEXISTENT)
-
-    assert(!existsSync('test/example/fs/symlink/p1_new'))
-    assert(!existsSync('test/example/fs/symlink/f_new.txt'))
   }
 
   /** удаление пустой папки */

@@ -1,23 +1,10 @@
 /** @module @nodutilus/fs */
 
-const { dirname, join, resolve } = require('path')
-const {
-  existsSync,
-  promises: {
-    copyFile,
-    lstat,
-    mkdir,
-    readdir,
-    readFile,
-    readlink,
-    rmdir,
-    stat,
-    symlink: symlinkFile,
-    writeFile
-  },
-  constants: { COPYFILE_EXCL }
-} = require('fs')
+import { dirname, join } from 'path'
+import { promises as fsPromises, constants as fsConstants } from 'fs'
 
+const { COPYFILE_EXCL } = fsConstants
+const { copyFile, mkdir, readdir, readFile, rmdir, stat, writeFile } = fsPromises
 /**
  * @typedef CONSTANTS
  * @property {number} COPY_EXCL
@@ -29,12 +16,10 @@ const {
  */
 /** @type {CONSTANTS} */
 const constants = Object.create(null)
-const COPY_EXCL = constants.COPY_EXCL = 0b000001
-const COPY_RMNONEXISTENT = constants.COPY_RMNONEXISTENT = 0b000010
-const SYMLINK_EXCL = constants.SYMLINK_EXCL = 0b000100
-const SYMLINK_RMNONEXISTENT = constants.SYMLINK_RMNONEXISTENT = 0b001000
-const WALK_FILEFIRST = constants.WALK_FILEFIRST = 0b010000
-const WRITE_EXCL = constants.WRITE_EXCL = 0b100000
+const COPY_EXCL = constants.COPY_EXCL = 0b0001
+const COPY_RMNONEXISTENT = constants.COPY_RMNONEXISTENT = 0b0010
+const WALK_FILEFIRST = constants.WALK_FILEFIRST = 0b0100
+const WRITE_EXCL = constants.WRITE_EXCL = 0b1000
 
 
 /**
@@ -160,98 +145,6 @@ async function __copy(src, dest, flags) {
 
 
 /**
- * @param {string} src
- * @param {string} dest
- * @param {number} flags
- * @returns {Promise<void>}
- */
-async function symlink(src, dest, flags) {
-  const srcStat = await stat(src)
-
-  if (srcStat.isDirectory()) {
-    await __symlink(src, dest, flags)
-  } else {
-    if (!(flags & SYMLINK_EXCL)) {
-      await mkdir(dirname(dest), { recursive: true })
-    }
-    await __symlinkFile(src, dest, flags)
-  }
-}
-
-
-/**
- * @param {string} src
- * @param {string} dest
- * @param {number} flags
- * @returns {Promise<void>}
- */
-async function __symlink(src, dest, flags) {
-  const mkdirOptions = { recursive: !(flags & SYMLINK_EXCL) }
-  const existentPaths = flags & SYMLINK_RMNONEXISTENT ? [] : false
-
-  await mkdir(dest, mkdirOptions)
-  await __walk('.', {
-    root: src,
-    walker: async (path, dirent) => {
-      const destPath = join(dest, path)
-
-      if (existentPaths) {
-        existentPaths.push(destPath)
-      }
-      if (dirent.isDirectory()) {
-        await mkdir(destPath, mkdirOptions)
-      } else {
-        await __symlinkFile(join(src, path), destPath)
-      }
-    }
-  })
-  if (existentPaths) {
-    await __walk('.', {
-      root: dest,
-      walker: async path => {
-        const destPath = join(dest, path)
-
-        if (!existentPaths.includes(destPath)) {
-          await remove(destPath)
-
-          return false
-        }
-      }
-    })
-  }
-}
-
-
-/**
- * @param {string} src
- * @param {string} dest
- * @param {number} flags
- * @returns {Promise<void>}
- */
-async function __symlinkFile(src, dest, flags) {
-  const resolvedSrc = resolve(src)
-
-  if (flags & SYMLINK_EXCL || !existsSync(dest)) {
-    await symlinkFile(resolvedSrc, dest)
-  } else {
-    const destStat = await lstat(dest)
-
-    if (destStat.isSymbolicLink()) {
-      const link = await readlink(dest)
-
-      if (resolvedSrc !== link) {
-        await remove(dest)
-        await symlinkFile(resolvedSrc, dest)
-      }
-    } else {
-      await remove(dest)
-      await symlinkFile(resolvedSrc, dest)
-    }
-  }
-}
-
-
-/**
  * @param {string} path
  * @returns {Promise<void>}
  */
@@ -327,12 +220,13 @@ async function writeText(path, data, flags) {
 }
 
 
-exports.constants = constants
-exports.copy = copy
-exports.readJSON = readJSON
-exports.readText = readText
-exports.remove = remove
-exports.symlink = symlink
-exports.walk = walk
-exports.writeJSON = writeJSON
-exports.writeText = writeText
+export {
+  constants,
+  copy,
+  readJSON,
+  readText,
+  remove,
+  walk,
+  writeJSON,
+  writeText
+}

@@ -1,5 +1,9 @@
 {
   "extends": "@nodutilus/nyc-config",
   "temp-dir": "./build/nyc_output",
-  "report-dir": "./build/coverage"
+  "report-dir": "./build/coverage",
+  "include": [
+    "@nodutilus",
+    "test/@nodutilus-test"
+  ]
 }

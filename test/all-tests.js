@@ -1,4 +1,7 @@
 import { Test } from '@nodutilus/test'
+import events from '@nodutilus-test/events'
+// import fs from '@nodutilus-test/fs'
+import test from '@nodutilus-test/test'
 
 
 class AllTests extends Test {
@@ -12,13 +15,13 @@ class AllTests extends Test {
     }
   }
 
+  static ['@nodutilus/events'] = events
+  // static ['@nodutilus/fs'] = fs
+  static ['@nodutilus/test'] = test
+
 }
 
 
-export async function runTests() {
-  AllTests['@nodutilus/events'] = await import('./events')
-  AllTests['@nodutilus/test'] = await import('./test')
-  //   require('./@nodutilus/fs'),
-
+export function runTests() {
   return Test.run(new AllTests())
 }

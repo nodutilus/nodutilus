@@ -1,10 +1,10 @@
-const { Test, assert } = require('@nodutilus/test')
-const { EventEmitter, PromiseEventEmitter } = require('@nodutilus/events')
+import { Test, assert } from '@nodutilus/test'
+import { EventEmitter, PromiseEventEmitter } from '@nodutilus/events'
 
 const testClassMethodAsEvents = Symbol('testClassMethodAsEvents')
 
 
-exports['@nodutilus/events'] = class EventsTest extends Test {
+export default class EventsTest extends Test {
 
   /** Попытка удаление события до подписки не должна падать */
   ['EventEmitter - удаление события до подписки']() {

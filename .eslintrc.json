@@ -9,5 +9,8 @@
         "jsdoc/require-jsdoc": "off"
       }
     }
+  ],
+  "ignorePatterns": [
+    "node_modules"
   ]
 }

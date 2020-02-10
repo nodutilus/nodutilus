@@ -94,7 +94,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Publish packages (GPR)
-        run: npx nodutilus-ci-cd publish-list-packages
+        run: npx nodutilus-ci-cd publish-package @nodutilus
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
@@ -104,6 +104,6 @@ jobs:
           scope: "@nodutilus"
           registry-url: "https://registry.npmjs.org"
       - name: Publish packages (NPM)
-        run: npx nodutilus-ci-cd publish-list-packages
+        run: npx nodutilus-ci-cd publish-package @nodutilus
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPMJS_TOKEN}}

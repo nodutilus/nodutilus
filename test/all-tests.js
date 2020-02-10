@@ -1,7 +1,33 @@
-'use strict'
+import { Test } from '@nodutilus/test'
+import { preparation } from './preparation.js'
+import events from '@nodutilus-test/events'
+import fs from '@nodutilus-test/fs'
+import test from '@nodutilus-test/test'
 
-Object.assign(exports,
-  require('./@nodutilus/events'),
-  require('./@nodutilus/fs'),
-  require('./@nodutilus/test')
-)
+
+class AllTests extends Test {
+
+  [Test.afterEachDeep]({ path = [], name, result: { success, error } }) {
+    const result = success ? 'success' : 'failure'
+
+    console.log(`${result}: ${path.join(', ')} => ${name}`)
+    if (error) {
+      console.log(error)
+    }
+  }
+
+  static ['@nodutilus/events'] = events
+  static ['@nodutilus/fs'] = fs
+  static ['@nodutilus/test'] = test
+
+}
+
+
+async function runTests() {
+  await preparation()
+
+  return Test.run(new AllTests())
+}
+
+
+export { AllTests, runTests }

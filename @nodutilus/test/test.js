@@ -1,8 +1,8 @@
 /** @module @nodutilus/test */
-'use strict'
 
-const { strict: assert } = require('assert')
-const { EventEmitter } = require('@nodutilus/events')
+import { strict as assert } from 'assert'
+import { EventEmitter } from '@nodutilus/events'
+
 
 const baseEvents = {
   before: Symbol('Test#event:before'),
@@ -186,7 +186,9 @@ function getInstanceTests(tests, instance) {
   })
 }
 
-
+/**
+ * Отчет о результатах тестирования
+ */
 class TestResult {
 
   /**
@@ -272,7 +274,9 @@ async function __notify(testInstance, event, data = {}) {
   }
 }
 
-
+/**
+ * Написание тестов в парадигме классов
+ */
 class Test {
 
   /**
@@ -399,6 +403,8 @@ Test.beforeEachNested = baseEvents.beforeEachNested
 Test.afterEachNested = baseEvents.afterEachNested
 
 
-exports.assert = assert
-exports.Test = Test
-exports.TestResult = TestResult
+export {
+  assert,
+  Test,
+  TestResult
+}

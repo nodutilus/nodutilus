@@ -1,9 +1,0 @@
-{
-  "extends": "@nodutilus",
-  "overrides": [{
-    "files": ["test/*"],
-    "rules": {
-      "jsdoc/require-jsdoc": "off"
-    }
-  }]
-}

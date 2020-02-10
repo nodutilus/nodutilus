@@ -1,25 +1,23 @@
-'use strict'
+import { Test, TestResult, assert } from '@nodutilus/test'
 
-const { Test, TestResult, assert } = require('@nodutilus/test')
-
-exports['@nodutilus/test'] = class TestTest extends Test {
+export default class TestTest extends Test {
 
   /** Тесты можно расширять через наследование классов */
   async ['Test - наследование тестов']() {
     class TestA extends Test {
 
       /***/
-      testA() {}
+      testA() { }
 
       /***/
-      testC() {}
+      testC() { }
 
     }
 
     class TestB extends TestA {
 
       /***/
-      testB() {}
+      testB() { }
 
       /** При наследовании можно затереть тест, что бы он не выполнялся
        *
@@ -76,14 +74,14 @@ exports['@nodutilus/test'] = class TestTest extends Test {
       }
 
       /***/
-      testA() {}
+      testA() { }
 
     }
 
     class TestB extends TestA {
 
       /***/
-      testB() {}
+      testB() { }
 
     }
 
@@ -111,20 +109,20 @@ exports['@nodutilus/test'] = class TestTest extends Test {
     class TestA extends Test {
 
       /***/
-      testA() {}
+      testA() { }
 
     }
 
     class TestB extends Test {
 
       /***/
-      testB() {}
+      testB() { }
 
     }
 
     TestB.TestE = TestA
 
-    class TestC extends Test {}
+    class TestC extends Test { }
 
     TestC.TestA = TestA
     TestC.TestB = TestB
@@ -187,8 +185,8 @@ exports['@nodutilus/test'] = class TestTest extends Test {
     const testA = new Test()
     const testB = new Test()
 
-    testA.test = () => {}
-    testB.testC = () => {}
+    testA.test = () => { }
+    testB.testC = () => { }
     testB.testA = testA
 
     const result = await Test.run(testB)

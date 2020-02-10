@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
-          node-version: "12"
+          node-version: ">=13"
           registry-url: "https://npm.pkg.github.com"
 
       - name: Install dependencies
@@ -27,16 +27,13 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: ESLint checks
-        run: npx eslint . --max-warnings 0
-      - name: ESLintCC checks
-        run: npx eslintcc . --greater-than C --show-rules
+        run: npx nodutilus-eslint
 
   tests:
-    name: Test, node ${{ matrix.node }}, ${{ matrix.os }}
+    name: Test, ${{ matrix.os }}
 
     strategy:
       matrix:
-        node: ["12"]
         os: [ubuntu-latest, windows-latest, macOS-latest]
 
     runs-on: ${{ matrix.os }}
@@ -45,7 +42,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
-          node-version: ${{ matrix.node }}
+          node-version: ">=13"
           registry-url: "https://npm.pkg.github.com"
 
       - name: Install dependencies
@@ -53,11 +50,8 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-      - name: Prepare Tests
-        run: npm run link-for-test
-
       - name: Run Tests
-        run: npm test
+        run: node test
 
   coverage:
     name: Check Coverage
@@ -68,42 +62,16 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
-          node-version: "12"
+          node-version: ">=13"
           registry-url: "https://npm.pkg.github.com"
 
       - name: Install dependencies
         run: npm install
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-      - name: Prepare Tests
-        run: npm run link-for-test
 
       - name: Check Coverage
-        run: npm run coverage
-
-  # Для PR только собираем модули
-  build:
-    name: Build
-    needs: [checks, tests, coverage]
-    if: github.event_name != 'push'
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@master
-        with:
-          node-version: "12"
-          registry-url: "https://npm.pkg.github.com"
-
-      - name: Install dependencies
-        run: npm install
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-      - name: Build packages
-        run: npm run build-multi-package
+        run: npx nodutilus-nyc
 
   # Для изменений в мастере - публикуем
   build-and-publish:
@@ -117,7 +85,7 @@ jobs:
       - uses: actions/checkout@master
       - uses: actions/setup-node@master
         with:
-          node-version: "12"
+          node-version: ">=13"
           registry-url: "https://npm.pkg.github.com"
 
       - name: Install dependencies
@@ -125,19 +93,17 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-      - name: Build packages
-        run: npm run build-multi-package
-
       - name: Publish packages (GPR)
-        run: npm run publish-multi-package
+        run: npx nodutilus-ci-cd publish-package @nodutilus
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - uses: actions/setup-node@master
         with:
-          registry-url: "https://registry.npmjs.org"
+          node-version: ">=13"
           scope: "@nodutilus"
+          registry-url: "https://registry.npmjs.org"
       - name: Publish packages (NPM)
-        run: npm run publish-multi-package
+        run: npx nodutilus-ci-cd publish-package @nodutilus
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPMJS_TOKEN}}

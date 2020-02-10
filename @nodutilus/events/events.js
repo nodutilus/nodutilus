@@ -1,5 +1,4 @@
 /** @module  @nodutilus/events */
-'use strict'
 
 /** @typedef {any} Event */
 /** @typedef {function(...any)} Listener */
@@ -16,7 +15,9 @@ const pemEvents = {
   reject: Symbol('PromiseEventEmitter#event:reject')
 }
 
-
+/**
+ * Управление событиями и подписками, в т.ч. асинхронными
+ */
 class EventEmitter {
 
   /** @returns {EventEmitter} */
@@ -159,7 +160,9 @@ class EventEmitter {
 
 }
 
-
+/**
+ * Управление событиями в режиме <Promise>
+ */
 class PromiseEventEmitter extends Promise {
 
   /**
@@ -376,5 +379,7 @@ class PromiseEventEmitter extends Promise {
 }
 
 
-exports.EventEmitter = EventEmitter
-exports.PromiseEventEmitter = PromiseEventEmitter
+export {
+  EventEmitter,
+  PromiseEventEmitter
+}

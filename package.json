@@ -1,44 +1,10 @@
 {
   "repository": "github:nodutilus/nodutilus",
   "license": "Unlicense",
-  "scripts": {
-    "link-for-test": "node bin/link-node-module src/@nodutilus test src/@nodutilus src",
-    "link-for-test-real": "nodutilus-ci-cd link-for-test src/@nodutilus test src/@nodutilus src",
-    "test": "node test",
-    "coverage": "(nyc node test || node test) && (nyc check-coverage || nyc report -r=text && nyc check-coverage)",
-    "coverage-html": "nyc -r=html node test",
-    "build-multi-package": "node bin/build-multi-package src/multi-package.json",
-    "build-real": "nodutilus-ci-cd build-multi-package multi-package.json",
-    "publish-multi-package": "node bin/publish-multi-package src/multi-package.json"
-  },
+  "type": "module",
   "dependencies": {
     "@nodutilus/ci-cd": "latest",
     "@nodutilus/eslint-config": "latest",
-    "eslint": "latest",
-    "eslintcc": "latest",
-    "nyc": "latest"
-  },
-  "eslintIgnore": [
-    "bin/node_modules",
-    "src/node_modules",
-    "test/node_modules"
-  ],
-  "nyc": {
-    "all": true,
-    "branches": 100,
-    "lines": 100,
-    "functions": 100,
-    "statements": 100,
-    "exclude": [
-      "bin",
-      "build",
-      "test/index.js",
-      "test/mem.js"
-    ],
-    "reporter": [
-      "lcovonly"
-    ],
-    "temp-dir": "./build/nyc_output",
-    "report-dir": "./build/coverage"
+    "@nodutilus/nyc-config": "latest"
   }
 }

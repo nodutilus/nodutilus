@@ -1,0 +1,16 @@
+{
+  "extends": "@nodutilus/eslint-config",
+  "overrides": [
+    {
+      "files": [
+        "test/**"
+      ],
+      "rules": {
+        "jsdoc/require-jsdoc": "off"
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "node_modules"
+  ]
+}

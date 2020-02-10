@@ -1,22 +1,20 @@
-'use strict'
-
-const { Test, assert } = require('@nodutilus/test')
+import { Test, assert } from '@nodutilus/test'
 
 const { ok, equal, deepEqual, throws, doesNotThrow } = assert
 
 
 class MyTestName extends Test {
 
-  baseTest() {}
+  baseTest() { }
 
-  static notTest1() {}
+  static notTest1() { }
 
   get notTest2() {
-    return () => {}
+    return () => { }
   }
 
   get notTest3() {
-    return new class Mtest extends Test {}()
+    return new class Mtest extends Test { }()
   }
 
 }
@@ -33,14 +31,14 @@ class MyTestConstructor extends Test {
 
   constructor() {
     super()
-    this.myTest = () => {}
+    this.myTest = () => { }
     this.NotTest = MyTestName
     this.mySubTest = new MyTestName()
     this.sizeBeforeRedefined = this.tests.size
     this.muOpt = 123
   }
 
-  NotTest() {}
+  NotTest() { }
 
 }
 
@@ -52,27 +50,27 @@ class MyTestConstructorFailure extends Test {
 
   constructor() {
     super()
-    this.myTest = () => {}
+    this.myTest = () => { }
     this.mySubTest = new MyTestFailure()
   }
 
 }
 
 
-class MyTestNameInclude extends Test {}
+class MyTestNameInclude extends Test { }
 
 
 MyTestNameInclude.Include = MyTestName
 MyTestNameInclude.notTest = new MyTestName()
 
 
-class MyTestNameIncludeFailure extends MyTestNameInclude {}
+class MyTestNameIncludeFailure extends MyTestNameInclude { }
 
 
 MyTestNameIncludeFailure.Include = MyTestFailure
 
 
-class MyTestNameIncludeExtends extends MyTestNameIncludeFailure {}
+class MyTestNameIncludeExtends extends MyTestNameIncludeFailure { }
 
 
 MyTestNameIncludeExtends.includeExt = MyTestName
@@ -80,7 +78,7 @@ MyTestNameIncludeExtends.includeExt = MyTestName
 
 class MyTestNameIncludeRedefine extends Test {
 
-  include() {}
+  include() { }
 
 }
 
@@ -100,7 +98,7 @@ MyTestNameIncludeRedefineExt0.include = MyTestFailure
 
 class MyTestNameIncludeRedefineExt extends MyTestNameIncludeRedefineExt0 {
 
-  include() {}
+  include() { }
 
 }
 
@@ -110,7 +108,7 @@ MyTestNameIncludeRedefineExt.includeExt = MyTestName
 
 class MyTestNameExt extends MyTestName {
 
-  baseTestExt() {}
+  baseTestExt() { }
 
 }
 
@@ -119,13 +117,13 @@ class MyTestConstructorExt extends MyTestConstructor {
 
   constructor() {
     super()
-    this.myTest2 = () => {}
+    this.myTest2 = () => { }
   }
 
 }
 
 
-class MyTestNameIncludeExt extends MyTestNameInclude {}
+class MyTestNameIncludeExt extends MyTestNameInclude { }
 
 
 MyTestNameIncludeExt.IncludeExt = MyTestName
@@ -153,7 +151,7 @@ class TestEvents extends Test {
     this.testNested3 = new Test()
   }
 
-  baseTest1() {}
+  baseTest1() { }
 
   baseTest2() {
     equal(this.beforeEach, true)
@@ -164,14 +162,14 @@ class TestEvents extends Test {
 
 class TestDeepEvents0 extends Test {
 
-  baseTest4() {}
+  baseTest4() { }
 
 }
 
 
 class TestDeepEvents1 extends Test {
 
-  baseTest8() {}
+  baseTest8() { }
 
 }
 
@@ -181,13 +179,13 @@ class TestDeepEvents extends Test {
   constructor() {
     super()
     this.testNested5 = new Test()
-    this.testNested5.baseTest6 = () => {}
+    this.testNested5.baseTest6 = () => { }
     this.testNested5.baseTest7 = new TestDeepEvents1()
   }
 
-  baseTest1() {}
+  baseTest1() { }
 
-  baseTest2() {}
+  baseTest2() { }
 
 }
 
@@ -197,7 +195,7 @@ TestDeepEvents.testNested3 = TestDeepEvents0
 
 class TestClassEvents0 extends Test {
 
-  baseTest2() {}
+  baseTest2() { }
 
 }
 
@@ -224,7 +222,7 @@ class TestClassEvents extends Test {
     this.all.set(name, {})
   }
 
-  baseTest1() {}
+  baseTest1() { }
 
   [Test.afterEach]({ name, result }) {
     this.own.get(name).success = result.success
@@ -267,7 +265,7 @@ class TestOrder1 extends Test {
     this.test5 = new Test()
   }
 
-  test1() {}
+  test1() { }
 
 }
 
@@ -280,10 +278,10 @@ class TestOrder2 extends TestOrder1 {
   constructor() {
     super()
     this.test6 = new Test()
-    this.test7 = () => {}
+    this.test7 = () => { }
   }
 
-  test2() {}
+  test2() { }
 
 }
 
@@ -495,7 +493,7 @@ class AllTests {
   async ['Test => dynamic test from Test']() {
     const dtm = new Test()
 
-    dtm.myTest = () => {}
+    dtm.myTest = () => { }
 
     const { tests } = dtm
     const result = await Test.run(dtm)
@@ -657,7 +655,7 @@ class AllTests {
 }
 
 
-async function preparation() {
+export async function preparation() {
   const tests = new AllTests()
   const testNames = Object.getOwnPropertyNames(Reflect.getPrototypeOf(tests))
     .filter(item => item !== 'constructor')
@@ -666,6 +664,3 @@ async function preparation() {
     await tests[testName]()
   }
 }
-
-
-exports.preparation = preparation

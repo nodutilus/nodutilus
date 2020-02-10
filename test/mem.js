@@ -1,6 +1,5 @@
-'use strict'
+import cluster from 'cluster'
 
-const cluster = require('cluster')
 let initMem = null
 
 function executeMemTest() {
@@ -58,7 +57,7 @@ async function simulationActivity() {
 
 
 async function testEventEmitter() {
-  const { EventEmitter } = require('@nodutilus/events')
+  const { EventEmitter } = await import('@nodutilus/events')
 
   for (let i = 0; i < 1000; i++) {
     const em = new EventEmitter()
@@ -72,7 +71,7 @@ async function testEventEmitter() {
 
 
 async function testPromiseEventEmitter() {
-  const { PromiseEventEmitter } = require('@nodutilus/events')
+  const { PromiseEventEmitter } = await import('@nodutilus/events')
 
 
   for (let i = 0; i < 1000; i++) {
@@ -81,35 +80,30 @@ async function testPromiseEventEmitter() {
     pem.once('testtesttesttesttesttesttesttesttesttesttest').then(() => { pem.resolve() })
     pem.on('testtesttesttesttesttesttesttesttesttesttest', () => { pem.emit('test2') })
     await pem.emit('testtesttesttesttesttesttesttesttesttesttest')
-    await pem.then(() => {}, () => {})
+    await pem.then(() => { }, () => { })
 
     const pem2 = new PromiseEventEmitter()
 
     pem2.reject(new Error('test'))
-    await pem2.catch(() => {}).then(() => {})
+    await pem2.catch(() => { }).then(() => { })
   }
 }
 
 
 async function testAllTests() {
-  const { Test } = require('@nodutilus/test')
+  const { Test } = await import('@nodutilus/test')
 
   for (let i = 0; i < 10; i++) {
-    class AllTests extends Test {}
-
-    Object.assign(AllTests, require('./all-tests'))
+    const { AllTests } = await import('./all-tests.js')
 
     // Не будем жечь диск для тестов на память
     AllTests['@nodutilus/fs'] = null
+    // Не будем логировать вывод тестов
+    AllTests.prototype[Test.afterEachDeep] = null
 
     await Test.run(new AllTests())
   }
 }
 
 
-if (require.main.filename === __filename) {
-  executeMemTest()
-}
-
-
-exports.executeMemTest = executeMemTest
+executeMemTest()

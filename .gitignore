@@ -1,9 +1,7 @@
-# Зависимости для сборки
-node_modules
-
-# Зависимости для тестирования и сборки
-src/node_modules
-test/node_modules
+# Зависимости
+/node_modules
+/@nodutilus/node_modules
+/test/node_modules
 
 # Промежуточные данные для тестов
 test/example/fs/copy

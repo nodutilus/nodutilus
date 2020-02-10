@@ -23,8 +23,11 @@ class AllTests extends Test {
 }
 
 
-export async function runTests() {
+async function runTests() {
   await preparation()
 
   return Test.run(new AllTests())
 }
+
+
+export { AllTests, runTests }

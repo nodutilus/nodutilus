@@ -279,6 +279,16 @@ async function __notify(testInstance, event, data = {}) {
  */
 class Test {
 
+  static events = Symbol('Test~events')
+  static before = baseEvents.before
+  static after = baseEvents.after
+  static beforeEach = baseEvents.beforeEach
+  static afterEach = baseEvents.afterEach
+  static beforeEachDeep = baseEvents.beforeEachDeep
+  static afterEachDeep = baseEvents.afterEachDeep
+  static beforeEachNested = baseEvents.beforeEachNested
+  static afterEachNested = baseEvents.afterEachNested
+
   /**
    * @returns {Test}
    */
@@ -389,18 +399,36 @@ class Test {
     return result
   }
 
+  /**
+   * @param {Test} testInstance
+   */
+  static runOnCI(testInstance) {
+    let prevParent
+
+    testInstance.event.on(Test.afterEachDeep, ({ path, name, result: { success, error } }) => {
+      const result = success ? '✓' : '✖'
+      const parent = path.join(' / ')
+      const msg = `${parent ? '  ' : ''}${result} ${name}`
+
+      if (parent !== prevParent) {
+        console.log(parent)
+        prevParent = parent
+      }
+      console.log(msg)
+      if (error) console.error(error)
+    })
+    this.run(testInstance)
+      .then(result => {
+        if (!result.success) {
+          process.exit(1)
+        }
+      }, error => {
+        console.error(error)
+        process.exit(1)
+      })
+  }
+
 }
-
-
-Test.events = Symbol('Test~events')
-Test.before = baseEvents.before
-Test.after = baseEvents.after
-Test.beforeEach = baseEvents.beforeEach
-Test.afterEach = baseEvents.afterEach
-Test.beforeEachDeep = baseEvents.beforeEachDeep
-Test.afterEachDeep = baseEvents.afterEachDeep
-Test.beforeEachNested = baseEvents.beforeEachNested
-Test.afterEachNested = baseEvents.afterEachNested
 
 
 export {

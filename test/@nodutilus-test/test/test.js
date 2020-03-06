@@ -1,4 +1,5 @@
 import { Test, TestResult, assert } from '@nodutilus/test'
+import { spawnSync } from 'child_process'
 
 export default class TestTest extends Test {
 
@@ -195,6 +196,33 @@ export default class TestTest extends Test {
     assert.equal(result.tests.get('testA').success, true)
     assert.equal(result.tests.get('testA').tests.get('test').success, true)
     assert.equal(result.tests.get('testC').success, true)
+  }
+
+  /** Проверка метода для запуска в в консольном режиме CI */
+  ['Test - runOnCI + log']() {
+    const child1 = spawnSync('node', ['test/example/test/run-on-ci__success.js'], {
+      encoding: 'utf-8'
+    })
+    const msg1 = child1.stdout.includes('parent\n  ✓ success')
+    const child2 = spawnSync('node', ['test/example/test/run-on-ci__failure.js'], {
+      encoding: 'utf-8'
+    })
+    const msg2 = child2.stdout.includes('✖ failure\nparent\n  ✖ failure')
+    const errMsg2 = child2.stderr.includes('Error: Example failure')
+    const child3 = spawnSync('node', ['test/example/test/run-on-ci__exception.js'], {
+      encoding: 'utf-8'
+    })
+    const msg3 = child3.stdout.includes('✖')
+    const errMsg3 = child3.stderr.includes('Error: afterEach')
+
+    assert.equal(child1.status, 0)
+    assert.equal(msg1, true, child1.stdout)
+    assert.equal(child2.status, 1)
+    assert.equal(msg2, true, child2.stdout)
+    assert.equal(errMsg2, true, child2.stderr)
+    assert.equal(child3.status, 1)
+    assert.equal(msg3, false, child3.stdout)
+    assert.equal(errMsg3, true, child3.stderr)
   }
 
 }

@@ -7,27 +7,15 @@ import test from '@nodutilus-test/test'
 
 class AllTests extends Test {
 
-  [Test.afterEachDeep]({ path = [], name, result: { success, error } }) {
-    const result = success ? 'success' : 'failure'
-
-    console.log(`${result}: ${path.join(', ')} => ${name}`)
-    if (error) {
-      console.log(error)
-    }
-  }
-
   static ['@nodutilus/events'] = events
   static ['@nodutilus/fs'] = fs
   static ['@nodutilus/test'] = test
 
+  async preparation() {
+    await preparation()
+  }
+
 }
 
 
-async function runTests() {
-  await preparation()
-
-  return Test.run(new AllTests())
-}
-
-
-export { AllTests, runTests }
+Test.runOnCI(new AllTests())

@@ -5,7 +5,5 @@ new Application(async () => {
   await symlinkModule('../../@nodutilus', 'test')
   await symlinkModule('../@nodutilus-test', 'test')
 
-  const all = await import('./all-tests.js')
-
-  await (all.default || all).runTests()
+  await import('./all-tests.js')
 }).redy()

@@ -404,6 +404,8 @@ class Test {
    */
   static runOnCI(testInstance) {
     let prevParent
+    let successCount = 0
+    let failureCount = 0
 
     testInstance.event.on(Test.afterEachDeep, ({ path, name, result: { success, error } }) => {
       const result = success ? '✓' : '✖'
@@ -416,11 +418,16 @@ class Test {
       }
       console.log(msg)
       if (error) console.error(error)
+      successCount += success
+      failureCount += !success
     })
     this.run(testInstance)
       .then(result => {
         if (!result.success) {
+          console.log(`∑  ✓ ${successCount}  ✖ ${failureCount}`)
           process.exit(1)
+        } else {
+          console.log(`∑  ✓ ${successCount}`)
         }
       }, error => {
         console.error(error)

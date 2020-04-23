@@ -166,7 +166,21 @@ export default class EventsTest extends Test {
 
     }
 
+    class MyEM2 extends MyEM {
+
+      /**
+       * Событие в наследнике вызываются аналогично событиям в предке
+       *
+       * @param {number} val
+       */
+      testEvent2(val) {
+        secondResult = val
+      }
+
+    }
+
     const myEM = new MyEM()
+    const myEM2 = new MyEM2()
 
     // Событие можно объявить в классе, и повторно подписаться на него позже
     myEM.on(event, val => {
@@ -192,6 +206,12 @@ export default class EventsTest extends Test {
     await myEMBase.emit('test')
 
     assert.equal(result2, 1)
+
+    await myEM2.emit('testEvent2', 5)
+    await myEM2.emit(event, 6)
+
+    assert.equal(secondResult, 5)
+    assert.equal(result, 6)
   }
 
   /** Методы как события для EventEmitter */

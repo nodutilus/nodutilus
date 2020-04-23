@@ -1,15 +1,18 @@
 {
   "name": "@nodutilus/test",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "repository": "github:nodutilus/nodutilus",
   "homepage": "https://nodutilus.github.io",
   "license": "Unlicense",
   "type": "module",
+  "engines": {
+    "node": ">=14"
+  },
   "exports": {
     ".": "./test.js"
   },
   "dependencies": {
-    "@nodutilus/events": "^0.1"
+    "@nodutilus/events": "^0.2"
   },
   "description": "Тесты на классах. Агрегация, наследование, события",
   "keywords": [

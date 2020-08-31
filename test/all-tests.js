@@ -5,7 +5,7 @@ import fs from '@nodutilus-test/fs'
 import test from '@nodutilus-test/test'
 
 
-class AllTests extends Test {
+export class AllTests extends Test {
 
   static ['@nodutilus/events'] = events
   static ['@nodutilus/fs'] = fs
@@ -16,6 +16,3 @@ class AllTests extends Test {
   }
 
 }
-
-
-Test.runOnCI(new AllTests())

@@ -5,8 +5,5 @@ new Application(async () => {
   await symlinkModule('../../@nodutilus', 'test')
   await symlinkModule('../@nodutilus-test', 'test')
 
-  const { Test } = await import('@nodutilus/test')
-  const { AllTests } = await import('./all-tests.js')
-
-  await Test.runOnCI(new AllTests())
+  await import('./run-on-ci.js')
 }).redy()

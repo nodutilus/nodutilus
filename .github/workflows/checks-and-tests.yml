@@ -11,9 +11,7 @@ on:
 jobs:
   checks:
     name: Checks with Linters
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@main
       - uses: nodutilus/project-config/actions/setup-node-latest@init-config
@@ -23,24 +21,14 @@ jobs:
 
   tests:
     name: Test, ${{ matrix.os }}
-
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-
     runs-on: ${{ matrix.os }}
-
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@master
-        with:
-          node-version: ">=14"
-          registry-url: "https://npm.pkg.github.com"
-
-      - name: Install dependencies
-        run: npm install
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - uses: actions/checkout@main
+      - uses: nodutilus/project-config/actions/setup-node-latest@init-config
+      - uses: nodutilus/project-config/actions/setup-npm@init-config
 
       - name: Run Tests
         run: node test
@@ -51,16 +39,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@master
-        with:
-          node-version: ">=14"
-          registry-url: "https://npm.pkg.github.com"
-
-      - name: Install dependencies
-        run: npm install
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - uses: actions/checkout@main
+      - uses: nodutilus/project-config/actions/setup-node-latest@init-config
+      - uses: nodutilus/project-config/actions/setup-npm@init-config
 
       - name: Check Coverage
         run: npx nodutilus-nyc

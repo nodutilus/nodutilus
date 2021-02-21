@@ -3,10 +3,10 @@ name: Checks & Tests
 on:
   pull_request:
     branches:
-      - master
+      - main
   push:
     branches:
-      - master
+      - main
 
 jobs:
   checks:
@@ -15,19 +15,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@master
-        with:
-          node-version: ">=14"
-          registry-url: "https://npm.pkg.github.com"
-
-      - name: Install dependencies
-        run: npm install
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-      - name: ESLint checks
-        run: npx nodutilus-eslint
+      - uses: actions/checkout@main
+      - uses: nodutilus/project-config/actions/setup-node-latest@init-config
+      - uses: nodutilus/project-config/actions/setup-npm@init-config
+      - uses: nodutilus/project-config/actions/eslint@init-config
+      - uses: nodutilus/project-config/actions/eslintcc@init-config
 
   tests:
     name: Test, ${{ matrix.os }}

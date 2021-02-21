@@ -3,8 +3,6 @@
   "license": "Unlicense",
   "type": "module",
   "dependencies": {
-    "@nodutilus/ci-cd": "latest",
-    "@nodutilus/eslint-config": "latest",
-    "@nodutilus/nyc-config": "latest"
+    "@nodutilus/project-config": "github:nodutilus/project-config#init-config"
   }
 }

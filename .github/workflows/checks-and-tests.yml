@@ -35,16 +35,12 @@ jobs:
 
   coverage:
     name: Check Coverage
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@main
       - uses: nodutilus/project-config/actions/setup-node-latest@init-config
       - uses: nodutilus/project-config/actions/setup-npm@init-config
-
-      - name: Check Coverage
-        run: npx nodutilus-nyc
+      - uses: nodutilus/project-config/actions/nyc@init-config
 
   # Для изменений в мастере - публикуем
   # build-and-publish:

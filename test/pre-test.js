@@ -3,15 +3,15 @@ import { resolve } from 'path'
 
 console.log(process.cwd())
 console.log(resolve('test/node_modules'))
-console.log(resolve('../../@nodutilus'))
+console.log(resolve('@nodutilus'))
 console.log(resolve('test/node_modules/@nodutilus'))
-console.log(resolve('../@nodutilus-test'))
+console.log(resolve('test/@nodutilus-test'))
 console.log(resolve('test/node_modules/@nodutilus-test'))
 
 mkdirSync(resolve('test/node_modules'), { recursive: true })
 if (!existsSync(resolve('test/node_modules/@nodutilus'))) {
-  symlinkSync(resolve('../../@nodutilus'), resolve('test/node_modules/@nodutilus'), 'dir')
+  symlinkSync('../../@nodutilus', resolve('test/node_modules/@nodutilus'), 'dir')
 }
 if (!existsSync(resolve('test/node_modules/@nodutilus-test'))) {
-  symlinkSync(resolve('../@nodutilus-test'), resolve('test/node_modules/@nodutilus-test'), 'dir')
+  symlinkSync('../@nodutilus-test', resolve('test/node_modules/@nodutilus-test'), 'dir')
 }

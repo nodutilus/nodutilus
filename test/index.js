@@ -1,9 +1,21 @@
-import { Application, symlinkModule } from '@nodutilus/ci-cd'
+import { Test } from '@nodutilus/test'
+import { preparation } from './preparation.js'
+import events from '@nodutilus-test/events'
+import fs from '@nodutilus-test/fs'
+import test from '@nodutilus-test/test'
 
-new Application(async () => {
-  await symlinkModule('../../@nodutilus', '@nodutilus')
-  await symlinkModule('../../@nodutilus', 'test')
-  await symlinkModule('../@nodutilus-test', 'test')
 
-  await import('./run-on-ci.js')
-}).redy()
+class AllTests extends Test {
+
+  static ['@nodutilus/events'] = events
+  static ['@nodutilus/fs'] = fs
+  static ['@nodutilus/test'] = test
+
+  async preparation() {
+    await preparation()
+  }
+
+}
+
+
+Test.runOnCI(new AllTests())

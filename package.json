@@ -4,5 +4,8 @@
   "type": "module",
   "dependencies": {
     "@nodutilus/project-config": "github:nodutilus/project-config#init-config"
+  },
+  "scripts": {
+    "pre-test": "node test/pre-test"
   }
 }

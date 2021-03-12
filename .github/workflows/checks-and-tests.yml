@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@main
       - uses: nodutilus/project-config/actions/setup-node-latest@init-config
       - uses: nodutilus/project-config/actions/setup-npm@init-config
-      - uses: nodutilus/project-config/actions/nyc@init-config
+      - uses: nodutilus/project-config/actions/c8@init-config
 
   # Для изменений в мастере - публикуем
   # build-and-publish:

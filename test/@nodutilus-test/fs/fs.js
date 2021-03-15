@@ -7,6 +7,7 @@ const { COPY_EXCL, COPY_RMNONEXISTENT, WALK_FILEFIRST, WRITE_EXCL } = fsConstant
 const { mkdir, rmdir } = fsPromises
 
 
+/** Тесты библиотеки @nodutilus/fs */
 export default class FsTest extends Test {
 
   /** Перед запуском очистим временные данные */

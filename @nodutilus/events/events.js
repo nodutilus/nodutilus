@@ -9,7 +9,7 @@ const privateEventsMap = new WeakMap()
 const privatePromiseEventEmittersMap = new WeakMap()
 /** @type {WeakMap<EventEmitter, any>} */
 const privatePromiseEventEmittersReason = new WeakMap()
-/** @type {Object<string, Symbol>} */
+/** @type {Object<string, symbol>} */
 const pemEvents = {
   resolve: Symbol('PromiseEventEmitter#event:resolve'),
   reject: Symbol('PromiseEventEmitter#event:reject')

@@ -1,10 +1,12 @@
 import { Test, TestResult, assert } from '@nodutilus/test'
 import { spawnSync } from 'child_process'
 
+/** Тесты библиотеки @nodutilus/test */
 export default class TestTest extends Test {
 
   /** Тесты можно расширять через наследование классов */
   async ['Test - наследование тестов']() {
+    /** Родительский класс */
     class TestA extends Test {
 
       /***/
@@ -15,6 +17,7 @@ export default class TestTest extends Test {
 
     }
 
+    /** Расширение и переопределение тестов при наследовании */
     class TestB extends TestA {
 
       /***/
@@ -22,7 +25,8 @@ export default class TestTest extends Test {
 
       /** При наследовании можно затереть тест, что бы он не выполнялся
        *
-       * @returns {number}
+       * @returns {number} Если результат не является функцией,
+       *  он игнорируется при переборе тестов-методов класса
        */
       get testC() { return 1 }
 
@@ -48,6 +52,7 @@ export default class TestTest extends Test {
   async ['Test - наследование событий тестов']() {
     const tests = []
 
+    /** Родительский класс */
     class TestA extends Test {
 
       /***/
@@ -56,7 +61,7 @@ export default class TestTest extends Test {
       }
 
       /**
-       * @param {{name:string}} name
+       * @param {{name:string}} name Имя метода теста
        */
       [Test.beforeEach]({ name }) {
         tests.push(name)
@@ -79,6 +84,7 @@ export default class TestTest extends Test {
 
     }
 
+    /** При наследовании используются события родителя */
     class TestB extends TestA {
 
       /***/
@@ -107,6 +113,7 @@ export default class TestTest extends Test {
    *  Пока нет полей класса, задаются после объявления класса.
    * (https://github.com/tc39/proposal-class-fields) */
   async ['Test - агрегация тестов']() {
+    /** Одиночный класс тестов */
     class TestA extends Test {
 
       /***/
@@ -114,6 +121,7 @@ export default class TestTest extends Test {
 
     }
 
+    /** Одиночный класс тестов */
     class TestB extends Test {
 
       /***/
@@ -123,6 +131,7 @@ export default class TestTest extends Test {
 
     TestB.TestE = TestA
 
+    /** Составной класс тестов */
     class TestC extends Test { }
 
     TestC.TestA = TestA
@@ -131,6 +140,7 @@ export default class TestTest extends Test {
     // Агрегируются классы тестов, но не их экземпляры
     TestC.TestD = new TestB()
 
+    /** Агрегация в конструкторе */
     class TestE extends TestC {
 
       /** */
@@ -139,13 +149,17 @@ export default class TestTest extends Test {
         // Также можно затереть тест в конструкции наследника агрегации
         // Значение может быть любым отличным от наследника Test
         this.TestB = 1
-        // В конструкторе не добавить тестовые классы, они игнорируются, можно толоко готовые экземпляры
+        // В конструкторе не добавить тестовые классы, они игнорируются
         this.TestG = TestA
+        // Можно толоко готовые экземпляры созданные с нужными параметрами
+        this.TestI = new TestB()
       }
 
-      /** Агрегацию можно выполнить внутри теста, вернув из него результат другого теста
+      /** Агрегацию можно выполнить внутри теста, вернув из него результат другого теста.
+       *    В данном случае можно динамически определять состав и параметры тестов, как и в конструкторе,
+       *    но в данном случае они запускаются на исполнение внутри самого тестового метода.
        *
-       * @returns {TestResult}
+       * @returns {TestResult} Результат выполнения вложенных тестов
        */
       async testH() {
         const result = await Test.run(new TestA())
@@ -179,6 +193,7 @@ export default class TestTest extends Test {
     assert.equal(resultE.tests.get('TestF'), undefined)
     assert.equal(resultE.tests.get('TestG'), undefined)
     assert.equal(resultE.tests.get('testH').tests.get('testA').success, true)
+    assert.equal(resultE.tests.get('TestI').tests.get('testB').success, true)
   }
 
   /** Тесты можно создавать и без объявления классов, просто расширяя экземпляр Test */

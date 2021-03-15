@@ -4,6 +4,7 @@ import { EventEmitter, PromiseEventEmitter } from '@nodutilus/events'
 const testClassMethodAsEvents = Symbol('testClassMethodAsEvents')
 
 
+/** Тесты библиотеки @nodutilus/events */
 export default class EventsTest extends Test {
 
   /** Попытка удаление события до подписки не должна падать */
@@ -129,12 +130,13 @@ export default class EventsTest extends Test {
     let counter = 0
     let checkThis = null
 
+    /** Родительский класс событий */
     class MyEM extends cls {
 
       /**
        * Используется как обработчик события
        *
-       * @param {number} val
+       * @param {number} val Произвольный аргумент события
        */
       async testEvent(val) {
         await new Promise(resolve => {
@@ -147,7 +149,7 @@ export default class EventsTest extends Test {
       /**
        * Событие может быть задано символом
        *
-       * @param {number} val
+       * @param {number} val Произвольный аргумент события
        */
       [event](val) {
         result = val
@@ -156,7 +158,7 @@ export default class EventsTest extends Test {
       /**
        * Для проверки запрета вызова служебных методов как событий переопределим emit
        *
-       * @param {...any} args
+       * @param {...any} args Произвольный аргумент события
        * @returns {Promise<void>}
        */
       async emit(...args) {
@@ -166,12 +168,13 @@ export default class EventsTest extends Test {
 
     }
 
+    /** Расширение событий через наследование */
     class MyEM2 extends MyEM {
 
       /**
        * Событие в наследнике вызываются аналогично событиям в предке
        *
-       * @param {number} val
+       * @param {number} val Произвольный аргумент события
        */
       testEvent2(val) {
         secondResult = val
@@ -212,6 +215,12 @@ export default class EventsTest extends Test {
 
     assert.equal(secondResult, 5)
     assert.equal(result, 6)
+
+    // События родителя так же доступны и в классе потомке,
+    //  и работают с его экземпляром
+    await myEM2.emit('testEvent', 7)
+
+    assert.equal(result, 7)
   }
 
   /** Методы как события для EventEmitter */

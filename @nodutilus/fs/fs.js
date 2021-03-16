@@ -4,15 +4,14 @@ import { dirname, join } from 'path'
 import { promises as fsPromises, constants as fsConstants } from 'fs'
 
 const { COPYFILE_EXCL } = fsConstants
-const { copyFile, mkdir, readdir, readFile, rmdir, stat, writeFile } = fsPromises
+const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
 /**
  * @typedef CONSTANTS
- * @property {number} COPY_EXCL
- * @property {number} COPY_RMNONEXISTENT
- * @property {number} SYMLINK_EXCL
- * @property {number} SYMLINK_RMNONEXISTENT
- * @property {number} WALK_FILEFIRST
- * @property {number} WRITE_EXCL
+ * @property {number} COPY_EXCL Завершать копирование ошибкой если файл или каталог уже существует
+ * @property {number} COPY_RMNONEXISTENT При копировании со слиянием каталогов
+ *  удалять найденные в целевом каталоге, но несуществующие в источнике каталоги и файлы
+ * @property {number} WALK_FILEFIRST При обходе каталога сначала возвращать вложенные файлы затем каталоги
+ * @property {number} WRITE_EXCL Завершать запись файла ошибкой если файл существует
  */
 /** @type {CONSTANTS} */
 const constants = Object.create(null)
@@ -23,15 +22,19 @@ const WRITE_EXCL = constants.WRITE_EXCL = 0b1000
 
 
 /**
- * @callback Walker
- * @param {string} path
- * @param {import('fs').Dirent} dirent
- * @returns {boolean|Promise<boolean>}
+ * @callback Walker Функция обратного вызова для обработки результатов обхода дерева каталога
+ * @param {string} path Имя найденного каталога или файла
+ * @param {import('fs').Dirent} dirent Сущность записи каталога
+ * @returns {void|boolean|Promise<void|boolean>} Если вернуть для каталога false,
+ *  он будет проигнорирован (не работает с флагом WALK_FILEFIRST)
  */
 /**
- * @param {string} path
- * @param {number|Walker} [flags]
- * @param {Walker} [walker]
+ * Обходит дерево каталога и возвращает вложенные каталоги и файлы в Walker
+ *
+ * @param {string} path Каталог для обхода
+ * @param {number} [flags] Модификаторы поведения
+ * @param {number}[flags.WALK_FILEFIRST] Возвращать сначало файлы
+ * @param {Walker} [walker] Обработчик результатов обхода дерева каталога
  * @returns {Promise<void>}
  */
 async function walk(path, flags, walker) {
@@ -43,14 +46,15 @@ async function walk(path, flags, walker) {
 
 
 /**
- * @typedef WalkOptions
- * @property {string} root
- * @property {number} [flags]
- * @property {Walker} walker
+ * @typedef WalkOptions Внутренние опции для метода обхода дерева каталога
+ * @property {string} root Корневой каталог для обхода
+ * @property {number} [flags] Модификаторы поведения
+ * @property {number}[flags.WALK_FILEFIRST] Возвращать сначала файлы
+ * @property {Walker} walker Обработчик результатов обхода дерева каталога
  */
 /**
- * @param {string} path
- * @param {WalkOptions} options
+ * @param {string} path Текущий каталог для обхода
+ * @param {WalkOptions} options Внутренние опции
  * @returns {Promise<void>}
  */
 async function __walk(path, options) {
@@ -79,9 +83,14 @@ async function __walk(path, options) {
 
 
 /**
- * @param {string} src
- * @param {string} dest
- * @param {number} flags
+ * Копирует файл или каталог со всем содержимым.
+ * По умолчанию осуществляет слияние каталогов и перезапись файлов (управляется флагами).
+ *
+ * @param {string} src Каталог или файл источник
+ * @param {string} dest Целевой каталог или файл
+ * @param {number} flags Модификаторы поведения
+ * @param {number}[flags.COPY_EXCL] Завершать копирование ошибкой если файл или каталог уже существует
+ * @param {number}[flags.COPY_RMNONEXISTENT] Удалять при слиянии каталоги и файлы не найденные в источнике
  * @returns {Promise<void>}
  */
 async function copy(src, dest, flags) {
@@ -102,9 +111,13 @@ async function copy(src, dest, flags) {
 
 
 /**
- * @param {string} src
- * @param {string} dest
- * @param {number} flags
+ * Вспомогательная функция для рекурсивного обхода дерева каталогов при копировании
+ *
+ * @param {string} src Каталог источник
+ * @param {string} dest Целевой каталог
+ * @param {number} flags Модификаторы поведения
+ * @param {number}[flags.COPY_EXCL] Завершать копирование ошибкой если файл или каталог уже существует
+ * @param {number}[flags.COPY_RMNONEXISTENT] Удалять при слиянии каталоги и файлы не найденные в источнике
  * @returns {Promise<void>}
  */
 async function __copy(src, dest, flags) {
@@ -145,18 +158,22 @@ async function __copy(src, dest, flags) {
 
 
 /**
- * @param {string} path
+ * Удаление файла или каталога со всем содержимым
+ *
+ * @param {string} path Каталог или файл
  * @returns {Promise<void>}
  */
 async function remove(path) {
-  await rmdir(path, { recursive: true })
+  await rm(path, { force: true, recursive: true })
 }
 
 
 /**
- * @param {string} path
- * @param {object} defaultValue
- * @returns {Promise<object>}
+ * Чтение файла в формате JSON
+ *
+ * @param {string} path Путь до файла
+ * @param {object} [defaultValue] Значение по умолчанию, если файл не найден
+ * @returns {Promise<object>} Распарсенный JOSN объект
  */
 async function readJSON(path, defaultValue) {
   const data = await readFile(path, 'utf8').then(JSON.parse).catch(error => {
@@ -171,9 +188,11 @@ async function readJSON(path, defaultValue) {
 
 
 /**
- * @param {string} path
- * @param {string} defaultValue
- * @returns {Promise<string>}
+ * Чтение файла в текстовом формате
+ *
+ * @param {string} path Путь до файла
+ * @param {string} [defaultValue] Значение по умолчанию, если файл не найден
+ * @returns {Promise<string>} Текст из файла
  */
 async function readText(path, defaultValue) {
   const data = await readFile(path, 'utf8').catch(error => {
@@ -188,9 +207,12 @@ async function readText(path, defaultValue) {
 
 
 /**
- * @param {string} path
- * @param {object} data
- * @param {number} flags
+ * Запись файла в формате JSON
+ *
+ * @param {string} path Путь до файла
+ * @param {object} data JOSN объект
+ * @param {number} [flags] Модификаторы поведения
+ * @param {number} [flags.WRITE_EXCL] Завершать запись файла ошибкой, если файл существует
  * @returns {Promise<void>}
  */
 async function writeJSON(path, data, flags) {
@@ -201,9 +223,12 @@ async function writeJSON(path, data, flags) {
 
 
 /**
- * @param {string} path
- * @param {string} data
- * @param {number} flags
+ * Запись файла в текстовом формате
+ *
+ * @param {string} path Путь до файла
+ * @param {string} data Текст
+ * @param {number} [flags] Модификаторы поведения
+ * @param {number} [flags.WRITE_EXCL] Завершать запись файла ошибкой, если файл существует
  * @returns {Promise<void>}
  */
 async function writeText(path, data, flags) {

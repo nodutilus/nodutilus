@@ -3,7 +3,7 @@
   "license": "Unlicense",
   "type": "module",
   "dependencies": {
-    "@nodutilus/project-config": "github:nodutilus/project-config#init-config"
+    "@nodutilus/project-config": "github:nodutilus/project-config#main"
   },
   "scripts": {
     "pre-test": "node test/pre-test"

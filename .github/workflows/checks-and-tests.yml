@@ -14,10 +14,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - uses: nodutilus/project-config/actions/setup-node-latest@init-config
-      - uses: nodutilus/project-config/actions/setup-npm@init-config
-      - uses: nodutilus/project-config/actions/eslint@init-config
-      - uses: nodutilus/project-config/actions/eslintcc@init-config
+      - uses: nodutilus/project-config/actions/setup-node-latest@main
+      - uses: nodutilus/project-config/actions/setup-npm@main
+      - uses: nodutilus/project-config/actions/eslint@main
+      - uses: nodutilus/project-config/actions/eslintcc@main
 
   tests:
     name: Test on ${{ matrix.os }}
@@ -27,18 +27,18 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@main
-      - uses: nodutilus/project-config/actions/setup-node-latest@init-config
-      - uses: nodutilus/project-config/actions/setup-npm@init-config
-      - uses: nodutilus/project-config/actions/test@init-config
+      - uses: nodutilus/project-config/actions/setup-node-latest@main
+      - uses: nodutilus/project-config/actions/setup-npm@main
+      - uses: nodutilus/project-config/actions/test@main
 
   coverage:
     name: Check Coverage
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - uses: nodutilus/project-config/actions/setup-node-latest@init-config
-      - uses: nodutilus/project-config/actions/setup-npm@init-config
-      - uses: nodutilus/project-config/actions/c8@init-config
+      - uses: nodutilus/project-config/actions/setup-node-latest@main
+      - uses: nodutilus/project-config/actions/setup-npm@main
+      - uses: nodutilus/project-config/actions/c8@main
 
   # Для изменений в мастере - публикуем
   # build-and-publish:

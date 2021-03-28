@@ -10,14 +10,12 @@ const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
  * @property {number} COPY_EXCL Завершать копирование ошибкой если файл или каталог уже существует
  * @property {number} COPY_RMNONEXISTENT При копировании со слиянием каталогов
  *  удалять найденные в целевом каталоге, но несуществующие в источнике каталоги и файлы
- * @property {number} WALK_FILEFIRST При обходе каталога сначала возвращать вложенные файлы затем каталоги
  * @property {number} WRITE_EXCL Завершать запись файла ошибкой если файл существует
  */
 /** @type {CONSTANTS} */
 const constants = Object.create(null)
 const COPY_EXCL = constants.COPY_EXCL = 0b0001
 const COPY_RMNONEXISTENT = constants.COPY_RMNONEXISTENT = 0b0010
-const WALK_FILEFIRST = constants.WALK_FILEFIRST = 0b0100
 const WRITE_EXCL = constants.WRITE_EXCL = 0b1000
 
 
@@ -26,57 +24,74 @@ const WRITE_EXCL = constants.WRITE_EXCL = 0b1000
  * @param {string} path Имя найденного каталога или файла
  * @param {import('fs').Dirent} dirent Сущность записи каталога
  * @returns {void|boolean|Promise<void|boolean>} Если вернуть для каталога false,
- *  он будет проигнорирован (не работает с флагом WALK_FILEFIRST)
+ *  он будет проигнорирован (не работает с опцией fileFirst)
+ */
+/**
+ * @typedef WalkOptions Опции для метода обхода дерева каталога
+ * @property {number} [fileFirst] При обходе каталога сначала возвращать вложенные файлы затем каталоги
+ * @property {Walker} [walker] Обработчик результатов обхода дерева каталога
  */
 /**
  * Обходит дерево каталога и возвращает вложенные каталоги и файлы в Walker
  *
  * @param {string} path Каталог для обхода
- * @param {number} [flags] Модификаторы поведения
- * @param {number}[flags.WALK_FILEFIRST] Возвращать сначало файлы
+ * @param {WalkOptions} [options] Модификаторы поведения
  * @param {Walker} [walker] Обработчик результатов обхода дерева каталога
- * @returns {Promise<void>}
+ * @returns {Promise<void>|Iterator<[string,import('fs').Dirent]>} Если не передан Walker,
+ *  то вернется итератор для обхода каталогов и файлов
  */
-async function walk(path, flags, walker) {
-  if (typeof flags === 'function') {
-    [flags, walker] = [walker, flags]
+function walk(path, options = {}, walker) {
+  const { fileFirst } = options
+
+  if (typeof options === 'function') {
+    [options, walker] = [walker, options]
   }
-  await __walk('.', { root: path, flags, walker })
+  walker = walker || options.walker
+
+  if (walker) {
+    return (async () => {
+      const walk = __walk(path, { fileFirst })
+      let next = await walk.next()
+
+      while (!next.done) {
+        next = await walk.next(await walker(...next.value))
+      }
+    })()
+  } else {
+    return __walk(path, { fileFirst })
+  }
 }
 
 
 /**
- * @typedef WalkOptions Внутренние опции для метода обхода дерева каталога
- * @property {string} root Корневой каталог для обхода
- * @property {number} [flags] Модификаторы поведения
- * @property {number}[flags.WALK_FILEFIRST] Возвращать сначала файлы
- * @property {Walker} walker Обработчик результатов обхода дерева каталога
+ * @typedef WalkContext Внутренние опции для метода обхода дерева каталога
+ * @property {number} [fileFirst] При обходе каталога сначала возвращать вложенные файлы затем каталоги
  */
 /**
  * @param {string} path Текущий каталог для обхода
- * @param {WalkOptions} options Внутренние опции
- * @returns {Promise<void>}
+ * @param {WalkContext} [context] Внутренние опции
+ * @yields {[string,import('fs').Dirent]}
  */
-async function __walk(path, options) {
-  const { root, flags, walker } = options
-  const files = await readdir(join(root, path), { withFileTypes: true })
+async function* __walk(path, context = {}) {
+  const { fileFirst } = context
+  const files = await readdir(path, { withFileTypes: true })
 
   for (const file of files) {
     const filePath = join(path, file.name)
 
     if (file.isDirectory()) {
-      if (flags & WALK_FILEFIRST) {
-        await __walk(filePath, options)
-        await walker(filePath, file)
+      if (fileFirst) {
+        yield* __walk(filePath, context)
+        yield [filePath, file]
       } else {
-        const needNested = await walker(filePath, file)
+        const needNested = yield [filePath, file]
 
         if (needNested !== false) {
-          await __walk(filePath, options)
+          yield* __walk(filePath, context)
         }
       }
     } else {
-      await walker(filePath, file)
+      yield [filePath, file]
     }
   }
 }
@@ -125,34 +140,28 @@ async function __copy(src, dest, flags) {
   const existentPaths = flags & COPY_RMNONEXISTENT ? [] : false
 
   await mkdir(dest, mkdirOptions)
-  await __walk('.', {
-    root: src,
-    walker: async (path, dirent) => {
+  for await (const [path, dirent] of __walk(src)) {
+    const destPath = join(dest, path)
+
+    if (existentPaths) {
+      existentPaths.push(destPath)
+    }
+    if (dirent.isDirectory()) {
+      await mkdir(destPath, mkdirOptions)
+    } else {
+      await copyFile(join(src, path), destPath)
+    }
+  }
+  if (existentPaths) {
+    for await (const [path] of __walk(dest)) {
       const destPath = join(dest, path)
 
-      if (existentPaths) {
-        existentPaths.push(destPath)
-      }
-      if (dirent.isDirectory()) {
-        await mkdir(destPath, mkdirOptions)
-      } else {
-        await copyFile(join(src, path), destPath)
+      if (!existentPaths.includes(destPath)) {
+        await remove(destPath)
+
+        return false
       }
     }
-  })
-  if (existentPaths) {
-    await __walk('.', {
-      root: dest,
-      walker: async path => {
-        const destPath = join(dest, path)
-
-        if (!existentPaths.includes(destPath)) {
-          await remove(destPath)
-
-          return false
-        }
-      }
-    })
   }
 }
 

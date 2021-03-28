@@ -3,7 +3,7 @@ import { copy, readJSON, readText, remove, walk, writeJSON, constants as fsConst
 import { normalize, relative } from 'path'
 import { existsSync, promises as fsPromises } from 'fs'
 
-const { COPY_EXCL, COPY_RMNONEXISTENT, WALK_FILEFIRST, WRITE_EXCL } = fsConstants
+const { COPY_EXCL, COPY_RMNONEXISTENT, WRITE_EXCL } = fsConstants
 const { mkdir, rmdir } = fsPromises
 
 
@@ -27,15 +27,15 @@ export default class FsTest extends Test {
   }
 
   /** перебираем сначала папки затем вложенные файлы */
-  async ['walk - базовый']() {
+  async ['walk - базовый (walker)']() {
     const files = []
     const expected = [
-      'f1.txt',
-      'p1',
-      normalize('p1/p1f1.txt'),
-      normalize('p1/p1f2.txt'),
-      'p2',
-      normalize('p2/p2f1.txt')
+      'test/example/fs/walk/f1.txt',
+      'test/example/fs/walk/p1',
+      normalize('test/example/fs/walk/p1/p1f1.txt'),
+      normalize('test/example/fs/walk/p1/p1f2.txt'),
+      'test/example/fs/walk/p2',
+      normalize('test/example/fs/walk/p2/p2f1.txt')
     ]
 
     await walk('test/example/fs/walk', path => {
@@ -45,20 +45,39 @@ export default class FsTest extends Test {
     assert.deepEqual(files, expected)
   }
 
+  /** перебираем сначала папки затем вложенные файлы */
+  async ['walk - базовый (for await)']() {
+    const files = []
+    const expected = [
+      'test/example/fs/walk/f1.txt',
+      'test/example/fs/walk/p1',
+      normalize('test/example/fs/walk/p1/p1f1.txt'),
+      normalize('test/example/fs/walk/p1/p1f2.txt'),
+      'test/example/fs/walk/p2',
+      normalize('test/example/fs/walk/p2/p2f1.txt')
+    ]
+
+    for await (const [path] of walk('test/example/fs/walk')) {
+      files.push(path)
+    }
+
+    assert.deepEqual(files, expected)
+  }
+
   /** если сначала перебираются папки, то можно вернуть false,
    * чтобы не проходить по вложениям папки */
   async ['walk - исключение папок']() {
     const files = []
     const expected = [
-      'f1.txt',
-      'p1',
-      'p2',
-      normalize('p2/p2f1.txt')
+      'test/example/fs/walk/f1.txt',
+      'test/example/fs/walk/p1',
+      'test/example/fs/walk/p2',
+      normalize('test/example/fs/walk/p2/p2f1.txt')
     ]
 
     await walk('test/example/fs/walk', (path, dirent) => {
       files.push(path)
-      if (dirent.isDirectory() && path === 'p1') {
+      if (dirent.isDirectory() && path === 'test/example/fs/walk/p1') {
         return false
       }
     })
@@ -71,15 +90,15 @@ export default class FsTest extends Test {
   async ['walk - сначала вложенные файлы']() {
     const files = []
     const expected = [
-      'f1.txt', true,
-      normalize('p1/p1f1.txt'), true,
-      normalize('p1/p1f2.txt'), true,
-      'p1', false,
-      normalize('p2/p2f1.txt'), true,
-      'p2', false
+      'test/example/fs/walk/f1.txt', true,
+      normalize('test/example/fs/walk/p1/p1f1.txt'), true,
+      normalize('test/example/fs/walk/p1/p1f2.txt'), true,
+      'test/example/fs/walk/p1', false,
+      normalize('test/example/fs/walk/p2/p2f1.txt'), true,
+      'test/example/fs/walk/p2', false
     ]
 
-    await walk('test/example/fs/walk', WALK_FILEFIRST, async (path, dirent) => {
+    await walk('test/example/fs/walk', { fileFirst: true }, async (path, dirent) => {
       await new Promise(resolve => setTimeout(resolve, 1))
       files.push(path)
       files.push(dirent.isFile())

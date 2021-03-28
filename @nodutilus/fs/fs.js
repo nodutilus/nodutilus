@@ -1,6 +1,6 @@
 /** @module @nodutilus/fs */
 
-import { dirname, join } from 'path'
+import { dirname, join, relative } from 'path'
 import { promises as fsPromises, constants as fsConstants } from 'fs'
 
 const { COPYFILE_EXCL } = fsConstants
@@ -141,7 +141,7 @@ async function __copy(src, dest, flags) {
 
   await mkdir(dest, mkdirOptions)
   for await (const [path, dirent] of __walk(src)) {
-    const destPath = join(dest, path)
+    const destPath = join(dest, relative(src, path))
 
     if (existentPaths) {
       existentPaths.push(destPath)
@@ -149,17 +149,13 @@ async function __copy(src, dest, flags) {
     if (dirent.isDirectory()) {
       await mkdir(destPath, mkdirOptions)
     } else {
-      await copyFile(join(src, path), destPath)
+      await copyFile(path, destPath)
     }
   }
   if (existentPaths) {
-    for await (const [path] of __walk(dest)) {
-      const destPath = join(dest, path)
-
-      if (!existentPaths.includes(destPath)) {
-        await remove(destPath)
-
-        return false
+    for await (const [path] of __walk(dest, { fileFirst: true })) {
+      if (!existentPaths.includes(path)) {
+        await remove(path)
       }
     }
   }

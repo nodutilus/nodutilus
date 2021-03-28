@@ -113,8 +113,8 @@ export default class FsTest extends Test {
     const filesB = []
 
     await copy('test/example/fs/walk', 'test/example/fs/copy')
-    await walk('test/example/fs/walk', path => filesA.push(path))
-    await walk('test/example/fs/copy', path => filesB.push(path))
+    await walk('test/example/fs/walk', path => filesA.push(relative('test/example/fs/walk', path)))
+    await walk('test/example/fs/copy', path => filesB.push(relative('test/example/fs/copy', path)))
 
     assert.deepEqual(filesB, filesA)
   }
@@ -126,8 +126,8 @@ export default class FsTest extends Test {
 
     await copy('test/example/fs/walk', 'test/example/fs/copy')
     await copy('test/example/fs/walk', 'test/example/fs/copy')
-    await walk('test/example/fs/walk', path => filesA.push(path))
-    await walk('test/example/fs/copy', path => filesB.push(path))
+    await walk('test/example/fs/walk', path => filesA.push(relative('test/example/fs/walk', path)))
+    await walk('test/example/fs/copy', path => filesB.push(relative('test/example/fs/copy', path)))
 
     assert.deepEqual(filesB, filesA)
   }
@@ -165,7 +165,7 @@ export default class FsTest extends Test {
     await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt')
     await walk('test/example/fs/copy', path => files.push(path))
 
-    assert.deepEqual(files, ['f1.txt'])
+    assert.deepEqual(files, ['test/example/fs/copy/f1.txt'])
   }
 
   /** копируем файл, если каталог назначения не создан */
@@ -175,7 +175,7 @@ export default class FsTest extends Test {
     await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt')
     await walk('test/example/fs/copy', path => files.push(path))
 
-    assert.deepEqual(files, ['f1.txt'])
+    assert.deepEqual(files, ['test/example/fs/copy/f1.txt'])
   }
 
   /** при копировании удаляем существующие файлы и папки в целевом каталоге,

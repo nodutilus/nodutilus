@@ -5,18 +5,6 @@ import { promises as fsPromises, constants as fsConstants } from 'fs'
 
 const { COPYFILE_EXCL } = fsConstants
 const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
-/**
- * @typedef CONSTANTS
- * @property {number} COPY_EXCL Завершать копирование ошибкой если файл или каталог уже существует
- * @property {number} COPY_RMNONEXISTENT При копировании со слиянием каталогов
- *  удалять найденные в целевом каталоге, но несуществующие в источнике каталоги и файлы
- * @property {number} WRITE_EXCL Завершать запись файла ошибкой если файл существует
- */
-/** @type {CONSTANTS} */
-const constants = Object.create(null)
-const COPY_EXCL = constants.COPY_EXCL = 0b0001
-const COPY_RMNONEXISTENT = constants.COPY_RMNONEXISTENT = 0b0010
-const WRITE_EXCL = constants.WRITE_EXCL = 0b1000
 
 
 /**
@@ -27,15 +15,15 @@ const WRITE_EXCL = constants.WRITE_EXCL = 0b1000
  *  он будет проигнорирован (не работает с опцией fileFirst)
  */
 /**
- * @typedef WalkOptions Опции для метода обхода дерева каталога
- * @property {number} [fileFirst] При обходе каталога сначала возвращать вложенные файлы затем каталоги
+ * @typedef WalkOptions Опции управления обходом дерева каталога
+ * @property {boolean} [fileFirst=false] При обходе каталога сначала возвращать вложенные файлы затем каталоги
  * @property {Walker} [walker] Обработчик результатов обхода дерева каталога
  */
 /**
  * Обходит дерево каталога и возвращает вложенные каталоги и файлы в Walker
  *
  * @param {string} path Каталог для обхода
- * @param {WalkOptions} [options] Модификаторы поведения
+ * @param {WalkOptions} [options] Опции управления обходом дерева каталога
  * @param {Walker} [walker] Обработчик результатов обхода дерева каталога
  * @returns {Promise<void>|Iterator<[string,import('fs').Dirent]>} Если не передан Walker,
  *  то вернется итератор для обхода каталогов и файлов
@@ -64,12 +52,12 @@ function walk(path, options = {}, walker) {
 
 
 /**
- * @typedef WalkContext Внутренние опции для метода обхода дерева каталога
- * @property {number} [fileFirst] При обходе каталога сначала возвращать вложенные файлы затем каталоги
+ * @typedef WalkContext Внутренние опции для обхода дерева каталога
+ * @property {boolean} [fileFirst=false] При обходе каталога сначала возвращать вложенные файлы затем каталоги
  */
 /**
  * @param {string} path Текущий каталог для обхода
- * @param {WalkContext} [context] Внутренние опции
+ * @param {WalkContext} [context] Внутренние опции для обхода дерева каталога
  * @yields {[string,import('fs').Dirent]}
  */
 async function* __walk(path, context = {}) {
@@ -98,29 +86,30 @@ async function* __walk(path, context = {}) {
 
 
 /**
+ * @typedef CopyOptions Опции управления копированием файлов и каталогов
+ * @property {boolean} [throwIfExists=false] Завершать копирование ошибкой если файл или каталог уже существует
+ * @property {boolean} [removeNonExists=false] При копировании со слиянием каталогов
+ *  удалять найденные в целевом каталоге, но несуществующие в источнике каталоги и файлы
+ */
+/**
  * Копирует файл или каталог со всем содержимым.
  * По умолчанию осуществляет слияние каталогов и перезапись файлов (управляется флагами).
  *
  * @param {string} src Каталог или файл источник
  * @param {string} dest Целевой каталог или файл
- * @param {number} flags Модификаторы поведения
- * @param {number}[flags.COPY_EXCL] Завершать копирование ошибкой если файл или каталог уже существует
- * @param {number}[flags.COPY_RMNONEXISTENT] Удалять при слиянии каталоги и файлы не найденные в источнике
+ * @param {CopyOptions} [options] Опции управления копированием файлов и каталогов
  * @returns {Promise<void>}
  */
-async function copy(src, dest, flags) {
+async function copy(src, dest, { throwIfExists, removeNonExists } = {}) {
   const srcStat = await stat(src)
 
   if (srcStat.isDirectory()) {
-    await __copy(src, dest, flags)
+    await __copy(src, dest, { throwIfExists, removeNonExists })
   } else {
-    const excl = flags & COPY_EXCL
-    const fsFlags = excl ? COPYFILE_EXCL : 0
-
-    if (!excl) {
+    if (!throwIfExists) {
       await mkdir(dirname(dest), { recursive: true })
     }
-    await copyFile(src, dest, fsFlags)
+    await copyFile(src, dest, throwIfExists ? COPYFILE_EXCL : 0)
   }
 }
 
@@ -130,14 +119,12 @@ async function copy(src, dest, flags) {
  *
  * @param {string} src Каталог источник
  * @param {string} dest Целевой каталог
- * @param {number} flags Модификаторы поведения
- * @param {number}[flags.COPY_EXCL] Завершать копирование ошибкой если файл или каталог уже существует
- * @param {number}[flags.COPY_RMNONEXISTENT] Удалять при слиянии каталоги и файлы не найденные в источнике
+ * @param {CopyOptions} [options] Опции управления копированием файлов и каталогов
  * @returns {Promise<void>}
  */
-async function __copy(src, dest, flags) {
-  const mkdirOptions = { recursive: !(flags & COPY_EXCL) }
-  const existentPaths = flags & COPY_RMNONEXISTENT ? [] : false
+async function __copy(src, dest, { throwIfExists, removeNonExists }) {
+  const mkdirOptions = { recursive: !throwIfExists }
+  const existentPaths = removeNonExists ? [] : false
 
   await mkdir(dest, mkdirOptions)
   for await (const [path, dirent] of __walk(src)) {
@@ -212,32 +199,38 @@ async function readText(path, defaultValue) {
 
 
 /**
+ * @typedef {WriteOptions} WriteJSONOptions Опции управления записью JSON файла
+ * @property {number} [space=2] Количество пробелов для форматирования JSON или null
+ */
+/**
  * Запись файла в формате JSON
  *
  * @param {string} path Путь до файла
  * @param {object} data JOSN объект
- * @param {number} [flags] Модификаторы поведения
- * @param {number} [flags.WRITE_EXCL] Завершать запись файла ошибкой, если файл существует
+ * @param {WriteJSONOptions} [options] Опции управления записью JSON файла
  * @returns {Promise<void>}
  */
-async function writeJSON(path, data, flags) {
-  const jsonData = JSON.stringify(data, null, 2)
+async function writeJSON(path, data, { throwIfExists, space } = {}) {
+  const jsonData = JSON.stringify(data, null, typeof space === 'undefined' ? 2 : space)
 
-  await writeText(path, jsonData, flags)
+  await writeText(path, jsonData, { throwIfExists })
 }
 
 
+/**
+ * @typedef WriteOptions Опции управления записью текстового файла
+ * @property {boolean} [throwIfExists=false] Завершать запись файла ошибкой, если файл существует
+ */
 /**
  * Запись файла в текстовом формате
  *
  * @param {string} path Путь до файла
  * @param {string} data Текст
- * @param {number} [flags] Модификаторы поведения
- * @param {number} [flags.WRITE_EXCL] Завершать запись файла ошибкой, если файл существует
+ * @param {WriteOptions} [options] Опции управления записью текстового файла
  * @returns {Promise<void>}
  */
-async function writeText(path, data, flags) {
-  const recursive = !(flags & WRITE_EXCL)
+async function writeText(path, data, { throwIfExists } = {}) {
+  const recursive = !throwIfExists
 
   if (recursive) {
     await mkdir(dirname(path), { recursive })
@@ -251,7 +244,6 @@ async function writeText(path, data, flags) {
 
 
 export {
-  constants,
   copy,
   readJSON,
   readText,

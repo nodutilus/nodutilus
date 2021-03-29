@@ -1,9 +1,8 @@
 import { Test, assert } from '@nodutilus/test'
-import { copy, readJSON, readText, remove, walk, writeJSON, constants as fsConstants } from '@nodutilus/fs'
+import { copy, readJSON, readText, remove, walk, writeJSON } from '@nodutilus/fs'
 import { normalize, relative } from 'path'
 import { existsSync, promises as fsPromises } from 'fs'
 
-const { COPY_EXCL, COPY_RMNONEXISTENT, WRITE_EXCL } = fsConstants
 const { mkdir, rmdir } = fsPromises
 
 
@@ -136,7 +135,7 @@ export default class FsTest extends Test {
   async ['copy - с ошибкой на папке']() {
     await copy('test/example/fs/walk/p2', 'test/example/fs/copy/p2')
 
-    const error = await copy('test/example/fs/walk', 'test/example/fs/copy', COPY_EXCL)
+    const error = await copy('test/example/fs/walk', 'test/example/fs/copy', { throwIfExists: true })
       .catch(error => error)
 
     assert.equal(error.syscall, 'mkdir')
@@ -148,7 +147,7 @@ export default class FsTest extends Test {
   async ['copy - с ошибкой на файле']() {
     await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt')
 
-    const error = await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt', COPY_EXCL)
+    const error = await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt', { throwIfExists: true })
       .catch(error => error)
 
     assert.equal(error.syscall, 'copyfile')
@@ -188,7 +187,7 @@ export default class FsTest extends Test {
     assert(existsSync('test/example/fs/copy/p1_new'))
     assert(existsSync('test/example/fs/copy/f_new.txt'))
 
-    await copy('test/example/fs/walk', 'test/example/fs/copy', COPY_RMNONEXISTENT)
+    await copy('test/example/fs/walk', 'test/example/fs/copy', { removeNonExists: true })
 
     assert(!existsSync('test/example/fs/copy/p1_new'))
     assert(!existsSync('test/example/fs/copy/f_new.txt'))
@@ -309,7 +308,7 @@ export default class FsTest extends Test {
 
     assert.equal(data, '{\n  "test": 2\n}')
 
-    const error = await writeJSON('test/example/fs/write/test.json', { test: 3 }, WRITE_EXCL)
+    const error = await writeJSON('test/example/fs/write/test.json', { test: 3 }, { throwIfExists: true })
       .catch(error => error)
 
     assert.equal(error.code, 'EEXIST')
@@ -318,11 +317,26 @@ export default class FsTest extends Test {
 
   /** не даем создавать новый каталог, если передали флаг WRITE_EXCL */
   async ['write[Text/JSON] - ошибка - нет папки']() {
-    const error = await writeJSON('test/example/fs/write/test.json', { test: true }, WRITE_EXCL)
+    const error = await writeJSON('test/example/fs/write/test.json', { test: true }, { throwIfExists: true })
       .catch(error => error)
 
     assert.equal(error.code, 'ENOENT')
     assert.equal(relative('.', error.path), normalize('test/example/fs/write/test.json'))
+  }
+
+  /** изменение форматирования для записи в JOSN (опция space) */
+  async ['writeJSON - space: null,\\t']() {
+    await writeJSON('test/example/fs/write/test.json', { test: 2 }, { space: null })
+
+    let data = await readText('test/example/fs/write/test.json')
+
+    assert.equal(data, '{"test":2}')
+
+    await writeJSON('test/example/fs/write/test.json', { test: 2 }, { space: '\t' })
+
+    data = await readText('test/example/fs/write/test.json')
+
+    assert.equal(data, '{\n\t"test": 2\n}')
   }
 
 }

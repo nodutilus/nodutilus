@@ -17,6 +17,8 @@ const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
 /**
  * @typedef WalkOptions Опции управления обходом дерева каталога
  * @property {boolean} [fileFirst=false] При обходе каталога сначала возвращать вложенные файлы затем каталоги
+ * @property {Array<RegExp|string>|RegExp|string} [include]
+ * @property {Array<RegExp|string>|RegExp|string} [exclude]
  * @property {Walker} [walker] Обработчик результатов обхода дерева каталога
  */
 /**

@@ -9,16 +9,32 @@ const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
 
 /**
  * @callback Walker Функция обратного вызова для обработки результатов обхода дерева каталога
- * @param {string} path Имя найденного каталога или файла
+ * @param {string} path Путь до найденного каталога или файла,
+ *  включая каталог (path) переданный в вызов функции walk в формате posix.
  * @param {import('fs').Dirent} dirent Сущность записи каталога
  * @returns {void|boolean|Promise<void|boolean>} Если вернуть для каталога false,
  *  он будет проигнорирован (не работает с опцией fileFirst)
  */
 /**
+ * @typedef {Array<RegExp|string>|RegExp|string} SearchingRegExp Регулярное выражение или набор выражений,
+ *  используемое для поиска совпадений в пути до каталога или файла.
+ * Переданные сроки будут преобразованы через конструктор new RegExp(<string>).
+ * В качестве разделителя пути необходимо использовать '/'
+ * @example
+ *  // Варианты для поиска файлов расширением `.log` c числовым именем в каталоге `home`
+ *  ['/home/.+\\d+.log$', String.raw`/home/.+\d+.log$`, /\/home\/.+\d+.log$/]
+ */
+/**
  * @typedef WalkOptions Опции управления обходом дерева каталога
  * @property {boolean} [fileFirst=false] При обходе каталога сначала возвращать вложенные файлы затем каталоги
- * @property {Array<RegExp|string>|RegExp|string} [include]
- * @property {Array<RegExp|string>|RegExp|string} [exclude]
+ * @property {SearchingRegExp} [include] Регулярное выражение (или набор выражений) для поиска совпадений пути при обходе.
+ *  Позволит вернуть в выдачу результатов только соответствующие условиям каталоги и файлы.
+ *  При этом обход дерева все равно выполняется для всех подкаталогов и файлов, но возвращаются только соответствующие условиям поиска.
+ *  Для проверки используется путь от каталога (path), переданного в вызов функции walk, до конечного каталога или файла в формате posix.
+ * @property {SearchingRegExp} [exclude] Регулярное выражение (или набор выражений) для исключения из обхода совпадающего пути.
+ *  Позволит исключить из обхода дерева и выдачи результатов каталоги и файлы соответствующие условиям.
+ *  Если часть пути совпадает с условиями, то все вложенные каталоги и файлы будут проигнорированы при обходе дерева.
+ *  Для проверки используется путь от каталога (path), переданного в вызов функции walk, до конечного каталога или файла в формате posix.
  * @property {Walker} [walker] Обработчик результатов обхода дерева каталога
  */
 /**
@@ -31,19 +47,16 @@ const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
  *  то вернется итератор для обхода каталогов и файлов
  */
 function walk(path, options = {}, walker) {
-  const { fileFirst } = options
+  const { fileFirst, include, exclude } = options
 
-  if (typeof options === 'function') {
-    [options, walker] = [walker, options]
-  }
-  walker = walker || options.walker
+  walker = (typeof options === 'function' ? options : walker) || options.walker
 
   // win32 to posix (https://github.com/nodejs/node/issues/12298)
   path = path.replaceAll('\\', '/')
 
   if (walker) {
     return (async () => {
-      const walk = __walk(path, { fileFirst })
+      const walk = __walk(path, { fileFirst, include, exclude })
       let next = await walk.next()
 
       while (!next.done) {
@@ -51,7 +64,7 @@ function walk(path, options = {}, walker) {
       }
     })()
   } else {
-    return __walk(path, { fileFirst })
+    return __walk(path, { fileFirst, include, exclude })
   }
 }
 
@@ -66,7 +79,7 @@ function walk(path, options = {}, walker) {
  * @yields {[string,import('fs').Dirent]}
  */
 async function* __walk(path, context = {}) {
-  const { fileFirst } = context
+  const { fileFirst, include, exclude } = context
   const files = await readdir(path, { withFileTypes: true })
 
   for (const file of files) {

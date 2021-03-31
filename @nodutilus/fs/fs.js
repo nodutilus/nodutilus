@@ -1,6 +1,6 @@
 /** @module @nodutilus/fs */
 
-import { dirname, join, relative } from 'path'
+import { dirname, join, relative } from 'path/posix'
 import { promises as fsPromises, constants as fsConstants } from 'fs'
 
 const { COPYFILE_EXCL } = fsConstants
@@ -37,6 +37,9 @@ function walk(path, options = {}, walker) {
     [options, walker] = [walker, options]
   }
   walker = walker || options.walker
+
+  // win32 to posix (https://github.com/nodejs/node/issues/12298)
+  path = path.replaceAll('\\', '/')
 
   if (walker) {
     return (async () => {

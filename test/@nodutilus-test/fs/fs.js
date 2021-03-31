@@ -1,6 +1,6 @@
 import { Test, assert } from '@nodutilus/test'
 import { copy, readJSON, readText, remove, walk, writeJSON } from '@nodutilus/fs'
-import { normalize, relative } from 'path'
+import { normalize, relative, dirname } from 'path'
 import { existsSync, promises as fsPromises } from 'fs'
 
 const { mkdir, rmdir } = fsPromises
@@ -31,15 +31,16 @@ export default class FsTest extends Test {
     const expected = [
       'test/example/fs/walk/f1.txt',
       'test/example/fs/walk/p1',
-      normalize('test/example/fs/walk/p1/p1f1.txt'),
-      normalize('test/example/fs/walk/p1/p1f2.txt'),
+      'test/example/fs/walk/p1/p1f1.txt',
+      'test/example/fs/walk/p1/p1f2.txt',
       'test/example/fs/walk/p2',
-      normalize('test/example/fs/walk/p2/p2f1.txt')
+      'test/example/fs/walk/p2/p2f1.txt'
     ]
 
     await walk('test/example/fs/walk', path => {
       files.push(path)
     })
+    files.sort()
 
     assert.deepEqual(files, expected)
   }
@@ -50,15 +51,16 @@ export default class FsTest extends Test {
     const expected = [
       'test/example/fs/walk/f1.txt',
       'test/example/fs/walk/p1',
-      normalize('test/example/fs/walk/p1/p1f1.txt'),
-      normalize('test/example/fs/walk/p1/p1f2.txt'),
+      'test/example/fs/walk/p1/p1f1.txt',
+      'test/example/fs/walk/p1/p1f2.txt',
       'test/example/fs/walk/p2',
-      normalize('test/example/fs/walk/p2/p2f1.txt')
+      'test/example/fs/walk/p2/p2f1.txt'
     ]
 
     for await (const [path] of walk('test/example/fs/walk')) {
       files.push(path)
     }
+    files.sort()
 
     assert.deepEqual(files, expected)
   }
@@ -71,7 +73,7 @@ export default class FsTest extends Test {
       'test/example/fs/walk/f1.txt',
       'test/example/fs/walk/p1',
       'test/example/fs/walk/p2',
-      normalize('test/example/fs/walk/p2/p2f1.txt')
+      'test/example/fs/walk/p2/p2f1.txt'
     ]
 
     await walk('test/example/fs/walk', (path, dirent) => {
@@ -80,6 +82,7 @@ export default class FsTest extends Test {
         return false
       }
     })
+    files.sort()
 
     assert.deepEqual(files, expected)
   }
@@ -87,21 +90,72 @@ export default class FsTest extends Test {
   /** перебираем сначала вложенные файлы затем папки
    * + асинхронный walker */
   async ['walk - сначала вложенные файлы']() {
-    const files = []
+    let files = []
     const expected = [
-      'test/example/fs/walk/f1.txt', true,
-      normalize('test/example/fs/walk/p1/p1f1.txt'), true,
-      normalize('test/example/fs/walk/p1/p1f2.txt'), true,
-      'test/example/fs/walk/p1', false,
-      normalize('test/example/fs/walk/p2/p2f1.txt'), true,
-      'test/example/fs/walk/p2', false
+      'test/example/fs/walk/f1.txt',
+      'test/example/fs/walk/p1',
+      'test/example/fs/walk/p1/p1f1.txt',
+      'test/example/fs/walk/p1/p1f2.txt',
+      'test/example/fs/walk/p2',
+      'test/example/fs/walk/p2/p2f1.txt'
     ]
+    const isFile = {
+      'test/example/fs/walk/f1.txt': true,
+      'test/example/fs/walk/p1': false,
+      'test/example/fs/walk/p1/p1f1.txt': true,
+      'test/example/fs/walk/p1/p1f2.txt': true,
+      'test/example/fs/walk/p2': false,
+      'test/example/fs/walk/p2/p2f1.txt': true
+    }
+    let isFileAll = true
+    let isFileFirst = true
 
     await walk('test/example/fs/walk', { fileFirst: true }, async (path, dirent) => {
       await new Promise(resolve => setTimeout(resolve, 1))
       files.push(path)
-      files.push(dirent.isFile())
+      isFileAll = isFileAll && (isFile[path] === dirent.isFile())
+      if (dirent.isFile()) {
+        const dir = dirname(path)
+
+        isFileFirst = isFileFirst && !(files.includes(dir))
+      }
     })
+    files.sort()
+
+    assert.deepEqual(files, expected)
+    assert.ok(isFileAll)
+    assert.ok(isFileFirst)
+
+    files = []
+    await walk('test/example/fs/walk', { fileFirst: false }, async (path, dirent) => {
+      await new Promise(resolve => setTimeout(resolve, 1))
+      files.push(path)
+      if (dirent.isFile()) {
+        isFileFirst = isFileFirst && !(files.includes(dirname(path)))
+      }
+    })
+
+    assert.ok(!isFileFirst)
+  }
+
+  /** проверяем что нормализованный путь для win отработает корректно.
+   *    такие пути заменяются внутри walk на posix вариант, для корректной работы поиска по маске */
+  async ['walk - формат path.win32']() {
+    const files = []
+    const expected = [
+      'test/example/fs/walk/f1.txt',
+      'test/example/fs/walk/p1',
+      'test/example/fs/walk/p2',
+      'test/example/fs/walk/p2/p2f1.txt'
+    ]
+
+    await walk(normalize('test/example/fs/walk'), (path, dirent) => {
+      files.push(path)
+      if (dirent.isDirectory() && path === 'test/example/fs/walk/p1') {
+        return false
+      }
+    })
+    files.sort()
 
     assert.deepEqual(files, expected)
   }

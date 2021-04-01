@@ -264,8 +264,40 @@ export default class FsTest extends Test {
     assert.deepEqual(files, expected)
   }
 
-  async ['walk -  exclude']() {
+  /** exclude исключает из обхода и результата все совпадения,
+   *    при этом если каталог исключается, то walk не будет заходить внутрь каталога */
+  async ['walk - exclude']() {
+    const files = []
+    const expected = [
+      'test/example/fs/walk/f1.txt',
+      'test/example/fs/walk/p2',
+      'test/example/fs/walk/p2/p2f1.txt'
+    ]
 
+    for await (const [path] of walk('test/example/fs/walk', { exclude: '/p1' })) {
+      files.push(path)
+    }
+    files.sort()
+
+    assert.deepEqual(files, expected)
+  }
+
+  /** если к каталогу в exclude добавить /, то сам каталог вернется, а все его содержимое проигнорируется,
+   *    таким образом можно исключить конкретные вложенные каталоги и файлы, сам каталог при этом в результат вернется
+   */
+  async ['walk - exclude + dir-end-/']() {
+    const files = []
+    const expected = [
+      'test/example/fs/walk/f1.txt',
+      'test/example/fs/walk/p1'
+    ]
+
+    for await (const [path] of walk('test/example/fs/walk', { exclude: [/\/p2/, '/p1/.*.txt'] })) {
+      files.push(path)
+    }
+    files.sort()
+
+    assert.deepEqual(files, expected)
   }
 
   async ['walk - include + exclude']() {

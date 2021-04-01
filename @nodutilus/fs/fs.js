@@ -123,6 +123,11 @@ async function* __walk(path, context = {}) {
   for (const file of files) {
     const filePath = join(path, file.name)
     const isInclude = !include || __searchPathByRegExp(include, filePath)
+    const isExclude = exclude ? __searchPathByRegExp(exclude, filePath) : false
+
+    if (isExclude && !(include && isInclude)) {
+      continue
+    }
 
     if (file.isDirectory()) {
       if (fileFirst) {

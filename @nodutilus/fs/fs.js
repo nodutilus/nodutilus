@@ -47,9 +47,12 @@ const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
  *  то вернется итератор для обхода каталогов и файлов
  */
 function walk(path, options = {}, walker) {
-  const { fileFirst, include, exclude } = options
+  const { fileFirst } = options
+  let { include, exclude } = options
 
   walker = (typeof options === 'function' ? options : walker) || options.walker
+  include = __normalizeSearchingRegExp(include)
+  exclude = __normalizeSearchingRegExp(exclude)
 
   // win32 to posix (https://github.com/nodejs/node/issues/12298)
   path = path.replaceAll('\\', '/')
@@ -70,6 +73,41 @@ function walk(path, options = {}, walker) {
 
 
 /**
+ * @param {SearchingRegExp} sRegExp Исходное регулярное выражение или набор выражений
+ * @returns {SearchingRegExp|void} Нормализованное регулярное выражение или набор выражений
+ */
+function __normalizeSearchingRegExp(sRegExp) {
+  if (sRegExp) {
+    if (sRegExp instanceof Array) {
+      sRegExp = sRegExp.map(item => item instanceof RegExp ? item : new RegExp(item))
+    } else if (!(sRegExp instanceof RegExp)) {
+      sRegExp = new RegExp(sRegExp)
+    }
+
+    return sRegExp
+  }
+}
+
+
+/**
+ * @param {SearchingRegExp} sRegExp Регулярное выражение или набор выражений для сопоставления
+ * @param {string} path Путь до каталога или файла для проверки соответствия условиям отбора
+ * @returns {boolean} true - если хотя бы одно из выражений поиска совпадает с путем
+ */
+function __searchPathByRegExp(sRegExp, path) {
+  if (sRegExp instanceof RegExp) {
+    return sRegExp.test(path)
+  } else {
+    for (const sRE of sRegExp) {
+      if (sRE.test(path)) {
+        return true
+      }
+    }
+  }
+}
+
+
+/**
  * @typedef WalkContext Внутренние опции для обхода дерева каталога
  * @property {boolean} [fileFirst=false] При обходе каталога сначала возвращать вложенные файлы затем каталоги
  */
@@ -84,20 +122,25 @@ async function* __walk(path, context = {}) {
 
   for (const file of files) {
     const filePath = join(path, file.name)
+    const isInclude = !include || __searchPathByRegExp(include, filePath)
 
     if (file.isDirectory()) {
       if (fileFirst) {
         yield* __walk(filePath, context)
-        yield [filePath, file]
+        if (isInclude) {
+          yield [filePath, file]
+        }
       } else {
-        const needNested = yield [filePath, file]
+        const needNested = isInclude ? yield [filePath, file] : true
 
         if (needNested !== false) {
           yield* __walk(filePath, context)
         }
       }
     } else {
-      yield [filePath, file]
+      if (isInclude) {
+        yield [filePath, file]
+      }
     }
   }
 }

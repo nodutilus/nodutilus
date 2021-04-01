@@ -160,6 +160,118 @@ export default class FsTest extends Test {
     assert.deepEqual(files, expected)
   }
 
+  /** строки при поиске превращаются в "жадный" RegExp,
+   *    включающий любое совпадение части пути с переданным выражением */
+  async ['walk - include, string']() {
+    const files = []
+    const expected = [
+      'test/example/fs/walk/p1/p1f1.txt',
+      'test/example/fs/walk/p1/p1f2.txt'
+    ]
+
+    for await (const [path] of walk('test/example/fs/walk', { include: 'p1/p1f' })) {
+      files.push(path)
+    }
+    files.sort()
+
+    assert.deepEqual(files, expected)
+  }
+
+  /** при включении в выражении каталога вернется всё его содержимое,
+   *    включая сам каталог */
+  async ['walk - include, dir']() {
+    const files = []
+    const expected = [
+      'test/example/fs/walk/p1',
+      'test/example/fs/walk/p1/p1f1.txt',
+      'test/example/fs/walk/p1/p1f2.txt'
+    ]
+
+    for await (const [path] of walk('test/example/fs/walk', { include: 'test/example/fs/walk/p1' })) {
+      files.push(path)
+    }
+    files.sort()
+
+    assert.deepEqual(files, expected)
+  }
+
+  /** если к каталогу в include добавить /, то сам каталог не вернется */
+  async ['walk - include, dir + /']() {
+    const files = []
+    const expected = [
+      'test/example/fs/walk/p1/p1f1.txt',
+      'test/example/fs/walk/p1/p1f2.txt'
+    ]
+
+    for await (const [path] of walk('test/example/fs/walk', { include: 'test/example/fs/walk/p1/' })) {
+      files.push(path)
+    }
+    files.sort()
+
+    assert.deepEqual(files, expected)
+  }
+
+  /** строки также поддерживают и синтаксис RegExp */
+  async ['walk - include, String.raw`RegExp-style`']() {
+    const files = []
+    const expected = [
+      'test/example/fs/walk/p1/p1f1.txt',
+      'test/example/fs/walk/p1/p1f2.txt',
+      'test/example/fs/walk/p2/p2f1.txt'
+    ]
+
+    for await (const [path] of walk('test/example/fs/walk', { include: String.raw`p\d/p\df\d` })) {
+      files.push(path)
+    }
+    files.sort()
+
+    assert.deepEqual(files, expected)
+  }
+
+  /** можно передать напрямую RegExp,
+   *    а также собрать выражение учитывающее весь путь файла */
+  async ['walk - include, RegExp + FullPath']() {
+    const files = []
+    const expected = [
+      'test/example/fs/walk/p1/p1f1.txt'
+    ]
+
+    for await (const [path] of walk('test/example/fs/walk', { include: /^test\/.*p1f1.txt$/ })) {
+      files.push(path)
+    }
+
+    assert.deepEqual(files, expected)
+  }
+
+  /** можно передать комбинированный массив выражений */
+  async ['walk - include, Array [RegExp, string]']() {
+    const files = []
+    const expected = [
+      'test/example/fs/walk/p1/p1f1.txt',
+      'test/example/fs/walk/p1/p1f2.txt'
+    ]
+
+    for await (const [path] of walk('test/example/fs/walk', {
+      include: [
+        /^test\/.*p1f1.txt$/,
+        '^test/.*/p1f2.txt$'
+      ]
+    })) {
+      files.push(path)
+    }
+    files.sort()
+
+    assert.deepEqual(files, expected)
+  }
+
+  async ['walk -  exclude']() {
+
+  }
+
+  async ['walk - include + exclude']() {
+
+  }
+
   /** купируем в несуществующую папку */
   async ['copy - базовый']() {
     const filesA = []

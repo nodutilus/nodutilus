@@ -299,8 +299,64 @@ export default class FsTest extends Test {
     assert.deepEqual(files, expected)
   }
 
-  async ['walk - include + exclude']() {
+  /** через исключающий RegExp в exclude можно исключить обход всех подкаталогов кроме указанных в exclude.
+   *    это создает инверсию исключения, и включает в только указанные каталоги.
+   *    этот вариант более оптимален т.к. можно исключить тяжелый каталог из обхода на одном уровне с искомым. */
+  async ['walk - exclude, all except']() {
+    const files = []
+    const expected = [
+      'test/example/fs/walk/p1',
+      'test/example/fs/walk/p1/p1f1.txt',
+      'test/example/fs/walk/p1/p1f2.txt'
+    ]
 
+    for await (const [path] of walk('test/example/fs/walk', { exclude: '/walk/(?!p1)' })) {
+      files.push(path)
+    }
+    files.sort()
+
+    assert.deepEqual(files, expected)
+  }
+
+  /** добавив "жадное" условие поиска, можно через exclude исключить часть выборки,
+   *    в т.ч. и файлы которые могут совпадать с include внутри исключенного каталога */
+  async ['walk - include + exclude']() {
+    const files = []
+    const expected = [
+      'test/example/fs/walk/p1/p1f1.txt',
+      'test/example/fs/walk/p1/p1f2.txt'
+    ]
+
+    for await (const [path] of walk('test/example/fs/walk', {
+      include: String.raw`p\d/p\df\d`,
+      exclude: 'walk/p2'
+    })) {
+      files.push(path)
+    }
+    files.sort()
+
+    assert.deepEqual(files, expected)
+  }
+
+  /** можно комбинировать инверсию exclude и include, перебрав все каталоги соответствующие exclude,
+   *    при этом отфильтровав их содержимое с помощью include */
+  async ['walk - exclude-all-except + include']() {
+    const files = []
+    const expected = [
+      'test/example/fs/walk/p1/p1f1.txt',
+      'test/example/fs/walk/p1/p1f2.txt',
+      'test/example/fs/walk/p2/p2f1.txt'
+    ]
+
+    for await (const [path] of walk('test/example/fs/walk', {
+      include: '.txt',
+      exclude: '/walk/(?!p1|p2)'
+    })) {
+      files.push(path)
+    }
+    files.sort()
+
+    assert.deepEqual(files, expected)
   }
 
   /** купируем в несуществующую папку */

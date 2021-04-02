@@ -125,7 +125,7 @@ async function* __walk(path, context = {}) {
     const isInclude = !include || __searchPathByRegExp(include, filePath)
     const isExclude = exclude ? __searchPathByRegExp(exclude, filePath) : false
 
-    if (isExclude && !(include && isInclude)) {
+    if (isExclude) {
       continue
     }
 

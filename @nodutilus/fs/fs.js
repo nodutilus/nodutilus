@@ -110,6 +110,8 @@ function __searchPathByRegExp(sRegExp, path) {
 /**
  * @typedef WalkContext Внутренние опции для обхода дерева каталога
  * @property {boolean} [fileFirst=false] При обходе каталога сначала возвращать вложенные файлы затем каталоги
+ * @property {SearchingRegExp} [include] @see WalkOptions.include
+ * @property {SearchingRegExp} [exclude] @see WalkOptions.include
  */
 /**
  * @param {string} path Текущий каталог для обхода

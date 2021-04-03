@@ -111,7 +111,7 @@ function __searchPathByRegExp(sRegExp, path) {
  * @typedef WalkContext Внутренние опции для обхода дерева каталога
  * @property {boolean} [fileFirst=false] При обходе каталога сначала возвращать вложенные файлы затем каталоги
  * @property {SearchingRegExp} [include] @see WalkOptions.include
- * @property {SearchingRegExp} [exclude] @see WalkOptions.include
+ * @property {SearchingRegExp} [exclude] @see WalkOptions.exclude
  */
 /**
  * @param {string} path Текущий каталог для обхода
@@ -158,6 +158,8 @@ async function* __walk(path, context = {}) {
  * @property {boolean} [throwIfExists=false] Завершать копирование ошибкой если файл или каталог уже существует
  * @property {boolean} [removeNonExists=false] При копировании со слиянием каталогов
  *  удалять найденные в целевом каталоге, но несуществующие в источнике каталоги и файлы
+ * @property {SearchingRegExp} [include] @see WalkOptions.include
+ * @property {SearchingRegExp} [exclude] @see WalkOptions.exclude
  */
 /**
  * Копирует файл или каталог со всем содержимым.
@@ -168,11 +170,12 @@ async function* __walk(path, context = {}) {
  * @param {CopyOptions} [options] Опции управления копированием файлов и каталогов
  * @returns {Promise<void>}
  */
-async function copy(src, dest, { throwIfExists, removeNonExists } = {}) {
+async function copy(src, dest, options = {}) {
+  const { throwIfExists } = options
   const srcStat = await stat(src)
 
   if (srcStat.isDirectory()) {
-    await __copy(src, dest, { throwIfExists, removeNonExists })
+    await __copy(src, dest, options)
   } else {
     if (!throwIfExists) {
       await mkdir(dirname(dest), { recursive: true })
@@ -190,12 +193,13 @@ async function copy(src, dest, { throwIfExists, removeNonExists } = {}) {
  * @param {CopyOptions} [options] Опции управления копированием файлов и каталогов
  * @returns {Promise<void>}
  */
-async function __copy(src, dest, { throwIfExists, removeNonExists }) {
+async function __copy(src, dest, options) {
+  const { throwIfExists, removeNonExists, include, exclude } = options
   const mkdirOptions = { recursive: !throwIfExists }
   const existentPaths = removeNonExists ? [] : false
 
   await mkdir(dest, mkdirOptions)
-  for await (const [path, dirent] of __walk(src)) {
+  for await (const [path, dirent] of walk(src, { include, exclude })) {
     const destPath = join(dest, relative(src, path))
 
     if (existentPaths) {
@@ -204,11 +208,12 @@ async function __copy(src, dest, { throwIfExists, removeNonExists }) {
     if (dirent.isDirectory()) {
       await mkdir(destPath, mkdirOptions)
     } else {
+      await mkdir(dirname(destPath), { recursive: true })
       await copyFile(path, destPath)
     }
   }
   if (existentPaths) {
-    for await (const [path] of __walk(dest, { fileFirst: true })) {
+    for await (const [path] of walk(dest, { fileFirst: true })) {
       if (!existentPaths.includes(path)) {
         await remove(path)
       }

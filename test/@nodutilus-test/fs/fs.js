@@ -446,6 +446,25 @@ export default class FsTest extends Test {
     assert(!existsSync('test/example/fs/copy/f_new.txt'))
   }
 
+  /** для копирования можно использовать опции include/exclude для walk */
+  async ['copy - фильтрация через include/exclude']() {
+    const files = []
+    const expected = [
+      'test/example/fs/copy/p1',
+      'test/example/fs/copy/p1/p1f1.txt',
+      'test/example/fs/copy/p1/p1f2.txt'
+    ]
+
+    await copy('test/example/fs/walk', 'test/example/fs/copy', {
+      include: '.txt',
+      exclude: '/walk/(?!p1)'
+    })
+    await walk('test/example/fs/copy', path => files.push(path))
+    files.sort()
+
+    assert.deepEqual(files, expected)
+  }
+
   /** удаление пустой папки */
   async ['remove - пустая папка']() {
     await mkdir('test/example/fs/remove')

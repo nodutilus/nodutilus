@@ -223,13 +223,30 @@ async function __copy(src, dest, options) {
 
 
 /**
+ * @typedef RemoveOptions Опции управления удалением файлов и каталогов
+ * @property {SearchingRegExp} [include] @see WalkOptions.include
+ * @property {SearchingRegExp} [exclude] @see WalkOptions.exclude
+ */
+/**
  * Удаление файла или каталога со всем содержимым
  *
  * @param {string} path Каталог или файл
+ * @param {RemoveOptions} [options] Опции управления удалением файлов и каталогов
  * @returns {Promise<void>}
  */
-async function remove(path) {
-  await rm(path, { force: true, recursive: true })
+async function remove(path, options = {}) {
+  const { include, exclude } = options
+
+  if (include || exclude) {
+    await walk(path, { include, exclude }, async (path, dirent) => {
+      await rm(path, { force: true, recursive: true })
+      if (dirent.isDirectory()) {
+        return false
+      }
+    })
+  } else {
+    await rm(path, { force: true, recursive: true })
+  }
 }
 
 

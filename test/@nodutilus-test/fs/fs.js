@@ -493,6 +493,39 @@ export default class FsTest extends Test {
     assert(!existsSync('test/example/fs/remove/f1.txt'))
   }
 
+  /** для удаления можно использовать опции include/exclude для walk.
+   *  при этом при удалении каталога, если он попала под условия, она удаляется сразу со всем содержимым */
+  async ['remove - фильтрация через include/exclude']() {
+    const files1 = []
+    const expected1 = [
+      'test/example/fs/remove/p1',
+      'test/example/fs/remove/p1/p1f1.txt',
+      'test/example/fs/remove/p1/p1f2.txt',
+      'test/example/fs/remove/p2'
+    ]
+    const files2 = []
+    const expected2 = [
+      'test/example/fs/remove/p2'
+    ]
+
+    await copy('test/example/fs/walk', 'test/example/fs/remove')
+    await remove('test/example/fs/remove', {
+      include: '.txt',
+      exclude: '/remove/p1'
+    })
+    await walk('test/example/fs/remove', path => files1.push(path))
+    files1.sort()
+
+    assert.deepEqual(files1, expected1)
+
+    await remove('test/example/fs/remove', {
+      include: '/remove/p1'
+    })
+    await walk('test/example/fs/remove', path => files2.push(path))
+    files2.sort()
+
+    assert.deepEqual(files2, expected2)
+  }
 
   /** чтение существующего файла */
   async ['readJSON - файл существует']() {

@@ -13,7 +13,7 @@ const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
  *  включая каталог (path) переданный в вызов функции walk в формате posix.
  * @param {import('fs').Dirent} dirent Сущность записи каталога
  * @returns {void|boolean|Promise<void|boolean>} Если вернуть для каталога false,
- *  он будет проигнорирован (не работает с опцией fileFirst)
+ *  его содержимое будет проигнорировано
  */
 /**
  * @typedef {Array<RegExp|string>|RegExp|string} SearchingRegExp Регулярное выражение или набор выражений,
@@ -25,8 +25,7 @@ const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
  *  ['/home/.+\\d+.log$', String.raw`/home/.+\d+.log$`, /\/home\/.+\d+.log$/]
  */
 /**
- * @typedef WalkOptions Опции управления обходом дерева каталога
- * @property {boolean} [fileFirst=false] При обходе каталога сначала возвращать вложенные файлы затем каталоги
+ * @typedef SearchingOptions
  * @property {SearchingRegExp} [include] Регулярное выражение (или набор выражений) для поиска совпадений пути при обходе.
  *  Позволит вернуть в выдачу результатов только соответствующие условиям каталоги и файлы.
  *  При этом обход дерева все равно выполняется для всех подкаталогов и файлов, но возвращаются только соответствующие условиям поиска.
@@ -35,6 +34,9 @@ const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
  *  Позволит исключить из обхода дерева и выдачи результатов каталоги и файлы соответствующие условиям.
  *  Если часть пути совпадает с условиями, то все вложенные каталоги и файлы будут проигнорированы при обходе дерева.
  *  Для проверки используется путь от каталога (path), переданного в вызов функции walk, до конечного каталога или файла в формате posix.
+ */
+/**
+ * @typedef {SearchingOptions} WalkOptions Опции управления обходом дерева каталога
  * @property {Walker} [walker] Обработчик результатов обхода дерева каталога
  */
 /**
@@ -47,7 +49,6 @@ const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
  *  то вернется итератор для обхода каталогов и файлов
  */
 function walk(path, options = {}, walker) {
-  const { fileFirst } = options
   let { include, exclude } = options
 
   walker = (typeof options === 'function' ? options : walker) || options.walker
@@ -59,15 +60,15 @@ function walk(path, options = {}, walker) {
 
   if (walker) {
     return (async () => {
-      const walk = __walk(path, { fileFirst, include, exclude })
-      let next = await walk.next()
+      const __walker = __walk(path, { include, exclude })
+      let next = await __walker.next()
 
       while (!next.done) {
-        next = await walk.next(await walker(...next.value))
+        next = await __walker.next(await walker(...next.value))
       }
     })()
   } else {
-    return __walk(path, { fileFirst, include, exclude })
+    return __walk(path, { include, exclude })
   }
 }
 
@@ -108,18 +109,12 @@ function __searchPathByRegExp(sRegExp, path) {
 
 
 /**
- * @typedef WalkContext Внутренние опции для обхода дерева каталога
- * @property {boolean} [fileFirst=false] При обходе каталога сначала возвращать вложенные файлы затем каталоги
- * @property {SearchingRegExp} [include] @see WalkOptions.include
- * @property {SearchingRegExp} [exclude] @see WalkOptions.exclude
- */
-/**
  * @param {string} path Текущий каталог для обхода
- * @param {WalkContext} [context] Внутренние опции для обхода дерева каталога
+ * @param {SearchingOptions} [options] Внутренние опции для обхода дерева каталога
  * @yields {[string,import('fs').Dirent]}
  */
-async function* __walk(path, context = {}) {
-  const { fileFirst, include, exclude } = context
+async function* __walk(path, options = {}) {
+  const { include, exclude } = options
   const files = await readdir(path, { withFileTypes: true })
 
   for (const file of files) {
@@ -132,17 +127,10 @@ async function* __walk(path, context = {}) {
     }
 
     if (file.isDirectory()) {
-      if (fileFirst) {
-        yield* __walk(filePath, context)
-        if (isInclude) {
-          yield [filePath, file]
-        }
-      } else {
-        const needNested = isInclude ? yield [filePath, file] : true
+      const nested = isInclude ? yield [filePath, file] : true
 
-        if (needNested !== false) {
-          yield* __walk(filePath, context)
-        }
+      if (nested !== false) {
+        yield* __walk(filePath, options)
       }
     } else {
       if (isInclude) {
@@ -154,12 +142,10 @@ async function* __walk(path, context = {}) {
 
 
 /**
- * @typedef CopyOptions Опции управления копированием файлов и каталогов
+ * @typedef {SearchingOptions} CopyOptions Опции управления копированием файлов и каталогов
  * @property {boolean} [throwIfExists=false] Завершать копирование ошибкой если файл или каталог уже существует
  * @property {boolean} [removeNonExists=false] При копировании со слиянием каталогов
  *  удалять найденные в целевом каталоге, но несуществующие в источнике каталоги и файлы
- * @property {SearchingRegExp} [include] @see WalkOptions.include
- * @property {SearchingRegExp} [exclude] @see WalkOptions.exclude
  */
 /**
  * Копирует файл или каталог со всем содержимым.
@@ -213,25 +199,27 @@ async function __copy(src, dest, options) {
     }
   }
   if (existentPaths) {
-    for await (const [path] of walk(dest, { fileFirst: true })) {
+    const walker = walk(dest)
+    let next = await walker.next()
+
+    while (!next.done) {
+      const [path, dirent] = next.value
+
       if (!existentPaths.includes(path)) {
         await remove(path)
       }
+
+      next = await walker.next(dirent.isDirectory() ? false : null)
     }
   }
 }
 
 
 /**
- * @typedef RemoveOptions Опции управления удалением файлов и каталогов
- * @property {SearchingRegExp} [include] @see WalkOptions.include
- * @property {SearchingRegExp} [exclude] @see WalkOptions.exclude
- */
-/**
  * Удаление файла или каталога со всем содержимым
  *
  * @param {string} path Каталог или файл
- * @param {RemoveOptions} [options] Опции управления удалением файлов и каталогов
+ * @param {SearchingOptions} [options] Опции управления удалением файлов и каталогов
  * @returns {Promise<void>}
  */
 async function remove(path, options = {}) {

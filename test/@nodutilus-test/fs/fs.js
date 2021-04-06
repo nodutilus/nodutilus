@@ -87,10 +87,9 @@ export default class FsTest extends Test {
     assert.deepEqual(files, expected)
   }
 
-  /** перебираем сначала вложенные файлы затем папки
-   * + асинхронный walker */
-  async ['walk - сначала вложенные файлы']() {
-    let files = []
+  /** асинхронный walker */
+  async ['walk - асинхронный walker']() {
+    const files = []
     const expected = [
       'test/example/fs/walk/f1.txt',
       'test/example/fs/walk/p1',
@@ -99,43 +98,14 @@ export default class FsTest extends Test {
       'test/example/fs/walk/p2',
       'test/example/fs/walk/p2/p2f1.txt'
     ]
-    const isFile = {
-      'test/example/fs/walk/f1.txt': true,
-      'test/example/fs/walk/p1': false,
-      'test/example/fs/walk/p1/p1f1.txt': true,
-      'test/example/fs/walk/p1/p1f2.txt': true,
-      'test/example/fs/walk/p2': false,
-      'test/example/fs/walk/p2/p2f1.txt': true
-    }
-    let isFileAll = true
-    let isFileFirst = true
 
-    await walk('test/example/fs/walk', { fileFirst: true }, async (path, dirent) => {
+    await walk('test/example/fs/walk', async (path, dirent) => {
       await new Promise(resolve => setTimeout(resolve, 1))
       files.push(path)
-      isFileAll = isFileAll && (isFile[path] === dirent.isFile())
-      if (dirent.isFile()) {
-        const dir = dirname(path)
-
-        isFileFirst = isFileFirst && !(files.includes(dir))
-      }
     })
     files.sort()
 
     assert.deepEqual(files, expected)
-    assert.ok(isFileAll)
-    assert.ok(isFileFirst)
-
-    files = []
-    await walk('test/example/fs/walk', { fileFirst: false }, async (path, dirent) => {
-      await new Promise(resolve => setTimeout(resolve, 1))
-      files.push(path)
-      if (dirent.isFile()) {
-        isFileFirst = isFileFirst && !(files.includes(dirname(path)))
-      }
-    })
-
-    assert.ok(!isFileFirst)
   }
 
   /** проверяем что нормализованный путь для win отработает корректно.

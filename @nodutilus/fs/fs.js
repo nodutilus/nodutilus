@@ -118,7 +118,8 @@ async function* __walk(path, options = {}) {
   const files = await readdir(path, { withFileTypes: true })
 
   for (const file of files) {
-    const filePath = join(path, file.name)
+    const isDirectory = file.isDirectory()
+    const filePath = join(path, file.name, isDirectory ? '/' : '')
     const isInclude = !include || __searchPathByRegExp(include, filePath)
     const isExclude = exclude ? __searchPathByRegExp(exclude, filePath) : false
 
@@ -126,7 +127,7 @@ async function* __walk(path, options = {}) {
       continue
     }
 
-    if (file.isDirectory()) {
+    if (isDirectory) {
       const nested = isInclude ? yield [filePath, file] : true
 
       if (nested !== false) {

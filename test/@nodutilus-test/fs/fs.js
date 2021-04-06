@@ -1,6 +1,6 @@
 import { Test, assert } from '@nodutilus/test'
 import { copy, readJSON, readText, remove, walk, writeJSON } from '@nodutilus/fs'
-import { normalize, relative, dirname } from 'path'
+import { normalize, relative } from 'path'
 import { existsSync, promises as fsPromises } from 'fs'
 
 const { mkdir, rmdir } = fsPromises
@@ -30,10 +30,10 @@ export default class FsTest extends Test {
     const files = []
     const expected = [
       'test/example/fs/walk/f1.txt',
-      'test/example/fs/walk/p1',
+      'test/example/fs/walk/p1/',
       'test/example/fs/walk/p1/p1f1.txt',
       'test/example/fs/walk/p1/p1f2.txt',
-      'test/example/fs/walk/p2',
+      'test/example/fs/walk/p2/',
       'test/example/fs/walk/p2/p2f1.txt'
     ]
 
@@ -50,10 +50,10 @@ export default class FsTest extends Test {
     const files = []
     const expected = [
       'test/example/fs/walk/f1.txt',
-      'test/example/fs/walk/p1',
+      'test/example/fs/walk/p1/',
       'test/example/fs/walk/p1/p1f1.txt',
       'test/example/fs/walk/p1/p1f2.txt',
-      'test/example/fs/walk/p2',
+      'test/example/fs/walk/p2/',
       'test/example/fs/walk/p2/p2f1.txt'
     ]
 
@@ -71,14 +71,14 @@ export default class FsTest extends Test {
     const files = []
     const expected = [
       'test/example/fs/walk/f1.txt',
-      'test/example/fs/walk/p1',
-      'test/example/fs/walk/p2',
+      'test/example/fs/walk/p1/',
+      'test/example/fs/walk/p2/',
       'test/example/fs/walk/p2/p2f1.txt'
     ]
 
     await walk('test/example/fs/walk', (path, dirent) => {
       files.push(path)
-      if (dirent.isDirectory() && path === 'test/example/fs/walk/p1') {
+      if (dirent.isDirectory() && path === 'test/example/fs/walk/p1/') {
         return false
       }
     })
@@ -92,10 +92,10 @@ export default class FsTest extends Test {
     const files = []
     const expected = [
       'test/example/fs/walk/f1.txt',
-      'test/example/fs/walk/p1',
+      'test/example/fs/walk/p1/',
       'test/example/fs/walk/p1/p1f1.txt',
       'test/example/fs/walk/p1/p1f2.txt',
-      'test/example/fs/walk/p2',
+      'test/example/fs/walk/p2/',
       'test/example/fs/walk/p2/p2f1.txt'
     ]
 
@@ -114,14 +114,14 @@ export default class FsTest extends Test {
     const files = []
     const expected = [
       'test/example/fs/walk/f1.txt',
-      'test/example/fs/walk/p1',
-      'test/example/fs/walk/p2',
+      'test/example/fs/walk/p1/',
+      'test/example/fs/walk/p2/',
       'test/example/fs/walk/p2/p2f1.txt'
     ]
 
     await walk(normalize('test/example/fs/walk'), (path, dirent) => {
       files.push(path)
-      if (dirent.isDirectory() && path === 'test/example/fs/walk/p1') {
+      if (dirent.isDirectory() && path === 'test/example/fs/walk/p1/') {
         return false
       }
     })
@@ -152,12 +152,12 @@ export default class FsTest extends Test {
   async ['walk - include, dir']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/p1',
+      'test/example/fs/walk/p1/',
       'test/example/fs/walk/p1/p1f1.txt',
       'test/example/fs/walk/p1/p1f2.txt'
     ]
 
-    for await (const [path] of walk('test/example/fs/walk', { include: 'test/example/fs/walk/p1' })) {
+    for await (const [path] of walk('test/example/fs/walk', { include: 'test/example/fs/walk/p1/' })) {
       files.push(path)
     }
     files.sort()
@@ -169,6 +169,7 @@ export default class FsTest extends Test {
   async ['walk - include, dir + /']() {
     const files = []
     const expected = [
+      'test/example/fs/walk/p1/',
       'test/example/fs/walk/p1/p1f1.txt',
       'test/example/fs/walk/p1/p1f2.txt'
     ]
@@ -240,11 +241,11 @@ export default class FsTest extends Test {
     const files = []
     const expected = [
       'test/example/fs/walk/f1.txt',
-      'test/example/fs/walk/p2',
+      'test/example/fs/walk/p2/',
       'test/example/fs/walk/p2/p2f1.txt'
     ]
 
-    for await (const [path] of walk('test/example/fs/walk', { exclude: '/p1' })) {
+    for await (const [path] of walk('test/example/fs/walk', { exclude: '/p1/' })) {
       files.push(path)
     }
     files.sort()
@@ -258,10 +259,10 @@ export default class FsTest extends Test {
     const files = []
     const expected = [
       'test/example/fs/walk/f1.txt',
-      'test/example/fs/walk/p1'
+      'test/example/fs/walk/p1/'
     ]
 
-    for await (const [path] of walk('test/example/fs/walk', { exclude: [/\/p2/, '/p1/.*.txt'] })) {
+    for await (const [path] of walk('test/example/fs/walk', { exclude: [/\/p2\//, '/p1/.*.txt'] })) {
       files.push(path)
     }
     files.sort()
@@ -275,7 +276,7 @@ export default class FsTest extends Test {
   async ['walk - exclude, all except']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/p1',
+      'test/example/fs/walk/p1/',
       'test/example/fs/walk/p1/p1f1.txt',
       'test/example/fs/walk/p1/p1f2.txt'
     ]
@@ -420,7 +421,7 @@ export default class FsTest extends Test {
   async ['copy - фильтрация через include/exclude']() {
     const files = []
     const expected = [
-      'test/example/fs/copy/p1',
+      'test/example/fs/copy/p1/',
       'test/example/fs/copy/p1/p1f1.txt',
       'test/example/fs/copy/p1/p1f2.txt'
     ]
@@ -468,20 +469,20 @@ export default class FsTest extends Test {
   async ['remove - фильтрация через include/exclude']() {
     const files1 = []
     const expected1 = [
-      'test/example/fs/remove/p1',
+      'test/example/fs/remove/p1/',
       'test/example/fs/remove/p1/p1f1.txt',
       'test/example/fs/remove/p1/p1f2.txt',
-      'test/example/fs/remove/p2'
+      'test/example/fs/remove/p2/'
     ]
     const files2 = []
     const expected2 = [
-      'test/example/fs/remove/p2'
+      'test/example/fs/remove/p2/'
     ]
 
     await copy('test/example/fs/walk', 'test/example/fs/remove')
     await remove('test/example/fs/remove', {
       include: '.txt',
-      exclude: '/remove/p1'
+      exclude: '/remove/p1/'
     })
     await walk('test/example/fs/remove', path => files1.push(path))
     files1.sort()
@@ -489,7 +490,7 @@ export default class FsTest extends Test {
     assert.deepEqual(files1, expected1)
 
     await remove('test/example/fs/remove', {
-      include: '/remove/p1'
+      include: '/remove/p1/'
     })
     await walk('test/example/fs/remove', path => files2.push(path))
     files2.sort()

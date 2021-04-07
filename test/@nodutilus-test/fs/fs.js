@@ -428,7 +428,7 @@ export default class FsTest extends Test {
 
     await copy('test/example/fs/walk', 'test/example/fs/copy', {
       include: '.txt',
-      exclude: '/walk/(?!p1)'
+      exclude: '/walk/(?!p1/)'
     })
     await walk('test/example/fs/copy', path => files.push(path))
     files.sort()
@@ -496,6 +496,45 @@ export default class FsTest extends Test {
     files2.sort()
 
     assert.deepEqual(files2, expected2)
+  }
+
+  /** удалить все подкаталоги кроме указанного include при помощи инверсии */
+  async ['remove - инверсия include']() {
+    const files = []
+    const expected = [
+      'test/example/fs/remove/p1/',
+      'test/example/fs/remove/p1/p1f1.txt',
+      'test/example/fs/remove/p1/p1f2.txt'
+    ]
+
+    await copy('test/example/fs/walk', 'test/example/fs/remove')
+    await remove('test/example/fs/remove', {
+      include: '/remove/(?!p1/)'
+    })
+    await walk('test/example/fs/remove', path => files.push(path))
+    files.sort()
+
+    assert.deepEqual(files, expected)
+  }
+
+  /** удаление выполняется с "жадным" поиском, и если не исключить родительский каталог,
+   *    попытка исключения через  exclude подкаталога будет проигнорирована,
+   *    т.к. родительский каталог не попадает под исключение и удаляется.
+   *  чтобы удаление проигнорировало родителя, необходимо включить и его,
+   *    либо использовать include, как в примере выше */
+  async ['remove - промах по exclude (подкаталог)']() {
+    const files1 = []
+    const expected1 = []
+
+    await copy('test/example/fs/walk', 'test/example/fs/remove')
+    await copy('test/example/fs/walk', 'test/example/fs/remove/p1')
+    await remove('test/example/fs/remove', {
+      exclude: '/remove/p1/p1'
+    })
+    await walk('test/example/fs/remove', path => files1.push(path))
+    files1.sort()
+
+    assert.deepEqual(files1, expected1)
   }
 
   /** чтение существующего файла */

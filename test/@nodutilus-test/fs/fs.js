@@ -1,6 +1,6 @@
 import { Test, assert } from '@nodutilus/test'
 import { copy, readJSON, readText, remove, walk, writeJSON } from '@nodutilus/fs'
-import { normalize, relative } from 'path'
+import { isAbsolute, resolve, normalize, relative } from 'path'
 import { existsSync, promises as fsPromises } from 'fs'
 
 const { mkdir, rmdir } = fsPromises
@@ -25,16 +25,42 @@ export default class FsTest extends Test {
     await rmdir('test/example/fs/write', { recursive: true })
   }
 
+  /** для удобства работы с путями до каталогов и папок выполняется их нормализация.
+   *  по пути должно быть возможно однозначно определить:
+   *    - каталог это или файл
+   *    - абсолютный путь или относительный
+   *  нормализация от модуля `path` откидывает эти сведения, делая путь максимально кратким,
+   *   поэтому `path` реализация расширяется:
+   *    - к относительным путям всегда добавляется ./ в начале
+   *    - к каталогу всегда добавляется / в конце */
+  async ['walk - нормализация пути']() {
+    await walk('test/example/fs/walk', (path, dirent) => {
+      if (dirent.isDirectory()) {
+        assert.ok(path.endsWith('/'))
+      }
+      assert.ok(!isAbsolute(path))
+      assert.ok(path.startsWith('./'))
+    })
+    // к абсолютному пути не добавляем ./
+    await walk(resolve('test/example/fs/walk'), (path, dirent) => {
+      if (dirent.isDirectory()) {
+        assert.ok(path.endsWith('/'))
+      }
+      assert.ok(isAbsolute(path))
+      assert.ok(!path.startsWith('./'))
+    })
+  }
+
   /** перебираем сначала папки затем вложенные файлы */
   async ['walk - базовый (walker)']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/f1.txt',
-      'test/example/fs/walk/p1/',
-      'test/example/fs/walk/p1/p1f1.txt',
-      'test/example/fs/walk/p1/p1f2.txt',
-      'test/example/fs/walk/p2/',
-      'test/example/fs/walk/p2/p2f1.txt'
+      './test/example/fs/walk/f1.txt',
+      './test/example/fs/walk/p1/',
+      './test/example/fs/walk/p1/p1f1.txt',
+      './test/example/fs/walk/p1/p1f2.txt',
+      './test/example/fs/walk/p2/',
+      './test/example/fs/walk/p2/p2f1.txt'
     ]
 
     await walk('test/example/fs/walk', path => {
@@ -49,12 +75,12 @@ export default class FsTest extends Test {
   async ['walk - базовый (for await)']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/f1.txt',
-      'test/example/fs/walk/p1/',
-      'test/example/fs/walk/p1/p1f1.txt',
-      'test/example/fs/walk/p1/p1f2.txt',
-      'test/example/fs/walk/p2/',
-      'test/example/fs/walk/p2/p2f1.txt'
+      './test/example/fs/walk/f1.txt',
+      './test/example/fs/walk/p1/',
+      './test/example/fs/walk/p1/p1f1.txt',
+      './test/example/fs/walk/p1/p1f2.txt',
+      './test/example/fs/walk/p2/',
+      './test/example/fs/walk/p2/p2f1.txt'
     ]
 
     for await (const [path] of walk('test/example/fs/walk')) {
@@ -70,15 +96,15 @@ export default class FsTest extends Test {
   async ['walk - исключение папок']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/f1.txt',
-      'test/example/fs/walk/p1/',
-      'test/example/fs/walk/p2/',
-      'test/example/fs/walk/p2/p2f1.txt'
+      './test/example/fs/walk/f1.txt',
+      './test/example/fs/walk/p1/',
+      './test/example/fs/walk/p2/',
+      './test/example/fs/walk/p2/p2f1.txt'
     ]
 
     await walk('test/example/fs/walk', (path, dirent) => {
       files.push(path)
-      if (dirent.isDirectory() && path === 'test/example/fs/walk/p1/') {
+      if (dirent.isDirectory() && path === './test/example/fs/walk/p1/') {
         return false
       }
     })
@@ -91,12 +117,12 @@ export default class FsTest extends Test {
   async ['walk - асинхронный walker']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/f1.txt',
-      'test/example/fs/walk/p1/',
-      'test/example/fs/walk/p1/p1f1.txt',
-      'test/example/fs/walk/p1/p1f2.txt',
-      'test/example/fs/walk/p2/',
-      'test/example/fs/walk/p2/p2f1.txt'
+      './test/example/fs/walk/f1.txt',
+      './test/example/fs/walk/p1/',
+      './test/example/fs/walk/p1/p1f1.txt',
+      './test/example/fs/walk/p1/p1f2.txt',
+      './test/example/fs/walk/p2/',
+      './test/example/fs/walk/p2/p2f1.txt'
     ]
 
     await walk('test/example/fs/walk', async (path, dirent) => {
@@ -113,15 +139,15 @@ export default class FsTest extends Test {
   async ['walk - формат path.win32']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/f1.txt',
-      'test/example/fs/walk/p1/',
-      'test/example/fs/walk/p2/',
-      'test/example/fs/walk/p2/p2f1.txt'
+      './test/example/fs/walk/f1.txt',
+      './test/example/fs/walk/p1/',
+      './test/example/fs/walk/p2/',
+      './test/example/fs/walk/p2/p2f1.txt'
     ]
 
     await walk(normalize('test/example/fs/walk'), (path, dirent) => {
       files.push(path)
-      if (dirent.isDirectory() && path === 'test/example/fs/walk/p1/') {
+      if (dirent.isDirectory() && path === './test/example/fs/walk/p1/') {
         return false
       }
     })
@@ -135,8 +161,8 @@ export default class FsTest extends Test {
   async ['walk - include, string']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/p1/p1f1.txt',
-      'test/example/fs/walk/p1/p1f2.txt'
+      './test/example/fs/walk/p1/p1f1.txt',
+      './test/example/fs/walk/p1/p1f2.txt'
     ]
 
     for await (const [path] of walk('test/example/fs/walk', { include: 'p1/p1f' })) {
@@ -152,9 +178,9 @@ export default class FsTest extends Test {
   async ['walk - include, dir']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/p1/',
-      'test/example/fs/walk/p1/p1f1.txt',
-      'test/example/fs/walk/p1/p1f2.txt'
+      './test/example/fs/walk/p1/',
+      './test/example/fs/walk/p1/p1f1.txt',
+      './test/example/fs/walk/p1/p1f2.txt'
     ]
 
     for await (const [path] of walk('test/example/fs/walk', { include: 'test/example/fs/walk/p1/' })) {
@@ -169,9 +195,9 @@ export default class FsTest extends Test {
   async ['walk - include, dir + /']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/p1/',
-      'test/example/fs/walk/p1/p1f1.txt',
-      'test/example/fs/walk/p1/p1f2.txt'
+      './test/example/fs/walk/p1/',
+      './test/example/fs/walk/p1/p1f1.txt',
+      './test/example/fs/walk/p1/p1f2.txt'
     ]
 
     for await (const [path] of walk('test/example/fs/walk', { include: 'test/example/fs/walk/p1/' })) {
@@ -186,9 +212,9 @@ export default class FsTest extends Test {
   async ['walk - include, String.raw`RegExp-style`']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/p1/p1f1.txt',
-      'test/example/fs/walk/p1/p1f2.txt',
-      'test/example/fs/walk/p2/p2f1.txt'
+      './test/example/fs/walk/p1/p1f1.txt',
+      './test/example/fs/walk/p1/p1f2.txt',
+      './test/example/fs/walk/p2/p2f1.txt'
     ]
 
     for await (const [path] of walk('test/example/fs/walk', { include: String.raw`p\d/p\df\d` })) {
@@ -204,10 +230,10 @@ export default class FsTest extends Test {
   async ['walk - include, RegExp + FullPath']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/p1/p1f1.txt'
+      './test/example/fs/walk/p1/p1f1.txt'
     ]
 
-    for await (const [path] of walk('test/example/fs/walk', { include: /^test\/.*p1f1.txt$/ })) {
+    for await (const [path] of walk('test/example/fs/walk', { include: /^.\/test\/.*p1f1.txt$/ })) {
       files.push(path)
     }
 
@@ -218,14 +244,14 @@ export default class FsTest extends Test {
   async ['walk - include, Array [RegExp, string]']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/p1/p1f1.txt',
-      'test/example/fs/walk/p1/p1f2.txt'
+      './test/example/fs/walk/p1/p1f1.txt',
+      './test/example/fs/walk/p1/p1f2.txt'
     ]
 
     for await (const [path] of walk('test/example/fs/walk', {
       include: [
-        /^test\/.*p1f1.txt$/,
-        '^test/.*/p1f2.txt$'
+        /^.\/test\/.*p1f1.txt$/,
+        '^./test/.*/p1f2.txt$'
       ]
     })) {
       files.push(path)
@@ -240,9 +266,9 @@ export default class FsTest extends Test {
   async ['walk - exclude']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/f1.txt',
-      'test/example/fs/walk/p2/',
-      'test/example/fs/walk/p2/p2f1.txt'
+      './test/example/fs/walk/f1.txt',
+      './test/example/fs/walk/p2/',
+      './test/example/fs/walk/p2/p2f1.txt'
     ]
 
     for await (const [path] of walk('test/example/fs/walk', { exclude: '/p1/' })) {
@@ -258,8 +284,8 @@ export default class FsTest extends Test {
   async ['walk - exclude + dir-end-/']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/f1.txt',
-      'test/example/fs/walk/p1/'
+      './test/example/fs/walk/f1.txt',
+      './test/example/fs/walk/p1/'
     ]
 
     for await (const [path] of walk('test/example/fs/walk', { exclude: [/\/p2\//, '/p1/.*.txt'] })) {
@@ -276,9 +302,9 @@ export default class FsTest extends Test {
   async ['walk - exclude, all except']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/p1/',
-      'test/example/fs/walk/p1/p1f1.txt',
-      'test/example/fs/walk/p1/p1f2.txt'
+      './test/example/fs/walk/p1/',
+      './test/example/fs/walk/p1/p1f1.txt',
+      './test/example/fs/walk/p1/p1f2.txt'
     ]
 
     for await (const [path] of walk('test/example/fs/walk', { exclude: '/walk/(?!p1)' })) {
@@ -294,8 +320,8 @@ export default class FsTest extends Test {
   async ['walk - include + exclude']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/p1/p1f1.txt',
-      'test/example/fs/walk/p1/p1f2.txt'
+      './test/example/fs/walk/p1/p1f1.txt',
+      './test/example/fs/walk/p1/p1f2.txt'
     ]
 
     for await (const [path] of walk('test/example/fs/walk', {
@@ -314,9 +340,9 @@ export default class FsTest extends Test {
   async ['walk - exclude-all-except + include']() {
     const files = []
     const expected = [
-      'test/example/fs/walk/p1/p1f1.txt',
-      'test/example/fs/walk/p1/p1f2.txt',
-      'test/example/fs/walk/p2/p2f1.txt'
+      './test/example/fs/walk/p1/p1f1.txt',
+      './test/example/fs/walk/p1/p1f2.txt',
+      './test/example/fs/walk/p2/p2f1.txt'
     ]
 
     for await (const [path] of walk('test/example/fs/walk', {
@@ -388,7 +414,7 @@ export default class FsTest extends Test {
     await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt')
     await walk('test/example/fs/copy', path => files.push(path))
 
-    assert.deepEqual(files, ['test/example/fs/copy/f1.txt'])
+    assert.deepEqual(files, ['./test/example/fs/copy/f1.txt'])
   }
 
   /** копируем файл, если каталог назначения не создан */
@@ -398,7 +424,7 @@ export default class FsTest extends Test {
     await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt')
     await walk('test/example/fs/copy', path => files.push(path))
 
-    assert.deepEqual(files, ['test/example/fs/copy/f1.txt'])
+    assert.deepEqual(files, ['./test/example/fs/copy/f1.txt'])
   }
 
   /** при копировании удаляем существующие файлы и папки в целевом каталоге,
@@ -421,9 +447,9 @@ export default class FsTest extends Test {
   async ['copy - фильтрация через include/exclude']() {
     const files = []
     const expected = [
-      'test/example/fs/copy/p1/',
-      'test/example/fs/copy/p1/p1f1.txt',
-      'test/example/fs/copy/p1/p1f2.txt'
+      './test/example/fs/copy/p1/',
+      './test/example/fs/copy/p1/p1f1.txt',
+      './test/example/fs/copy/p1/p1f2.txt'
     ]
 
     await copy('test/example/fs/walk', 'test/example/fs/copy', {
@@ -469,14 +495,14 @@ export default class FsTest extends Test {
   async ['remove - фильтрация через include/exclude']() {
     const files1 = []
     const expected1 = [
-      'test/example/fs/remove/p1/',
-      'test/example/fs/remove/p1/p1f1.txt',
-      'test/example/fs/remove/p1/p1f2.txt',
-      'test/example/fs/remove/p2/'
+      './test/example/fs/remove/p1/',
+      './test/example/fs/remove/p1/p1f1.txt',
+      './test/example/fs/remove/p1/p1f2.txt',
+      './test/example/fs/remove/p2/'
     ]
     const files2 = []
     const expected2 = [
-      'test/example/fs/remove/p2/'
+      './test/example/fs/remove/p2/'
     ]
 
     await copy('test/example/fs/walk', 'test/example/fs/remove')
@@ -502,9 +528,9 @@ export default class FsTest extends Test {
   async ['remove - инверсия include']() {
     const files = []
     const expected = [
-      'test/example/fs/remove/p1/',
-      'test/example/fs/remove/p1/p1f1.txt',
-      'test/example/fs/remove/p1/p1f2.txt'
+      './test/example/fs/remove/p1/',
+      './test/example/fs/remove/p1/p1f1.txt',
+      './test/example/fs/remove/p1/p1f2.txt'
     ]
 
     await copy('test/example/fs/walk', 'test/example/fs/remove')

@@ -1,5 +1,6 @@
 /** @module @nodutilus/fs */
 
+import { isAbsolute } from 'path'
 import { dirname, join, relative } from 'path/posix'
 import { promises as fsPromises, constants as fsConstants } from 'fs'
 
@@ -49,6 +50,7 @@ const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
  *  то вернется итератор для обхода каталогов и файлов
  */
 function walk(path, options = {}, walker) {
+  const prefix = isAbsolute(path) ? '' : './'
   let { include, exclude } = options
 
   walker = (typeof options === 'function' ? options : walker) || options.walker
@@ -60,7 +62,7 @@ function walk(path, options = {}, walker) {
 
   if (walker) {
     return (async () => {
-      const __walker = __walk(path, { include, exclude })
+      const __walker = __walk(path, { prefix, include, exclude })
       let next = await __walker.next()
 
       while (!next.done) {
@@ -68,7 +70,7 @@ function walk(path, options = {}, walker) {
       }
     })()
   } else {
-    return __walk(path, { include, exclude })
+    return __walk(path, { prefix, include, exclude })
   }
 }
 
@@ -114,12 +116,13 @@ function __searchPathByRegExp(sRegExp, path) {
  * @yields {[string,import('fs').Dirent]}
  */
 async function* __walk(path, options = {}) {
-  const { include, exclude } = options
+  const { prefix, include, exclude } = options
   const files = await readdir(path, { withFileTypes: true })
 
   for (const file of files) {
     const isDirectory = file.isDirectory()
-    const filePath = join(path, file.name, isDirectory ? '/' : '')
+    const postfix = isDirectory ? '/' : ''
+    const filePath = prefix + join(path, file.name) + postfix
     const isInclude = !include || __searchPathByRegExp(include, filePath)
     const isExclude = exclude ? __searchPathByRegExp(exclude, filePath) : false
 

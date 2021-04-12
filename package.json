@@ -2,8 +2,8 @@
   "repository": "github:nodutilus/nodutilus",
   "license": "Unlicense",
   "type": "module",
-  "dependencies": {
-    "@nodutilus/project-config": "github:nodutilus/project-config#v1.0.1"
+  "devDependencies": {
+    "@nodutilus/project-config": "latest"
   },
   "scripts": {
     "pre-test": "node test/pre-test"

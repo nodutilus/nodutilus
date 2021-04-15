@@ -40,37 +40,15 @@ jobs:
       - uses: nodutilus/project-config/actions/setup-npm@main
       - uses: nodutilus/project-config/actions/c8@main
 
-  # Для изменений в мастере - публикуем
-  # build-and-publish:
-  #   name: Build & Publish
-  #   needs: [checks, tests, coverage]
-  #   if: github.event_name == 'push'
-
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - uses: actions/checkout@master
-  #     - uses: actions/setup-node@master
-  #       with:
-  #         node-version: ">=14"
-  #         registry-url: "https://npm.pkg.github.com"
-
-  #     - name: Install dependencies
-  #       run: npm install
-  #       env:
-  #         NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-  #     - name: Publish packages (GPR)
-  #       run: npx nodutilus-ci-cd publish-package @nodutilus
-  #       env:
-  #         NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-  #     - uses: actions/setup-node@master
-  #       with:
-  #         node-version: ">=14"
-  #         scope: "@nodutilus"
-  #         registry-url: "https://registry.npmjs.org"
-  #     - name: Publish packages (NPM)
-  #       run: npx nodutilus-ci-cd publish-package @nodutilus
-  #       env:
-  #         NODE_AUTH_TOKEN: ${{secrets.NPMJS_TOKEN}}
+  build-and-publish:
+    name: Build & Publish
+    needs: [checks, tests, coverage]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - uses: nodutilus/project-config/actions/setup-node-latest@main
+      - uses: nodutilus/project-config/actions/setup-npm@main
+      - uses: nodutilus/project-config/actions/npm-publish@main
+        with:
+          token: ${{ secrets.NPM_TOKEN }}

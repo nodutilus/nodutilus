@@ -1,9 +1,9 @@
 /** @module @nodutilus/fs */
 
-import { isAbsolute } from 'path'
-import { dirname, join, relative } from 'path/posix'
+import { isAbsolute, posix } from 'path'
 import { promises as fsPromises, constants as fsConstants } from 'fs'
 
+const { dirname, join, relative } = posix
 const { COPYFILE_EXCL } = fsConstants
 const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
 

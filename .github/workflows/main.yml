@@ -18,6 +18,7 @@ jobs:
       - uses: nodutilus/project-config/actions/setup-npm@main
       - uses: nodutilus/project-config/actions/eslint@main
       - uses: nodutilus/project-config/actions/eslintcc@main
+      - uses: nodutilus/project-config/actions/ts-check@dev/ts-check
 
   tests:
     name: Test on ${{ matrix.os }}

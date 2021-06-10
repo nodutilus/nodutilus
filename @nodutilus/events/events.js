@@ -5,7 +5,7 @@
  */
 
 /** @typedef {any} Event Имя или уникальный идентификатор события */
-/** @typedef {function(...any)} Listener Слушатель события */
+/** @typedef {function(...any):void} Listener Слушатель события */
 /** @typedef {Map<Event, Set<Listener>>} ListenersMap Перечень всех слушателей события */
 /** @type {WeakMap<EventEmitter, ListenersMap>} Хранилище базовых событий для экземпляра EventEmitter */
 const privateEventsMap = new WeakMap()

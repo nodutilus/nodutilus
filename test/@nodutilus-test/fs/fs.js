@@ -3,7 +3,7 @@ import { copy, readJSON, readText, remove, walk, writeJSON } from '@nodutilus/fs
 import { isAbsolute, resolve, normalize, relative } from 'path'
 import { existsSync, promises as fsPromises } from 'fs'
 
-const { mkdir, rmdir } = fsPromises
+const { mkdir, rm } = fsPromises
 
 
 /** Тесты библиотеки @nodutilus/fs */
@@ -11,18 +11,18 @@ export default class FsTest extends Test {
 
   /** Перед запуском очистим временные данные */
   async [Test.before]() {
-    await rmdir('test/example/fs/copy', { recursive: true })
-    await rmdir('test/example/fs/symlink', { recursive: true })
-    await rmdir('test/example/fs/remove', { recursive: true })
-    await rmdir('test/example/fs/write', { recursive: true })
+    await rm('test/example/fs/copy', { force: true, recursive: true })
+    await rm('test/example/fs/symlink', { force: true, recursive: true })
+    await rm('test/example/fs/remove', { force: true, recursive: true })
+    await rm('test/example/fs/write', { force: true, recursive: true })
   }
 
   /** Удалим временные данные после тестов */
   async [Test.afterEach]() {
-    await rmdir('test/example/fs/copy', { recursive: true })
-    await rmdir('test/example/fs/symlink', { recursive: true })
-    await rmdir('test/example/fs/remove', { recursive: true })
-    await rmdir('test/example/fs/write', { recursive: true })
+    await rm('test/example/fs/copy', { force: true, recursive: true })
+    await rm('test/example/fs/symlink', { force: true, recursive: true })
+    await rm('test/example/fs/remove', { force: true, recursive: true })
+    await rm('test/example/fs/write', { force: true, recursive: true })
   }
 
   /** для удобства работы с путями до каталогов и папок выполняется их нормализация.

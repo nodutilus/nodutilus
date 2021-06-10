@@ -3,7 +3,7 @@
   "license": "Unlicense",
   "type": "module",
   "devDependencies": {
-    "@nodutilus/project-config": "latest"
+    "@nodutilus/project-config": "github:nodutilus/project-config#dev/ts-check"
   },
   "scripts": {
     "pre-test": "node test/pre-test"

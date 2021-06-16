@@ -17,8 +17,10 @@ export default class EventsTest extends Test {
     assert.equal(em.listenerCount('test'), 0)
   }
 
-  /** После отписки от последнего события сет со слушателями удаляется.
-   * На данное поведение опирается метод "has" */
+  /**
+   * После отписки от последнего события сет со слушателями удаляется.
+   * На данное поведение опирается метод "has"
+   */
   ['EventEmitter - удаление события после удаления последнего слушателя']() {
     const em = new EventEmitter()
     const fn1 = () => em.off('test', fn1)
@@ -54,8 +56,10 @@ export default class EventsTest extends Test {
     assert.equal(value, 1)
   }
 
-  /** once - аналогичен базовому во встроенном модуле events,
-   * но работает только с Promise */
+  /**
+   * once - аналогичен базовому во встроенном модуле events,
+   * но работает только с Promise
+   */
   async ['EventEmitter - once']() {
     const em = new EventEmitter()
     const p = new Promise(resolve => setTimeout(() => {
@@ -395,8 +399,10 @@ export default class EventsTest extends Test {
     assert.equal(result2, 'test17')
   }
 
-  /** PEE создается наследованием из Promise, с добавлением emitter,
-   * при этом последующие then/catch/finally создают обычный Promise */
+  /**
+   * PEE создается наследованием из Promise, с добавлением emitter,
+   * при этом последующие then/catch/finally создают обычный Promise
+   */
   async ['PromiseEventEmitter - создание, чейнинг']() {
     const pem = new PromiseEventEmitter()
     const tpem = pem.then(value => {
@@ -491,8 +497,10 @@ export default class EventsTest extends Test {
     assert.equal(error, 'error')
   }
 
-  /** executor не может вернуть значение, но может быть асинхронным,
-   * чтобы отпустить текущий поток выполнения */
+  /**
+   * executor не может вернуть значение, но может быть асинхронным,
+   * чтобы отпустить текущий поток выполнения
+   */
   async ['PromiseEventEmitter - асинхронный executor']() {
     let value = 0
     const pem = new PromiseEventEmitter(async emmiter => {
@@ -525,12 +533,14 @@ export default class EventsTest extends Test {
     assert.equal(error, 'this.nonExistent is not a function')
   }
 
-  /** Если у executor всего 1 аргумент emitter, то создается полноценный PEE,
+  /**
+   * Если у executor всего 1 аргумент emitter, то создается полноценный PEE,
    *  а внутри создается синхронный executor, который получает методы resolve, reject.
    * Если в конструктор PEE передается 2 аргумента, методы resolve, reject,
    *  то экземпляр создается как обычный Promise.
    * Это необходимо для поддержания правильного чейнинга,
-   *    т.к. он должен создавать новые экземпляры Promise. */
+   *    т.к. он должен создавать новые экземпляры Promise.
+   */
   async ['PromiseEventEmitter - синхронный executor']() {
     const pem = new PromiseEventEmitter((resolve, reject) => {
       assert(typeof resolve === 'function')
@@ -558,8 +568,10 @@ export default class EventsTest extends Test {
     assert.equal(error, 'test')
   }
 
-  /** Ошибки в коде синхронного executor должны перехватываться через
-   * try/catch на блоке с await для PEE, а не на конструкторе PEE */
+  /**
+   * Ошибки в коде синхронного executor должны перехватываться через
+   * try/catch на блоке с await для PEE, а не на конструкторе PEE
+   */
   async ['PromiseEventEmitter - перехват синхронной ошибки в коде']() {
     const pem = new PromiseEventEmitter(() => {
       this.nonExistent()
@@ -575,8 +587,10 @@ export default class EventsTest extends Test {
     assert.equal(error, 'this.nonExistent is not a function')
   }
 
-  /** once позволяет организовать обмен между executor'ом и внешним кодом,
-   * не создавая при этом лишних callback'ов */
+  /**
+   * once позволяет организовать обмен между executor'ом и внешним кодом,
+   * не создавая при этом лишних callback'ов
+   */
   async ['PromiseEventEmitter - once']() {
     let result2 = 0
     const pem = new PromiseEventEmitter(async emitter => {
@@ -606,8 +620,10 @@ export default class EventsTest extends Test {
     assert.equal(result3, 4)
   }
 
-  /** В PromiseEventEmitter emit без await выполняется асинхронно, а код после него синхронно,
-   * и если после emit есть ошибка, то once его ожидающий завершиться ошибкой */
+  /**
+   * В PromiseEventEmitter emit без await выполняется асинхронно, а код после него синхронно,
+   * и если после emit есть ошибка, то once его ожидающий завершиться ошибкой
+   */
   async ['PromiseEventEmitter - once, ошибка после emit']() {
     const pem = new PromiseEventEmitter(emitter => {
       emitter.emit('result1', 1).catch(reason => { })
@@ -655,9 +671,11 @@ export default class EventsTest extends Test {
     assert.equal(error, 'this.nonExistent is not a function')
   }
 
-  /** Если в событиях PEE возникает ошибка, то все последующие асинхронные действия завершаться этой ошибкой.
+  /**
+   * Если в событиях PEE возникает ошибка, то все последующие асинхронные действия завершаться этой ошибкой.
    * emit - не отправит событие и упадет с ошибкой возникшей ранее
-   * once - не создаст новой подписки и упадет с ошибкой возникшей ранее */
+   * once - не создаст новой подписки и упадет с ошибкой возникшей ранее
+   */
   async ['PromiseEventEmitter - emit и once после ошибки']() {
     const pem = new PromiseEventEmitter(async emitter => {
       await new Promise(resolve => setTimeout(resolve, 1))
@@ -701,8 +719,10 @@ export default class EventsTest extends Test {
     assert.equal(error, 'this.nonExistent is not a function')
   }
 
-  /** Повторный emitter.reject не должен перетирать ошибку,
-   * которую будут получать последующие асинхронные вызовы событий провалившегося обещания */
+  /**
+   * Повторный emitter.reject не должен перетирать ошибку,
+   * которую будут получать последующие асинхронные вызовы событий провалившегося обещания
+   */
   async ['PromiseEventEmitter - emitter.reject - только 1 раз']() {
     const pem = new PromiseEventEmitter(async emitter => {
       await new Promise(resolve => setTimeout(resolve, 1))
@@ -747,8 +767,10 @@ export default class EventsTest extends Test {
     assert.equal(error, 'test 1')
   }
 
-  /** Проверяем, что можно обмениваться данными в асинхронном режиме
-   * между основным и дочерним исполнением кода */
+  /**
+   * Проверяем, что можно обмениваться данными в асинхронном режиме
+   * между основным и дочерним исполнением кода
+   */
   async ['PromiseEventEmitter - once + emit, принял, обработал, отдал']() {
     let result2 = 0
     const pem = new PromiseEventEmitter(async emitter => {

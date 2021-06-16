@@ -25,14 +25,16 @@ export default class FsTest extends Test {
     await rm('test/example/fs/write', { force: true, recursive: true })
   }
 
-  /** для удобства работы с путями до каталогов и папок выполняется их нормализация.
+  /**
+   * для удобства работы с путями до каталогов и папок выполняется их нормализация.
    *  по пути должно быть возможно однозначно определить:
    *    - каталог это или файл
    *    - абсолютный путь или относительный
    *  нормализация от модуля `path` откидывает эти сведения, делая путь максимально кратким,
    *   поэтому `path` реализация расширяется:
    *    - к относительным путям всегда добавляется ./ в начале
-   *    - к каталогу всегда добавляется / в конце */
+   *    - к каталогу всегда добавляется / в конце
+   */
   async ['walk - нормализация пути']() {
     await walk('test/example/fs/walk', (path, dirent) => {
       if (dirent.isDirectory()) {
@@ -91,8 +93,10 @@ export default class FsTest extends Test {
     assert.deepEqual(files, expected)
   }
 
-  /** если сначала перебираются папки, то можно вернуть false,
-   * чтобы не проходить по вложениям папки */
+  /**
+   * если сначала перебираются папки, то можно вернуть false,
+   * чтобы не проходить по вложениям папки
+   */
   async ['walk - исключение папок']() {
     const files = []
     const expected = [
@@ -134,8 +138,10 @@ export default class FsTest extends Test {
     assert.deepEqual(files, expected)
   }
 
-  /** проверяем что нормализованный путь для win отработает корректно.
-   *    такие пути заменяются внутри walk на posix вариант, для корректной работы поиска по маске */
+  /**
+   * проверяем что нормализованный путь для win отработает корректно.
+   *    такие пути заменяются внутри walk на posix вариант, для корректной работы поиска по маске
+   */
   async ['walk - формат path.win32']() {
     const files = []
     const expected = [
@@ -156,8 +162,10 @@ export default class FsTest extends Test {
     assert.deepEqual(files, expected)
   }
 
-  /** строки при поиске превращаются в "жадный" RegExp,
-   *    включающий любое совпадение части пути с переданным выражением */
+  /**
+   * строки при поиске превращаются в "жадный" RegExp,
+   *    включающий любое совпадение части пути с переданным выражением
+   */
   async ['walk - include, string']() {
     const files = []
     const expected = [
@@ -173,8 +181,10 @@ export default class FsTest extends Test {
     assert.deepEqual(files, expected)
   }
 
-  /** при включении в выражении каталога вернется всё его содержимое,
-   *    включая сам каталог */
+  /**
+   * при включении в выражении каталога вернется всё его содержимое,
+   *    включая сам каталог
+   */
   async ['walk - include, dir']() {
     const files = []
     const expected = [
@@ -225,8 +235,10 @@ export default class FsTest extends Test {
     assert.deepEqual(files, expected)
   }
 
-  /** можно передать напрямую RegExp,
-   *    а также собрать выражение учитывающее весь путь файла */
+  /**
+   * можно передать напрямую RegExp,
+   *    а также собрать выражение учитывающее весь путь файла
+   */
   async ['walk - include, RegExp + FullPath']() {
     const files = []
     const expected = [
@@ -261,8 +273,10 @@ export default class FsTest extends Test {
     assert.deepEqual(files, expected)
   }
 
-  /** exclude исключает из обхода и результата все совпадения,
-   *    при этом если каталог исключается, то walk не будет заходить внутрь каталога */
+  /**
+   * exclude исключает из обхода и результата все совпадения,
+   *    при этом если каталог исключается, то walk не будет заходить внутрь каталога
+   */
   async ['walk - exclude']() {
     const files = []
     const expected = [
@@ -279,8 +293,10 @@ export default class FsTest extends Test {
     assert.deepEqual(files, expected)
   }
 
-  /** если к каталогу в exclude добавить /, то сам каталог вернется, а все его содержимое проигнорируется,
-   *    таким образом можно исключить конкретные вложенные каталоги и файлы, сам каталог при этом в результат вернется */
+  /**
+   * если к каталогу в exclude добавить /, то сам каталог вернется, а все его содержимое проигнорируется,
+   *    таким образом можно исключить конкретные вложенные каталоги и файлы, сам каталог при этом в результат вернется
+   */
   async ['walk - exclude + dir-end-/']() {
     const files = []
     const expected = [
@@ -296,9 +312,11 @@ export default class FsTest extends Test {
     assert.deepEqual(files, expected)
   }
 
-  /** через исключающий RegExp в exclude можно исключить обход всех подкаталогов кроме указанных в exclude.
+  /**
+   * через исключающий RegExp в exclude можно исключить обход всех подкаталогов кроме указанных в exclude.
    *    это создает инверсию исключения, и включает в только указанные каталоги.
-   *    этот вариант более оптимален т.к. можно исключить тяжелый каталог из обхода на одном уровне с искомым. */
+   *    этот вариант более оптимален т.к. можно исключить тяжелый каталог из обхода на одном уровне с искомым.
+   */
   async ['walk - exclude, all except']() {
     const files = []
     const expected = [
@@ -315,8 +333,10 @@ export default class FsTest extends Test {
     assert.deepEqual(files, expected)
   }
 
-  /** добавив "жадное" условие поиска, можно через exclude исключить часть выборки,
-   *    в т.ч. и файлы которые могут совпадать с include внутри исключенного каталога */
+  /**
+   * добавив "жадное" условие поиска, можно через exclude исключить часть выборки,
+   *    в т.ч. и файлы которые могут совпадать с include внутри исключенного каталога
+   */
   async ['walk - include + exclude']() {
     const files = []
     const expected = [
@@ -335,8 +355,10 @@ export default class FsTest extends Test {
     assert.deepEqual(files, expected)
   }
 
-  /** можно комбинировать инверсию exclude и include, перебрав все каталоги соответствующие exclude,
-   *    при этом отфильтровав их содержимое с помощью include */
+  /**
+   * можно комбинировать инверсию exclude и include, перебрав все каталоги соответствующие exclude,
+   *    при этом отфильтровав их содержимое с помощью include
+   */
   async ['walk - exclude-all-except + include']() {
     const files = []
     const expected = [
@@ -427,8 +449,10 @@ export default class FsTest extends Test {
     assert.deepEqual(files, ['./test/example/fs/copy/f1.txt'])
   }
 
-  /** при копировании удаляем существующие файлы и папки в целевом каталоге,
-   *  которых нет в исходном каталоге */
+  /**
+   * при копировании удаляем существующие файлы и папки в целевом каталоге,
+   *  которых нет в исходном каталоге
+   */
   async ['copy - удаление несуществующих']() {
     await copy('test/example/fs/walk/p1', 'test/example/fs/copy/p1_new')
     await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f_new.txt')
@@ -490,8 +514,10 @@ export default class FsTest extends Test {
     assert(!existsSync('test/example/fs/remove/f1.txt'))
   }
 
-  /** для удаления можно использовать опции include/exclude для walk.
-   *  при этом при удалении каталога, если он попала под условия, она удаляется сразу со всем содержимым */
+  /**
+   * для удаления можно использовать опции include/exclude для walk.
+   *  при этом при удалении каталога, если он попала под условия, она удаляется сразу со всем содержимым
+   */
   async ['remove - фильтрация через include/exclude']() {
     const files1 = []
     const expected1 = [
@@ -543,11 +569,13 @@ export default class FsTest extends Test {
     assert.deepEqual(files, expected)
   }
 
-  /** удаление выполняется с "жадным" поиском, и если не исключить родительский каталог,
+  /**
+   * удаление выполняется с "жадным" поиском, и если не исключить родительский каталог,
    *    попытка исключения через  exclude подкаталога будет проигнорирована,
    *    т.к. родительский каталог не попадает под исключение и удаляется.
    *  чтобы удаление проигнорировало родителя, необходимо включить и его,
-   *    либо использовать include, как в примере выше */
+   *    либо использовать include, как в примере выше
+   */
   async ['remove - промах по exclude (подкаталог)']() {
     const files1 = []
     const expected1 = []

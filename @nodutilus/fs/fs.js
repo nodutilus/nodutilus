@@ -8,47 +8,7 @@ const { COPYFILE_EXCL } = fsConstants
 const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
 
 
-/**
- * @callback Walker Функция обратного вызова для обработки результатов обхода дерева каталога
- * @param {string} path Путь до найденного каталога или файла,
- *  включая каталог (path) переданный в вызов функции walk в формате posix.
- * @param {import('fs').Dirent} dirent Сущность записи каталога
- * @returns {void|boolean|Promise<void|boolean>} Если вернуть для каталога false,
- *  его содержимое будет проигнорировано
- */
-/**
- * @typedef {Array<RegExp|string>|RegExp|string} SearchingRegExp Регулярное выражение или набор выражений,
- *  используемое для поиска совпадений в пути до каталога или файла.
- * Переданные сроки будут преобразованы через конструктор new RegExp(<string>).
- * В качестве разделителя пути необходимо использовать '/'
- * @example
- *  // Варианты для поиска файлов расширением `.log` c числовым именем в каталоге `home`
- *  ['/home/.+\\d+.log$', String.raw`/home/.+\d+.log$`, /\/home\/.+\d+.log$/]
- */
-/**
- * @typedef SearchingOptions
- * @property {SearchingRegExp} [include] Регулярное выражение (или набор выражений) для поиска совпадений пути при обходе.
- *  Позволит вернуть в выдачу результатов только соответствующие условиям каталоги и файлы.
- *  При этом обход дерева все равно выполняется для всех подкаталогов и файлов, но возвращаются только соответствующие условиям поиска.
- *  Для проверки используется путь от каталога (path), переданного в вызов функции walk, до конечного каталога или файла в формате posix.
- * @property {SearchingRegExp} [exclude] Регулярное выражение (или набор выражений) для исключения из обхода совпадающего пути.
- *  Позволит исключить из обхода дерева и выдачи результатов каталоги и файлы соответствующие условиям.
- *  Если часть пути совпадает с условиями, то все вложенные каталоги и файлы будут проигнорированы при обходе дерева.
- *  Для проверки используется путь от каталога (path), переданного в вызов функции walk, до конечного каталога или файла в формате posix.
- */
-/**
- * @typedef {SearchingOptions} WalkOptions Опции управления обходом дерева каталога
- * @property {Walker} [walker] Обработчик результатов обхода дерева каталога
- */
-/**
- * Обходит дерево каталога и возвращает вложенные каталоги и файлы в Walker
- *
- * @param {string} path Каталог для обхода
- * @param {WalkOptions} [options] Опции управления обходом дерева каталога
- * @param {Walker} [walker] Обработчик результатов обхода дерева каталога
- * @returns {Promise<void>|Iterator<[string,import('fs').Dirent]>} Если не передан Walker,
- *  то вернется итератор для обхода каталогов и файлов
- */
+/** @type {import('@nodutilus/fs').WalkFunctionCommon} */
 function walk(path, options = {}, walker) {
   const prefix = isAbsolute(path) ? '' : './'
   let { include, exclude } = options
@@ -75,10 +35,7 @@ function walk(path, options = {}, walker) {
 }
 
 
-/**
- * @param {SearchingRegExp} sRegExp Исходное регулярное выражение или набор выражений
- * @returns {SearchingRegExp|void} Нормализованное регулярное выражение или набор выражений
- */
+/** @type {import('@nodutilus/fs').__normalizeSearchingRegExp} */
 function __normalizeSearchingRegExp(sRegExp) {
   if (sRegExp) {
     if (sRegExp instanceof Array) {
@@ -92,11 +49,7 @@ function __normalizeSearchingRegExp(sRegExp) {
 }
 
 
-/**
- * @param {SearchingRegExp} sRegExp Регулярное выражение или набор выражений для сопоставления
- * @param {string} path Путь до каталога или файла для проверки соответствия условиям отбора
- * @returns {boolean} true - если хотя бы одно из выражений поиска совпадает с путем
- */
+/** @type {import('@nodutilus/fs').__searchPathByRegExp} */
 function __searchPathByRegExp(sRegExp, path) {
   if (sRegExp instanceof RegExp) {
     return sRegExp.test(path)

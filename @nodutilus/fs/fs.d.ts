@@ -74,11 +74,9 @@ declare module '@nodutilus/fs' {
     ): boolean
   }
 
-  interface WalkGenerator extends Generator<[string, Dirent], [string, Dirent]> {
-    [Symbol.asyncIterator](): Generator<[string, Dirent], [string, Dirent]>
-  }
+  type WalkGenerator = AsyncGenerator<[string, Dirent], [string, Dirent], boolean | void>
 
-  interface __walk {
+  interface WalkGeneratorFunction {
     (
       /** Текущий каталог для обхода */
       path: string,

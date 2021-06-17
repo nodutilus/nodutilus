@@ -62,7 +62,8 @@ function __searchPathByRegExp(sRegExp, path) {
   }
 }
 
-/** @type {import('@nodutilus/fs').__walk} */
+
+/** @type {import('@nodutilus/fs').WalkGeneratorFunction} */
 async function* __walk(path, options = {}) {
   const { prefix, include, exclude } = options
   const files = await readdir(path, { withFileTypes: true })

@@ -35,7 +35,7 @@ function walk(path, options = {}, walker) {
 }
 
 
-/** @type {import('@nodutilus/fs').__normalizeSearchingRegExp} */
+/** @type {import('@nodutilus/fs').NormalizeSearchingRegExp} */
 function __normalizeSearchingRegExp(sRegExp) {
   if (sRegExp) {
     if (sRegExp instanceof Array) {
@@ -49,7 +49,7 @@ function __normalizeSearchingRegExp(sRegExp) {
 }
 
 
-/** @type {import('@nodutilus/fs').__searchPathByRegExp} */
+/** @type {import('@nodutilus/fs').SearchPathByRegExp} */
 function __searchPathByRegExp(sRegExp, path) {
   if (sRegExp instanceof RegExp) {
     return sRegExp.test(path)
@@ -62,12 +62,7 @@ function __searchPathByRegExp(sRegExp, path) {
   }
 }
 
-
-/**
- * @param {string} path Текущий каталог для обхода
- * @param {SearchingOptions} [options] Внутренние опции для обхода дерева каталога
- * @yields {[string,import('fs').Dirent]}
- */
+/** @type {import('@nodutilus/fs').__walk} */
 async function* __walk(path, options = {}) {
   const { prefix, include, exclude } = options
   const files = await readdir(path, { withFileTypes: true })

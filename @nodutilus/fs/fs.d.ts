@@ -54,7 +54,7 @@ declare module '@nodutilus/fs' {
   }
 
   /** Нормализует регулярное выражение или набор выражений */
-  interface __normalizeSearchingRegExp {
+  interface NormalizeSearchingRegExp {
     (
       /** Исходное регулярное выражение или набор выражений */
       sRegExp: SearchingRegExp
@@ -65,7 +65,7 @@ declare module '@nodutilus/fs' {
    * Проверяет путь до каталога или файла на соответствие выражению для поиска.
    * Вернет true - если хотя бы одно из выражений поиска совпадает с путем
    */
-  interface __searchPathByRegExp {
+  interface SearchPathByRegExp {
     (
       /** Регулярное выражение или набор выражений для сопоставления */
       sRegExp: SearchingRegExp,
@@ -74,8 +74,21 @@ declare module '@nodutilus/fs' {
     ): boolean
   }
 
+  interface WalkGenerator extends Generator<[string, Dirent], [string, Dirent]> {
+    [Symbol.asyncIterator](): Generator<[string, Dirent], [string, Dirent]>
+  }
+
+  interface __walk {
+    (
+      /** Текущий каталог для обхода */
+      path: string,
+      /** Внутренние опции для обхода дерева каталога */
+      options: WalkOptions
+    ): WalkGenerator
+  }
+
   interface WalkFunctionCommon {
-    (path: string, options?: WalkOptions, walker?: Walker): Promise<void> | Iterable<Promise<[string, Dirent]>>
+    (path: string, options?: WalkOptions, walker?: Walker): Promise<void> | WalkGenerator
   }
 
   interface WalkFunction extends WalkFunctionCommon {
@@ -107,14 +120,14 @@ declare module '@nodutilus/fs' {
       path: string,
       /** Опции управления обходом дерева каталога */
       options: WalkOptions
-    ): Iterable<Promise<[string, Dirent]>>
+    ): WalkGenerator
     /**
      * Возвращает итератор для рекурсивного обхода подкаталогов и файлов
      */
     (
       /** Каталог для обхода */
       path: string
-    ): Iterable<Promise<[string, Dirent]>>
+    ): WalkGenerator
   }
 
   /**

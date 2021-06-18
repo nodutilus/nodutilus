@@ -197,7 +197,7 @@ declare module '@nodutilus/fs' {
       /** Путь до файла */
       path: string,
       /** Значение по умолчанию, если файл не найден */
-      defaultValue: object
+      defaultValue?: object
     ): Promise<object>
   }
 

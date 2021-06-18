@@ -153,13 +153,7 @@ async function __copy(src, dest, options) {
 }
 
 
-/**
- * Удаление файла или каталога со всем содержимым
- *
- * @param {string} path Каталог или файл
- * @param {SearchingOptions} [options] Опции управления удалением файлов и каталогов
- * @returns {Promise<void>}
- */
+/** @type {import('@nodutilus/fs').RemoveFunction} */
 async function remove(path, options = {}) {
   const { include, exclude } = options
 
@@ -176,13 +170,7 @@ async function remove(path, options = {}) {
 }
 
 
-/**
- * Чтение файла в формате JSON
- *
- * @param {string} path Путь до файла
- * @param {object} [defaultValue] Значение по умолчанию, если файл не найден
- * @returns {Promise<object>} Распарсенный JOSN объект
- */
+/** @type {import('@nodutilus/fs').ReadJSONFunction} */
 async function readJSON(path, defaultValue) {
   const data = await readFile(path, 'utf8').then(JSON.parse).catch(error => {
     if (error.code === 'ENOENT' && typeof defaultValue !== 'undefined') {

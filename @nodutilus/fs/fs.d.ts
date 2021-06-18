@@ -181,6 +181,26 @@ declare module '@nodutilus/fs' {
     ): Promise<void>
   }
 
+  interface RemoveFunction {
+    /** Удаляет файл или каталог со всем содержимым */
+    (
+      /** Каталог или файл */
+      path: string,
+      /** Опции управления удалением файлов и каталогов */
+      options?: SearchingOptions
+    ): Promise<void>
+  }
+
+  interface ReadJSONFunction {
+    /** Читает файл в формате JSON и возвращает полученный объект */
+    (
+      /** Путь до файла */
+      path: string,
+      /** Значение по умолчанию, если файл не найден */
+      defaultValue: object
+    ): Promise<object>
+  }
+
   /**
    * Рекурсивно обходит дерево каталога и возвращает найденные подкаталоги и файлы в функцию Walker.
    * Если не передан Walker, то возвращает итератор для рекурсивного обхода подкаталогов и файлов
@@ -191,4 +211,12 @@ declare module '@nodutilus/fs' {
    * По умолчанию осуществляет слияние каталогов и перезапись файлов (управляется флагами).
    */
   export const copy: CopyFunction
+  /**
+   * Удаляет файл или каталог со всем содержимым
+   */
+  export const remove: RemoveFunction
+  /**
+   * Читает файл в формате JSON и возвращает полученный объект
+   */
+  export const readJSON: ReadJSONFunction
 }

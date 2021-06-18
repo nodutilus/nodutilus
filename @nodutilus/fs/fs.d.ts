@@ -201,6 +201,58 @@ declare module '@nodutilus/fs' {
     ): Promise<object>
   }
 
+  interface ReadTextFunction {
+    /** Читает файл в текстовом формате */
+    (
+      /** Путь до файла */
+      path: string,
+      /** Значение по умолчанию, если файл не найден */
+      defaultValue?: string
+    ): Promise<string>
+  }
+
+  /** Опции управления записью текстового файла */
+  interface WriteOptions {
+    /**
+     * Завершать запись файла ошибкой, если файл существует
+     * @default false
+     */
+    throwIfExists?: boolean
+  }
+
+  /** Опции управления записью JSON файла */
+  interface WriteJSONOptions extends WriteOptions {
+    /**
+     * Количество пробелов для форматирования JSON
+     * @default 2
+     */
+    space?: number | null
+  }
+
+  interface WriteJSONFunction {
+    /** Записывает файл в формате JSON */
+    (
+      /** Путь до файла */
+      path: string,
+      /** JSON объект */
+      data: object,
+      /** Опции управления записью JSON файла */
+      options?: WriteJSONOptions
+    ): Promise<void>
+  }
+
+  interface WriteTextFunction {
+    /** Записывает файл в текстовом формате */
+    (
+      /** Путь до файла */
+      path: string,
+      /** Текст */
+      data: string,
+      /** Опции управления записью текстового файла */
+      options?: WriteOptions
+    ): Promise<void>
+  }
+
   /**
    * Рекурсивно обходит дерево каталога и возвращает найденные подкаталоги и файлы в функцию Walker.
    * Если не передан Walker, то возвращает итератор для рекурсивного обхода подкаталогов и файлов
@@ -219,4 +271,16 @@ declare module '@nodutilus/fs' {
    * Читает файл в формате JSON и возвращает полученный объект
    */
   export const readJSON: ReadJSONFunction
+  /**
+   * Читает файл в текстовом формате
+   */
+  export const readText: ReadTextFunction
+  /**
+   * Записывает файл в формате JSON
+   */
+  export const writeJSON: WriteJSONFunction
+  /**
+   * Записывает файл в текстовом формате
+   */
+  export const writeText: WriteTextFunction
 }

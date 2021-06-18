@@ -10,6 +10,7 @@ const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
 // @ts-ignore
 const walk = __walkCommon
 
+
 /** @type {import('@nodutilus/fs').WalkFunctionCommon} */
 function __walkCommon(path, options = {}, walker = undefined) {
   const prefix = isAbsolute(path) ? '' : './'
@@ -183,13 +184,7 @@ async function readJSON(path, defaultValue) {
 }
 
 
-/**
- * Чтение файла в текстовом формате
- *
- * @param {string} path Путь до файла
- * @param {string} [defaultValue] Значение по умолчанию, если файл не найден
- * @returns {Promise<string>} Текст из файла
- */
+/** @type {import('@nodutilus/fs').ReadTextFunction} */
 async function readText(path, defaultValue) {
   const data = await readFile(path, 'utf8').catch(error => {
     if (error.code === 'ENOENT' && typeof defaultValue !== 'undefined') {
@@ -202,18 +197,7 @@ async function readText(path, defaultValue) {
 }
 
 
-/**
- * @typedef {WriteOptions} WriteJSONOptions Опции управления записью JSON файла
- * @property {number} [space=2] Количество пробелов для форматирования JSON или null
- */
-/**
- * Запись файла в формате JSON
- *
- * @param {string} path Путь до файла
- * @param {object} data JOSN объект
- * @param {WriteJSONOptions} [options] Опции управления записью JSON файла
- * @returns {Promise<void>}
- */
+/** @type {import('@nodutilus/fs').WriteJSONFunction} */
 async function writeJSON(path, data, { throwIfExists, space } = {}) {
   const jsonData = JSON.stringify(data, null, typeof space === 'undefined' ? 2 : space)
 
@@ -221,18 +205,7 @@ async function writeJSON(path, data, { throwIfExists, space } = {}) {
 }
 
 
-/**
- * @typedef WriteOptions Опции управления записью текстового файла
- * @property {boolean} [throwIfExists=false] Завершать запись файла ошибкой, если файл существует
- */
-/**
- * Запись файла в текстовом формате
- *
- * @param {string} path Путь до файла
- * @param {string} data Текст
- * @param {WriteOptions} [options] Опции управления записью текстового файла
- * @returns {Promise<void>}
- */
+/** @type {import('@nodutilus/fs').WriteTextFunction} */
 async function writeText(path, data, { throwIfExists } = {}) {
   const recursive = !throwIfExists
 

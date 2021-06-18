@@ -37,15 +37,20 @@ function walk(path, options = {}, walker) {
 
 /** @type {import('@nodutilus/fs').NormalizeSearchingRegExp} */
 function __normalizeSearchingRegExp(sRegExp) {
+  /** @type {import('@nodutilus/fs').InnerSearchingRegExp} */
+  let innerSRegExp
+
   if (sRegExp) {
     if (sRegExp instanceof Array) {
-      sRegExp = sRegExp.map(item => item instanceof RegExp ? item : new RegExp(item))
+      innerSRegExp = sRegExp.map(item => item instanceof RegExp ? item : new RegExp(item))
     } else if (!(sRegExp instanceof RegExp)) {
-      sRegExp = new RegExp(sRegExp)
+      innerSRegExp = new RegExp(sRegExp)
+    } else {
+      innerSRegExp = sRegExp
     }
-
-    return sRegExp
   }
+
+  return innerSRegExp
 }
 
 

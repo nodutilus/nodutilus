@@ -27,7 +27,8 @@ declare module '@nodutilus/fs' {
    * ['/home/.+\\d+.log$', String.raw`/home/.+\d+.log$`, /\/home\/.+\d+.log$/]
    */
   type SearchingRegExp = Array<RegExp | string> | RegExp | string
-
+  /** @see SearchingRegExp */
+  type InnerSearchingRegExp = Array<RegExp> | RegExp
 
   /** Базовые опции поиска в каталоге */
   interface SearchingOptions {
@@ -63,7 +64,7 @@ declare module '@nodutilus/fs' {
     (
       /** Исходное регулярное выражение или набор выражений */
       sRegExp: SearchingRegExp
-    ): SearchingRegExp
+    ): InnerSearchingRegExp
   }
 
   /**
@@ -73,7 +74,7 @@ declare module '@nodutilus/fs' {
   interface SearchPathByRegExp {
     (
       /** Регулярное выражение или набор выражений для сопоставления */
-      sRegExp: SearchingRegExp,
+      sRegExp: InnerSearchingRegExp,
       /** Путь до каталога или файла для проверки соответствия условиям отбора */
       path: string
     ): boolean

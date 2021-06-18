@@ -55,6 +55,8 @@ declare module '@nodutilus/fs' {
   }
 
   interface InnerWalkOptions extends WalkOptions {
+    include?: InnerSearchingRegExp
+    exclude?: InnerSearchingRegExp
     /** Префикс для унификации относительного пути (всегда начинается с ./) к файлу или каталогу */
     prefix: string
   }

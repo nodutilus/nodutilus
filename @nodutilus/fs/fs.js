@@ -11,11 +11,10 @@ const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
 /** @type {import('@nodutilus/fs').WalkFunctionCommon} */
 function walk(path, options = {}, walker) {
   const prefix = isAbsolute(path) ? '' : './'
-  let { include, exclude } = options
+  const include = __normalizeSearchingRegExp(options.include)
+  const exclude = __normalizeSearchingRegExp(options.exclude)
 
   walker = (typeof options === 'function' ? options : walker) || options.walker
-  include = __normalizeSearchingRegExp(include)
-  exclude = __normalizeSearchingRegExp(exclude)
 
   // win32 to posix (https://github.com/nodejs/node/issues/12298)
   path = path.replaceAll('\\', '/')

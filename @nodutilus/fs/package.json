@@ -1,6 +1,6 @@
 {
   "name": "@nodutilus/fs",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "repository": "github:nodutilus/nodutilus",
   "homepage": "https://nodutilus.github.io",
   "license": "Unlicense",
@@ -11,6 +11,7 @@
   "exports": {
     ".": "./fs.js"
   },
+  "types": "./fs.d.ts",
   "description": "Методы для работы с каталогами и файлами, которых нет в стандартной библиотеке fs",
   "keywords": [
     "fs",

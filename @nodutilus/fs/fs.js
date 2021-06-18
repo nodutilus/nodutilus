@@ -24,7 +24,7 @@ function walk(path, options = {}, walker) {
       const __walker = __walk(path, { prefix, include, exclude })
       let next = await __walker.next()
 
-      while (!next.done) {
+      while (!next.done && next.value) {
         next = await __walker.next(await walker(...next.value))
       }
     })()

@@ -82,7 +82,7 @@ declare module '@nodutilus/fs' {
     ): boolean
   }
 
-  type WalkGenerator = AsyncGenerator<[string, Dirent], [string, Dirent], boolean | void>
+  type WalkGenerator = AsyncGenerator<[string, Dirent], [string, Dirent] | void, boolean | void>
 
   interface WalkGeneratorFunction {
     (

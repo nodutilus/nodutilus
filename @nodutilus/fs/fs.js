@@ -6,10 +6,12 @@ import { promises as fsPromises, constants as fsConstants } from 'fs'
 const { dirname, join, relative } = posix
 const { COPYFILE_EXCL } = fsConstants
 const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
-
+/** @type {import('@nodutilus/fs').WalkFunction} */
+// @ts-ignore
+const walk = __walkCommon
 
 /** @type {import('@nodutilus/fs').WalkFunctionCommon} */
-function walk(path, options = {}, walker = undefined) {
+function __walkCommon(path, options = {}, walker = undefined) {
   const prefix = isAbsolute(path) ? '' : './'
   const include = __normalizeSearchingRegExp(options.include)
   const exclude = __normalizeSearchingRegExp(options.exclude)

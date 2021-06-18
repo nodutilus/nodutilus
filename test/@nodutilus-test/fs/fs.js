@@ -129,7 +129,7 @@ export default class FsTest extends Test {
       './test/example/fs/walk/p2/p2f1.txt'
     ]
 
-    await walk('test/example/fs/walk', async (path, dirent) => {
+    await walk('test/example/fs/walk', async path => {
       await new Promise(resolve => setTimeout(resolve, 1))
       files.push(path)
     })
@@ -384,8 +384,8 @@ export default class FsTest extends Test {
     const filesB = []
 
     await copy('test/example/fs/walk', 'test/example/fs/copy')
-    await walk('test/example/fs/walk', path => filesA.push(relative('test/example/fs/walk', path)))
-    await walk('test/example/fs/copy', path => filesB.push(relative('test/example/fs/copy', path)))
+    await walk('test/example/fs/walk', path => { filesA.push(relative('test/example/fs/walk', path)) })
+    await walk('test/example/fs/copy', path => { filesB.push(relative('test/example/fs/copy', path)) })
 
     assert.deepEqual(filesB, filesA)
   }
@@ -397,8 +397,8 @@ export default class FsTest extends Test {
 
     await copy('test/example/fs/walk', 'test/example/fs/copy')
     await copy('test/example/fs/walk', 'test/example/fs/copy')
-    await walk('test/example/fs/walk', path => filesA.push(relative('test/example/fs/walk', path)))
-    await walk('test/example/fs/copy', path => filesB.push(relative('test/example/fs/copy', path)))
+    await walk('test/example/fs/walk', path => { filesA.push(relative('test/example/fs/walk', path)) })
+    await walk('test/example/fs/copy', path => { filesB.push(relative('test/example/fs/copy', path)) })
 
     assert.deepEqual(filesB, filesA)
   }
@@ -434,7 +434,7 @@ export default class FsTest extends Test {
 
     await mkdir('test/example/fs/copy')
     await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt')
-    await walk('test/example/fs/copy', path => files.push(path))
+    await walk('test/example/fs/copy', path => { files.push(path) })
 
     assert.deepEqual(files, ['./test/example/fs/copy/f1.txt'])
   }
@@ -444,7 +444,7 @@ export default class FsTest extends Test {
     const files = []
 
     await copy('test/example/fs/walk/f1.txt', 'test/example/fs/copy/f1.txt')
-    await walk('test/example/fs/copy', path => files.push(path))
+    await walk('test/example/fs/copy', path => { files.push(path) })
 
     assert.deepEqual(files, ['./test/example/fs/copy/f1.txt'])
   }
@@ -480,7 +480,7 @@ export default class FsTest extends Test {
       include: '.txt',
       exclude: '/walk/(?!p1/)'
     })
-    await walk('test/example/fs/copy', path => files.push(path))
+    await walk('test/example/fs/copy', path => { files.push(path) })
     files.sort()
 
     assert.deepEqual(files, expected)
@@ -536,7 +536,7 @@ export default class FsTest extends Test {
       include: '.txt',
       exclude: '/remove/p1/'
     })
-    await walk('test/example/fs/remove', path => files1.push(path))
+    await walk('test/example/fs/remove', path => { files1.push(path) })
     files1.sort()
 
     assert.deepEqual(files1, expected1)
@@ -544,7 +544,7 @@ export default class FsTest extends Test {
     await remove('test/example/fs/remove', {
       include: '/remove/p1/'
     })
-    await walk('test/example/fs/remove', path => files2.push(path))
+    await walk('test/example/fs/remove', path => { files2.push(path) })
     files2.sort()
 
     assert.deepEqual(files2, expected2)
@@ -563,7 +563,7 @@ export default class FsTest extends Test {
     await remove('test/example/fs/remove', {
       include: '/remove/(?!p1/)'
     })
-    await walk('test/example/fs/remove', path => files.push(path))
+    await walk('test/example/fs/remove', path => { files.push(path) })
     files.sort()
 
     assert.deepEqual(files, expected)
@@ -585,7 +585,7 @@ export default class FsTest extends Test {
     await remove('test/example/fs/remove', {
       exclude: '/remove/p1/p1'
     })
-    await walk('test/example/fs/remove', path => files1.push(path))
+    await walk('test/example/fs/remove', path => { files1.push(path) })
     files1.sort()
 
     assert.deepEqual(files1, expected1)

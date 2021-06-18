@@ -9,7 +9,7 @@ const { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } = fsPromises
 
 
 /** @type {import('@nodutilus/fs').WalkFunctionCommon} */
-function walk(path, options = {}, walker) {
+function walk(path, options = {}, walker = undefined) {
   const prefix = isAbsolute(path) ? '' : './'
   const include = __normalizeSearchingRegExp(options.include)
   const exclude = __normalizeSearchingRegExp(options.exclude)
@@ -98,21 +98,7 @@ async function* __walk(path, options) {
 }
 
 
-/**
- * @typedef {SearchingOptions} CopyOptions Опции управления копированием файлов и каталогов
- * @property {boolean} [throwIfExists=false] Завершать копирование ошибкой если файл или каталог уже существует
- * @property {boolean} [removeNonExists=false] При копировании со слиянием каталогов
- *  удалять найденные в целевом каталоге, но несуществующие в источнике каталоги и файлы
- */
-/**
- * Копирует файл или каталог со всем содержимым.
- * По умолчанию осуществляет слияние каталогов и перезапись файлов (управляется флагами).
- *
- * @param {string} src Каталог или файл источник
- * @param {string} dest Целевой каталог или файл
- * @param {CopyOptions} [options] Опции управления копированием файлов и каталогов
- * @returns {Promise<void>}
- */
+/** @type {import('@nodutilus/fs').CopyFunction} */
 async function copy(src, dest, options = {}) {
   const { throwIfExists } = options
   const srcStat = await stat(src)
@@ -128,14 +114,7 @@ async function copy(src, dest, options = {}) {
 }
 
 
-/**
- * Вспомогательная функция для рекурсивного обхода дерева каталогов при копировании
- *
- * @param {string} src Каталог источник
- * @param {string} dest Целевой каталог
- * @param {CopyOptions} [options] Опции управления копированием файлов и каталогов
- * @returns {Promise<void>}
- */
+/** @type {import('@nodutilus/fs').RecursiveCopyFunction} */
 async function __copy(src, dest, options) {
   const { throwIfExists, removeNonExists, include, exclude } = options
   const mkdirOptions = { recursive: !throwIfExists }
@@ -159,7 +138,7 @@ async function __copy(src, dest, options) {
     const walker = walk(dest)
     let next = await walker.next()
 
-    while (!next.done) {
+    while (!next.done && next.value) {
       const [path, dirent] = next.value
 
       if (!existentPaths.includes(path)) {

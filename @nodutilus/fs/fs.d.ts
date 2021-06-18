@@ -53,6 +53,11 @@ declare module '@nodutilus/fs' {
     walker?: Walker
   }
 
+  interface InnerWalkOptions extends WalkOptions {
+    /** Префикс для унификации относительного пути (всегда начинается с ./) к файлу или каталогу */
+    prefix: string
+  }
+
   /** Нормализует регулярное выражение или набор выражений */
   interface NormalizeSearchingRegExp {
     (
@@ -81,7 +86,7 @@ declare module '@nodutilus/fs' {
       /** Текущий каталог для обхода */
       path: string,
       /** Внутренние опции для обхода дерева каталога */
-      options: WalkOptions
+      options: InnerWalkOptions
     ): WalkGenerator
   }
 

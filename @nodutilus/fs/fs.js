@@ -101,6 +101,11 @@ async function* __walk(path, options) {
 }
 
 
+/**
+ * Ждем когда метод cp для копирования выйдет из под experimental
+ * дока: @see https://nodejs.org/api/fs.html#fs_fspromises_cp_src_dest_options
+ * После проверить можно ли на него перейти
+ */
 /** @type {import('@nodutilus/fs').CopyFunction} */
 async function copy(src, dest, options = {}) {
   const { throwIfExists } = options
